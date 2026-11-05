@@ -20,3 +20,13 @@ export function readGreyImage(canvas, source, sourceWidth, sourceHeight, width) 
   }
   return { pixels, width, height }
 }
+
+/** Decodes a photo and returns it as a grey image `width` pixels wide. */
+export async function readPhotoGreyImage(blob, width) {
+  const bitmap = await createImageBitmap(blob)
+  try {
+    return readGreyImage(document.createElement('canvas'), bitmap, bitmap.width, bitmap.height, width)
+  } finally {
+    bitmap.close()
+  }
+}

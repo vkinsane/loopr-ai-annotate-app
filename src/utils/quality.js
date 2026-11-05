@@ -1,8 +1,13 @@
 const PIXELS_PER_MEGAPIXEL = 1_000_000
+const BYTES_PER_KB = 1024
+
+// Live frames and photos are measured at the same width, so one set of sharpness thresholds fits both.
+export const ANALYSIS_WIDTH = 320
 
 export const RESOLUTION_MP = { poorBelow: 2, goodFrom: 8 }
+export const FILE_SIZE_KB = { poorBelow: 150, goodFrom: 500 }
 
-// Brightness is mean luma (0–255); sharpness is Laplacian variance on a 160 px wide frame.
+// Brightness is mean luma (0–255); sharpness is Laplacian variance at ANALYSIS_WIDTH.
 // Both are uncalibrated starting values, to be replaced with values measured on real devices.
 export const BRIGHTNESS = { tooDark: 40, dim: 70, bright: 190, tooBright: 220 }
 
@@ -44,6 +49,12 @@ export function gradeResolution(width, height) {
   return mp < RESOLUTION_MP.goodFrom ? 'warn' : 'good'
 }
 
+export function gradeFileSize(bytes) {
+  const kb = bytes / BYTES_PER_KB
+  if (kb < FILE_SIZE_KB.poorBelow) return 'poor'
+  return kb < FILE_SIZE_KB.goodFrom ? 'warn' : 'good'
+}
+
 export function gradeBrightness(value) {
   if (value < BRIGHTNESS.tooDark || value > BRIGHTNESS.tooBright) return 'poor'
   if (value < BRIGHTNESS.dim || value > BRIGHTNESS.bright) return 'warn'
@@ -73,4 +84,48 @@ export function getCaptureHint(quality, torch) {
 
   if (gradeSharpness(quality.sharpness) !== 'good') return { text: 'Slightly blurry. Hold steady.', warn: true }
   return { text: DEFAULT_HINT, warn: false }
+}
+
+const ISSUES = {
+  resolution: { problem: 'low resolution', advice: 'move closer to the door' },
+  fileSize: { problem: 'low on detail', advice: 'check the camera resolution' },
+  dark: { problem: 'too dark', advice: 'turn on the torch or add light over the belt' },
+  bright: { problem: 'too bright', advice: 'reduce glare or turn off the torch' },
+  blurry: { problem: 'blurry', advice: 'hold the phone steady' },
+}
+
+function joinAdvice(issues, ending) {
+  const text = issues.map((issue) => issue.advice).join(', ')
+  return `${text[0].toUpperCase()}${text.slice(1)}, ${ending}`
+}
+
+/**
+ * Takes { width, height, bytes, brightness, sharpness }.
+ * Returns { grades: { resolution, fileSize, brightness, sharpness }, summary: { grade, title, advice } }.
+ */
+export function gradePhoto({ width, height, bytes, brightness, sharpness }) {
+  const grades = {
+    resolution: gradeResolution(width, height),
+    fileSize: gradeFileSize(bytes),
+    brightness: gradeBrightness(brightness),
+    sharpness: gradeSharpness(sharpness),
+  }
+  const issues = [
+    { grade: grades.resolution, ...ISSUES.resolution },
+    { grade: grades.fileSize, ...ISSUES.fileSize },
+    { grade: grades.brightness, ...(brightness < BRIGHTNESS.dim ? ISSUES.dark : ISSUES.bright) },
+    { grade: grades.sharpness, ...ISSUES.blurry },
+  ].filter((issue) => issue.grade !== 'good')
+
+  const poor = issues.filter((issue) => issue.grade === 'poor')
+  if (poor.length > 0) {
+    const problems = poor.map((issue) => issue.problem)
+    const list = problems.length > 1 ? `${problems.slice(0, -1).join(', ')} and ${problems.at(-1)}` : problems[0]
+    return { grades, summary: { grade: 'poor', title: `Photo is ${list}`, advice: joinAdvice(poor, 'then retake.') } }
+  }
+  if (issues.length > 0) {
+    const title = issues.length === 1 ? 'Usable, with one warning' : `Usable, with ${issues.length} warnings`
+    return { grades, summary: { grade: 'warn', title, advice: joinAdvice(issues, 'then retake for best results.') } }
+  }
+  return { grades, summary: { grade: 'good', title: 'Photo looks good', advice: 'Ready to mark defects.' } }
 }

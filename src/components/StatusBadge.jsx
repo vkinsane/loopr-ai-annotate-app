@@ -1,19 +1,14 @@
 import { Box } from '@mui/material'
-import { VISUALLY_HIDDEN } from '../theme.js'
+import { styles } from './StatusBadge.styles.js'
 
-const SYMBOLS = {
-  good: { symbol: '✓', color: 'success.light' },
-  warn: { symbol: '!', color: 'warning.light' },
-  poor: { symbol: '✕', color: 'error.light' },
-}
+const SYMBOLS = { good: '✓', warn: '!', poor: '✕' }
 
-export default function StatusBadge({ grade, label }) {
-  const { symbol, color } = SYMBOLS[grade]
-
+/** Plain: coloured text, label hidden on phones. Pill: tinted background, label always shown. */
+export default function StatusBadge({ grade, label, pill = false }) {
   return (
-    <Box component="span" sx={{ color, fontWeight: 600 }}>
-      <span aria-hidden>{symbol}</span>
-      <Box component="span" sx={(theme) => ({ [theme.breakpoints.down('sm')]: VISUALLY_HIDDEN })}>
+    <Box component="span" sx={pill ? styles.pill(grade) : styles.badge(grade)}>
+      <span aria-hidden>{SYMBOLS[grade]}</span>
+      <Box component="span" sx={pill ? undefined : styles.label}>
         {' '}
         {label}
       </Box>

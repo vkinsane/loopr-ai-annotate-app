@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Box, Button } from '@mui/material'
 import CaptureScreen from './screens/CaptureScreen.jsx'
+import PreviewScreen from './screens/PreviewScreen.jsx'
 
 function App() {
   const [photo, setPhoto] = useState(null)
@@ -11,19 +11,7 @@ function App() {
   }, [photo])
 
   if (!photo) return <CaptureScreen onCapture={setPhoto} />
-
-  // Temporary until PreviewScreen is built: shows the photo so capture can be checked end to end.
-  return (
-    <Box sx={{ p: 2, display: 'grid', gap: 2, justifyItems: 'center' }}>
-      <img src={photo.url} alt="Captured photo" style={{ maxWidth: '100%', maxHeight: '80dvh' }} />
-      <span>
-        {photo.width} × {photo.height} · {(photo.blob.size / 1024).toFixed(0)} KB · {photo.method}
-      </span>
-      <Button variant="contained" onClick={() => setPhoto(null)}>
-        Retake
-      </Button>
-    </Box>
-  )
+  return <PreviewScreen photo={photo} onRetake={() => setPhoto(null)} />
 }
 
 export default App

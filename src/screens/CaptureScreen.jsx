@@ -6,10 +6,9 @@ import { useCamera, useLiveQuality, useTorch } from '../hooks'
 import { cameraTheme } from '../theme.js'
 import { getCaptureHint } from '../utils'
 import CameraErrorScreen from './CameraErrorScreen.jsx'
+import { styles } from './CaptureScreen.styles.js'
 
-const LANDSCAPE = '@media (orientation: landscape)'
 const DEFAULT_ASPECT_RATIO = 4 / 3
-const GUIDE = { size: 32, inset: 24, line: '3px solid' }
 const CORNERS = [['top', 'left'], ['top', 'right'], ['bottom', 'left'], ['bottom', 'right']]
 
 export default function CaptureScreen({ onCapture }) {
@@ -46,175 +45,56 @@ export default function CaptureScreen({ onCapture }) {
 
   return (
     <ThemeProvider theme={cameraTheme}>
-      <Box
-        component="main"
-        sx={{
-          height: '100dvh',
-          display: 'flex',
-          flexDirection: 'column',
-          bgcolor: 'background.default',
-          color: 'text.primary',
-          overflow: 'hidden',
-          [LANDSCAPE]: { flexDirection: 'row' },
-        }}
-      >
-        <Box sx={{ flex: 1, minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+      <Box component="main" sx={styles.root}>
+        <Box sx={styles.main}>
           <LiveQualityChips
             resolution={state.status === 'live' ? { width: state.width, height: state.height } : null}
             quality={quality}
           />
-
-          {/* Size container: the frame is the largest box with the camera's aspect ratio, so what you see is what gets captured. */}
-          <Box
-            sx={{ flex: 1, minHeight: 0, mx: 2, containerType: 'size', display: 'grid', placeItems: 'center' }}
-          >
-            <Box
-              sx={{
-                position: 'relative',
-                aspectRatio: String(aspectRatio),
-                width: `min(100cqw, 100cqh * ${aspectRatio})`,
-                borderRadius: '16px',
-                overflow: 'hidden',
-                bgcolor: 'background.paper',
-              }}
-            >
+          <Box sx={styles.viewport}>
+            <Box sx={styles.frame(aspectRatio)}>
               {/* playsInline and muted are required for inline autoplay on iOS Safari. */}
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                aria-label="Live camera view"
-                style={{ display: 'block', width: '100%', height: '100%' }}
-              />
-              <FrameGuides />
+              <video ref={videoRef} autoPlay playsInline muted aria-label="Live camera view" style={styles.video} />
+              {CORNERS.map(([vertical, horizontal]) => (
+                <Box key={`${vertical}-${horizontal}`} aria-hidden sx={styles.guide(vertical, horizontal)} />
+              ))}
             </Box>
           </Box>
         </Box>
 
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: '1fr auto 1fr',
-            gridTemplateAreas: '"hint hint hint" ". shutter torch"',
-            alignItems: 'center',
-            justifyItems: 'center',
-            gap: 2.5,
-            px: 2,
-            pt: 2.5,
-            pb: 4.5,
-            [LANDSCAPE]: {
-              width: 140,
-              gridTemplateColumns: 'auto',
-              gridTemplateAreas: '"torch" "shutter" "hint"',
-              alignContent: 'center',
-              p: 2,
-            },
-          }}
-        >
-          <Typography
-            sx={{
-              gridArea: 'hint',
-              fontSize: 14,
-              textAlign: 'center',
-              color: hint.warn ? 'warning.light' : 'text.secondary',
-            }}
+        <Box sx={styles.controls}>
+          <Typography sx={styles.hint(hint.warn)}>{hint.text}</Typography>
+          <ButtonBase
+            aria-label="Take photo"
+            disabled={state.status !== 'live' || capturing}
+            onClick={handleCapture}
+            sx={styles.shutter}
           >
-            {hint.text}
-          </Typography>
-          <ShutterButton disabled={state.status !== 'live' || capturing} onClick={handleCapture} />
+            <Box sx={styles.shutterFill} />
+          </ButtonBase>
           {torch.supported && (
             <IconButton
               aria-label="Torch"
               aria-pressed={torch.on}
               disabled={torch.pending || capturing}
               onClick={torch.toggle}
-              sx={{
-                gridArea: 'torch',
-                width: 52,
-                height: 52,
-                color: torch.on ? 'background.default' : 'text.primary',
-                bgcolor: torch.on ? 'common.white' : 'action.selected',
-                '&:hover': { bgcolor: torch.on ? 'grey.300' : 'action.focus' },
-              }}
+              sx={styles.torch(torch.on)}
             >
               {torch.on ? <FlashlightOn /> : <FlashlightOff />}
             </IconButton>
           )}
         </Box>
 
-        {state.status === 'starting' && <StartingOverlay />}
+        {state.status === 'starting' && (
+          <Box role="status" sx={styles.overlay}>
+            <CircularProgress color="inherit" size={56} />
+            <Typography component="h1" sx={styles.title}>Starting camera…</Typography>
+            <Typography sx={styles.overlayText}>
+              Allow camera access when your browser asks. Photos stay on this device.
+            </Typography>
+          </Box>
+        )}
       </Box>
     </ThemeProvider>
-  )
-}
-
-function FrameGuides() {
-  return CORNERS.map(([vertical, horizontal]) => (
-    <Box
-      key={`${vertical}-${horizontal}`}
-      aria-hidden
-      sx={{
-        position: 'absolute',
-        [vertical]: GUIDE.inset,
-        [horizontal]: GUIDE.inset,
-        width: GUIDE.size,
-        height: GUIDE.size,
-        [`border-${vertical}`]: GUIDE.line,
-        [`border-${horizontal}`]: GUIDE.line,
-        [`border-${vertical}-${horizontal}-radius`]: 6,
-        color: 'common.white',
-      }}
-    />
-  ))
-}
-
-function ShutterButton({ disabled, onClick }) {
-  return (
-    <ButtonBase
-      aria-label="Take photo"
-      disabled={disabled}
-      onClick={onClick}
-      sx={{
-        gridArea: 'shutter',
-        width: 76,
-        height: 76,
-        p: 0.5,
-        borderRadius: '50%',
-        border: 4,
-        borderColor: 'common.white',
-        '&.Mui-disabled': { opacity: 0.4 },
-      }}
-    >
-      <Box sx={{ width: '100%', height: '100%', borderRadius: '50%', bgcolor: 'common.white' }} />
-    </ButtonBase>
-  )
-}
-
-function StartingOverlay() {
-  return (
-    <Box
-      role="status"
-      sx={{
-        position: 'fixed',
-        inset: 0,
-        bgcolor: 'background.default',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 2.5,
-        p: 4,
-        textAlign: 'center',
-      }}
-    >
-      <CircularProgress color="inherit" size={56} />
-      <Typography component="h1" sx={{ fontSize: 22, fontWeight: 600 }}>
-        Starting camera…
-      </Typography>
-      <Typography sx={{ color: 'text.secondary', maxWidth: 280 }}>
-        Allow camera access when your browser asks. Photos stay on this device.
-      </Typography>
-    </Box>
   )
 }

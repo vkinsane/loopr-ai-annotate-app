@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
-import { laplacianVariance, meanBrightness, readGreyImage } from '../utils'
+import { ANALYSIS_WIDTH, laplacianVariance, meanBrightness, readGreyImage } from '../utils'
 
 const SAMPLE_INTERVAL_MS = 250
-const SAMPLE_WIDTH = 160
 
 /** Returns { brightness, sharpness } while `active`, otherwise null. */
 export function useLiveQuality(videoRef, active) {
@@ -15,7 +14,7 @@ export function useLiveQuality(videoRef, active) {
     const canvas = document.createElement('canvas')
     const timer = window.setInterval(() => {
       if (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) return
-      const image = readGreyImage(canvas, video, video.videoWidth, video.videoHeight, SAMPLE_WIDTH)
+      const image = readGreyImage(canvas, video, video.videoWidth, video.videoHeight, ANALYSIS_WIDTH)
       setQuality({
         brightness: Math.round(meanBrightness(image.pixels)),
         sharpness: Math.round(laplacianVariance(image)),

@@ -25,11 +25,12 @@ src/
 │  ├─ useCamera.js             # stream + capturePhoto
 │  ├─ useTorch.js
 │  ├─ useLiveQuality.js
+│  ├─ usePhotoQuality.js       # brightness + sharpness of the captured photo
 │  ├─ index.js                # re-exports, for one-line imports
 │  └─ __tests__/
 └─ utils/
    ├─ cameraErrors.js          # pure
-   ├─ quality.js               # pure: thresholds, brightness, sharpness, grade
+   ├─ quality.js               # pure: thresholds, measures, grades, banner text
    ├─ image.js                 # canvas: blob/video → small grey pixel array
    ├─ geometry.js              # pure
    ├─ annotations.js           # pure reducer
@@ -56,6 +57,7 @@ e2e/flow.spec.js               # one Playwright test, fake camera
 - A private helper used in only one place is inlined. Exported `utils/` functions stay separate (pure, testable).
 - One import line per module or folder: `import { useCamera, useTorch } from '../hooks'`.
 - Comments only where the code can't say it: browser quirks, uncalibrated values, data shapes.
+- Styles live in a `*.styles.js` file next to their component (`export const styles = { … }`); JSX uses `sx={styles.root}`. State-dependent styles are functions: `sx={styles.torch(on)}`.
 
 ## Language
 - **JavaScript (JSX), no TypeScript:** chosen to cut type noise. Trade-off: no compile-time checks, so data shapes are described in short doc comments and oxlint catches common mistakes.

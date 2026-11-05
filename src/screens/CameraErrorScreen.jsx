@@ -1,5 +1,6 @@
 import { LockOutlined, NoPhotographyOutlined, PhotoCameraOutlined, ReportProblemOutlined, VideocamOff } from '@mui/icons-material'
 import { Box, Button, Typography } from '@mui/material'
+import { styles } from './CameraErrorScreen.styles.js'
 
 const ICONS = {
   unsupported: { Icon: LockOutlined, color: 'error.light' },
@@ -13,56 +14,17 @@ export default function CameraErrorScreen({ error, onRetry }) {
   const { Icon, color } = ICONS[error.kind]
 
   return (
-    <Box sx={{ height: '100dvh', display: 'flex', flexDirection: 'column', p: 3 }}>
-      <Box
-        role="alert"
-        sx={{
-          flexGrow: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 2,
-          textAlign: 'center',
-          maxWidth: 420,
-          mx: 'auto',
-        }}
-      >
-        <Box
-          sx={{
-            width: 72,
-            height: 72,
-            borderRadius: '50%',
-            bgcolor: 'background.paper',
-            display: 'grid',
-            placeItems: 'center',
-          }}
-        >
-          <Icon sx={{ fontSize: 32, color }} />
+    <Box sx={styles.root}>
+      <Box role="alert" sx={styles.content}>
+        <Box sx={styles.iconCircle}>
+          <Icon sx={styles.icon(color)} />
         </Box>
-        <Typography component="h1" sx={{ fontSize: 22, fontWeight: 600 }}>
+        <Typography component="h1" sx={styles.title}>
           {error.title}
         </Typography>
-        <Typography sx={{ color: 'text.secondary', maxWidth: 300 }}>{error.message}</Typography>
+        <Typography sx={styles.message}>{error.message}</Typography>
         {error.steps && (
-          <Box
-            component="ol"
-            sx={{
-              m: 0,
-              mt: 1,
-              py: 2,
-              pr: 2,
-              pl: 4.5,
-              width: '100%',
-              textAlign: 'left',
-              fontSize: 14,
-              lineHeight: '22px',
-              bgcolor: 'background.paper',
-              border: 1,
-              borderColor: 'divider',
-              borderRadius: 1,
-            }}
-          >
+          <Box component="ol" sx={styles.steps}>
             {error.steps.map((step) => (
               <li key={step}>{step}</li>
             ))}
@@ -70,13 +32,7 @@ export default function CameraErrorScreen({ error, onRetry }) {
         )}
       </Box>
       {error.canRetry && (
-        <Button
-          variant="contained"
-          size="large"
-          fullWidth
-          onClick={onRetry}
-          sx={{ height: 52, maxWidth: 420, mx: 'auto', mb: 1 }}
-        >
+        <Button variant="contained" size="large" fullWidth onClick={onRetry} sx={styles.retry}>
           Try again
         </Button>
       )}
