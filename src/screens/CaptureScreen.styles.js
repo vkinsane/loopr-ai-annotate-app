@@ -20,6 +20,10 @@ export const styles = {
     [`border-${vertical}`]: GUIDE.line, [`border-${horizontal}`]: GUIDE.line,
     [`border-${vertical}-${horizontal}-radius`]: 6, color: 'common.white',
   }),
+  saving: {
+    position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+    gap: 1.5, bgcolor: 'rgba(0, 0, 0, 0.35)', color: 'common.white', fontWeight: 600,
+  },
   controls: {
     display: 'grid', gridTemplateColumns: '1fr auto 1fr', gridTemplateAreas: '"hint hint hint" ". shutter torch"',
     alignItems: 'center', justifyItems: 'center', gap: 2.5, px: 2, pt: 2.5, pb: 4.5,

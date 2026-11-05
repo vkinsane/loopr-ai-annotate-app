@@ -90,44 +90,47 @@ export function useCamera(videoRef) {
     setAttempt((count) => count + 1)
   }
 
-  /** Resolves with { blob, url, width, height, method }. */
+  /** Resolves with { blob, url, method }. The frame freezes while saving and resumes if capture fails. */
   async function capture() {
     const video = videoRef.current
     if (!video || state.status !== 'live') throw new Error('Camera is not ready')
+    video.pause()
 
-    // ImageCapture can use the full sensor (Chromium, Android). Elsewhere, including iPhone,
-    // a full-size video frame is the best available.
-    if ('ImageCapture' in window) {
-      try {
-        return await toPhoto(await new ImageCapture(state.track).takePhoto(), 'image-capture')
-      } catch (error) {
-        console.warn('ImageCapture failed, using the video frame instead', error)
+    try {
+      // ImageCapture can use the full sensor (Chromium, Android). Elsewhere, including iPhone,
+      // a full-size video frame is the best available.
+      if ('ImageCapture' in window) {
+        try {
+          return toPhoto(await new ImageCapture(state.track).takePhoto(), 'image-capture')
+        } catch (error) {
+          console.warn('ImageCapture failed, using the video frame instead', error)
+        }
       }
-    }
 
-    const canvas = document.createElement('canvas')
-    canvas.width = video.videoWidth
-    canvas.height = video.videoHeight
-    const context = canvas.getContext('2d')
-    if (!context) throw new Error('Canvas 2D context is not available')
-    context.drawImage(video, 0, 0)
-    const blob = await new Promise((resolve, reject) => {
-      canvas.toBlob(
-        (result) => (result ? resolve(result) : reject(new Error('Could not encode the photo'))),
-        'image/jpeg',
-        JPEG_QUALITY,
-      )
-    })
-    return toPhoto(blob, 'canvas')
+      const canvas = document.createElement('canvas')
+      canvas.width = video.videoWidth
+      canvas.height = video.videoHeight
+      const context = canvas.getContext('2d')
+      if (!context) throw new Error('Canvas 2D context is not available')
+      context.drawImage(video, 0, 0)
+      const blob = await new Promise((resolve, reject) => {
+        canvas.toBlob(
+          (result) => (result ? resolve(result) : reject(new Error('Could not encode the photo'))),
+          'image/jpeg',
+          JPEG_QUALITY,
+        )
+      })
+      return toPhoto(blob, 'canvas')
+    } catch (error) {
+      video.play().catch((playError) => console.warn('Could not resume the preview', playError))
+      throw error
+    }
   }
 
   return { state, retry, capture }
 }
 
-async function toPhoto(blob, method) {
-  // Decoding gives the displayed size after EXIF rotation, which takePhoto() JPEGs can carry.
-  const bitmap = await createImageBitmap(blob)
-  const photo = { blob, url: URL.createObjectURL(blob), width: bitmap.width, height: bitmap.height, method }
-  bitmap.close()
-  return photo
+// Width and height come later from the quality check, which decodes the photo anyway.
+function toPhoto(blob, method) {
+  return { blob, url: URL.createObjectURL(blob), method }
 }

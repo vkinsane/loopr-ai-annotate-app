@@ -1,16 +1,21 @@
 import { useEffect, useState } from 'react'
 import { ANALYSIS_WIDTH, laplacianVariance, meanBrightness, readPhotoGreyImage } from '../utils'
 
-/** Returns { brightness, sharpness }, { failed: true }, or null while measuring. */
+/** Returns { width, height, brightness, sharpness }, { failed: true }, or null while measuring. */
 export function usePhotoQuality(photo) {
   const [result, setResult] = useState(null)
 
   useEffect(() => {
     const request = new AbortController()
     readPhotoGreyImage(photo.blob, ANALYSIS_WIDTH).then(
-      (image) => {
+      ({ photoWidth, photoHeight, image }) => {
         if (request.signal.aborted) return
-        const quality = { brightness: Math.round(meanBrightness(image.pixels)), sharpness: Math.round(laplacianVariance(image)) }
+        const quality = {
+          width: photoWidth,
+          height: photoHeight,
+          brightness: Math.round(meanBrightness(image.pixels)),
+          sharpness: Math.round(laplacianVariance(image)),
+        }
         setResult({ photo, quality })
       },
       (error) => {

@@ -58,6 +58,12 @@ export default function CaptureScreen({ onCapture }) {
               {CORNERS.map(([vertical, horizontal]) => (
                 <Box key={`${vertical}-${horizontal}`} aria-hidden sx={styles.guide(vertical, horizontal)} />
               ))}
+              {capturing && (
+                <Box role="status" sx={styles.saving}>
+                  <CircularProgress color="inherit" size={32} />
+                  Saving photo…
+                </Box>
+              )}
             </Box>
           </Box>
         </Box>

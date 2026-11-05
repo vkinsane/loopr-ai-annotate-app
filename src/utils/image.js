@@ -21,11 +21,15 @@ export function readGreyImage(canvas, source, sourceWidth, sourceHeight, width) 
   return { pixels, width, height }
 }
 
-/** Decodes a photo and returns it as a grey image `width` pixels wide. */
+/**
+ * Decodes a photo once. Returns { photoWidth, photoHeight, image }: the size after EXIF rotation,
+ * and a grey image `width` pixels wide.
+ */
 export async function readPhotoGreyImage(blob, width) {
   const bitmap = await createImageBitmap(blob)
   try {
-    return readGreyImage(document.createElement('canvas'), bitmap, bitmap.width, bitmap.height, width)
+    const image = readGreyImage(document.createElement('canvas'), bitmap, bitmap.width, bitmap.height, width)
+    return { photoWidth: bitmap.width, photoHeight: bitmap.height, image }
   } finally {
     bitmap.close()
   }
