@@ -7,13 +7,9 @@ import { styles } from './PreviewScreen.styles.js'
 const BYTES_PER_KB = 1024
 const SEVERITY = { good: 'success', warn: 'warning', poor: 'error' }
 const GRADE_LABELS = { good: 'Good', warn: 'Warning', poor: 'Poor' }
-const MEASURE_FAILED = {
-  grade: 'warn',
-  title: "Couldn't check photo quality",
-  advice: 'Check the photo yourself before marking defects.',
-}
+const MEASURE_FAILED = { grade: 'poor', title: "Couldn't read this photo", advice: 'Retake to continue.' }
 
-/** `photo` is { blob, url, method }. Annotate is disabled until `onAnnotate` is provided. */
+/** `photo` is { blob, url, method }. `onAnnotate` receives the photo's { width, height } once measured. */
 export default function PreviewScreen({ photo, onRetake, onAnnotate }) {
   const quality = usePhotoQuality(photo)
   const { blob } = photo
@@ -40,7 +36,12 @@ export default function PreviewScreen({ photo, onRetake, onAnnotate }) {
     </Button>
   )
   const annotate = (
-    <Button variant={poor ? 'outlined' : 'contained'} onClick={onAnnotate} disabled={!onAnnotate} sx={styles.action}>
+    <Button
+      variant={poor ? 'outlined' : 'contained'}
+      onClick={() => onAnnotate({ width: quality.width, height: quality.height })}
+      disabled={!measured}
+      sx={styles.action}
+    >
       {poor ? 'Annotate anyway' : 'Annotate'}
     </Button>
   )

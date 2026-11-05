@@ -18,7 +18,7 @@ src/
 ├─ components/
 │  ├─ StatusBadge.jsx          # ✓ / ! / ✕ — used on 3 screens
 │  ├─ LiveQualityChips.jsx     # resolution, brightness, sharpness chips
-│  ├─ AnnotationCanvas.jsx     # photo + SVG boxes + gestures
+│  ├─ AnnotationCanvas.jsx     # photo + boxes + pointer gestures
 │  ├─ DefectList.jsx
 │  └─ __tests__/
 ├─ hooks/
@@ -44,7 +44,9 @@ e2e/flow.spec.js               # one Playwright test, fake camera
 - **Imports:** one line per package (`import { Box, Chip } from '@mui/material'`). The production build tree-shakes unused components and icons; bundle size was unchanged when we switched.
 - **Themes** in `theme.js`: light app theme plus a dark camera theme; `CssBaseline` provides the reset.
 - **Inter** loaded from Google Fonts in `index.html` (no npm package). Falls back to `system-ui` if the network blocks it.
-- **AnnotationCanvas stays custom SVG**: MUI has no drawing tools, and this logic is a core evaluation point.
+- **AnnotationCanvas is custom**: MUI has no drawing tools, and this logic is a core evaluation point.
+  - Boxes are stored in photo pixels and drawn as % of the frame, so they stay aligned at any size.
+  - Boxes are HTML elements, not SVG: real text labels, fixed 44 px corner touch targets, free hit-testing.
 
 ## Rules
 - `utils/` has no React. Everything except `image.js` is pure.
