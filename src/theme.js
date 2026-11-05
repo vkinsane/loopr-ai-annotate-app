@@ -27,10 +27,11 @@ export const cameraTheme = createTheme({
   },
 })
 
+// Strings, not numbers: in MUI's sx, width/height values from 0 to 1 mean a percentage (1 = 100%).
 export const VISUALLY_HIDDEN = {
   position: 'absolute',
-  width: 1,
-  height: 1,
+  width: '1px',
+  height: '1px',
   overflow: 'hidden',
   clip: 'rect(0 0 0 0)',
   whiteSpace: 'nowrap',

@@ -1,5 +1,5 @@
 export const styles = {
-  root: { height: '100dvh', display: 'flex', flexDirection: 'column', p: 3 },
+  root: { height: '100dvh', display: 'flex', flexDirection: 'column', p: 3, bgcolor: 'background.default', color: 'text.primary' },
   content: {
     flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
     gap: 2, maxWidth: 420, mx: 'auto', textAlign: 'center',
@@ -13,5 +13,5 @@ export const styles = {
     textAlign: 'left', fontSize: 14, lineHeight: '22px',
     bgcolor: 'background.paper', border: 1, borderColor: 'divider', borderRadius: 1,
   },
-  retry: { height: 52, maxWidth: 420, mx: 'auto', mb: 1 },
+  retry: { height: 52, maxWidth: 420, mx: 'auto', mb: 1, fontSize: 16, fontWeight: 600, textTransform: 'none' },
 }
