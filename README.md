@@ -13,6 +13,8 @@ npm run lint
 
 Camera access needs HTTPS or `localhost`.
 
+Built with React + JavaScript (no TypeScript): see the Language note in ARCHITECTURE.md.
+
 ## Docs
 
 - [ARCHITECTURE.md](ARCHITECTURE.md): folder structure and rules

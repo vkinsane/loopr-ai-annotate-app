@@ -1,6 +1,6 @@
-import { createTheme, type ThemeOptions } from '@mui/material/styles'
+import { createTheme } from '@mui/material/styles'
 
-const shared: ThemeOptions = {
+const shared = {
   typography: {
     fontFamily: "'Inter', system-ui, sans-serif",
   },
@@ -27,3 +27,13 @@ export const cameraTheme = createTheme({
     divider: '#263040',
   },
 })
+
+// Hidden on screen but still read by screen readers.
+export const VISUALLY_HIDDEN = {
+  position: 'absolute',
+  width: 1,
+  height: 1,
+  overflow: 'hidden',
+  clip: 'rect(0 0 0 0)',
+  whiteSpace: 'nowrap',
+}

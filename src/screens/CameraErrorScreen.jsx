@@ -1,4 +1,3 @@
-import type { SvgIconComponent } from '@mui/icons-material'
 import LockOutlined from '@mui/icons-material/LockOutlined'
 import NoPhotographyOutlined from '@mui/icons-material/NoPhotographyOutlined'
 import PhotoCameraOutlined from '@mui/icons-material/PhotoCameraOutlined'
@@ -7,10 +6,9 @@ import VideocamOff from '@mui/icons-material/VideocamOff'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
-import type { CameraError, CameraErrorKind } from '../types.ts'
 
 // Red when only the user or IT can fix it, amber when trying again may help.
-const ICONS: Record<CameraErrorKind, { Icon: SvgIconComponent; color: string }> = {
+const ICONS = {
   unsupported: { Icon: LockOutlined, color: 'error.light' },
   denied: { Icon: NoPhotographyOutlined, color: 'error.light' },
   'not-found': { Icon: VideocamOff, color: 'warning.light' },
@@ -18,12 +16,7 @@ const ICONS: Record<CameraErrorKind, { Icon: SvgIconComponent; color: string }> 
   unknown: { Icon: ReportProblemOutlined, color: 'warning.light' },
 }
 
-interface Props {
-  error: CameraError
-  onRetry: () => void
-}
-
-export default function CameraErrorScreen({ error, onRetry }: Props) {
+export default function CameraErrorScreen({ error, onRetry }) {
   const { Icon, color } = ICONS[error.kind]
 
   return (

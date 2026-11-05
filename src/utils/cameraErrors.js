@@ -1,6 +1,4 @@
-import type { CameraError } from '../types.ts'
-
-export const UNSUPPORTED_ERROR: CameraError = {
+export const UNSUPPORTED_ERROR = {
   kind: 'unsupported',
   title: "Camera isn't available here",
   message:
@@ -8,7 +6,7 @@ export const UNSUPPORTED_ERROR: CameraError = {
   canRetry: false,
 }
 
-const DENIED_ERROR: CameraError = {
+const DENIED_ERROR = {
   kind: 'denied',
   title: 'Camera access is blocked',
   message: 'This app needs the camera to take inspection photos. Photos stay on this device.',
@@ -20,7 +18,7 @@ const DENIED_ERROR: CameraError = {
   canRetry: true,
 }
 
-const NOT_FOUND_ERROR: CameraError = {
+const NOT_FOUND_ERROR = {
   kind: 'not-found',
   title: 'No camera found',
   message:
@@ -28,7 +26,7 @@ const NOT_FOUND_ERROR: CameraError = {
   canRetry: true,
 }
 
-export const IN_USE_ERROR: CameraError = {
+export const IN_USE_ERROR = {
   kind: 'in-use',
   title: 'Camera is busy',
   message:
@@ -36,7 +34,7 @@ export const IN_USE_ERROR: CameraError = {
   canRetry: true,
 }
 
-const UNKNOWN_ERROR: CameraError = {
+const UNKNOWN_ERROR = {
   kind: 'unknown',
   title: "Camera couldn't start",
   message: 'Something went wrong while starting the camera. Try again.',
@@ -44,7 +42,7 @@ const UNKNOWN_ERROR: CameraError = {
 }
 
 // Keyed by DOMException name: browser messages differ per vendor and aren't written for operators.
-const ERRORS_BY_NAME: Readonly<Record<string, CameraError>> = {
+const ERRORS_BY_NAME = {
   NotAllowedError: DENIED_ERROR,
   SecurityError: DENIED_ERROR, // blocked by a permissions policy, e.g. inside an iframe
   NotFoundError: NOT_FOUND_ERROR,
@@ -52,7 +50,8 @@ const ERRORS_BY_NAME: Readonly<Record<string, CameraError>> = {
   AbortError: IN_USE_ERROR, // Firefox reports a busy camera this way
 }
 
-export function toCameraError(error: unknown): CameraError {
+/** Turns a getUserMedia rejection into { kind, title, message, steps?, canRetry }. */
+export function toCameraError(error) {
   const name = error instanceof Error ? error.name : ''
   return ERRORS_BY_NAME[name] ?? UNKNOWN_ERROR
 }
