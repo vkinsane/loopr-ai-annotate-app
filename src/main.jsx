@@ -1,7 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import CssBaseline from '@mui/material/CssBaseline'
-import { ThemeProvider } from '@mui/material/styles'
+import { CssBaseline, ThemeProvider } from '@mui/material'
 import { theme } from './theme.js'
 import App from './App.jsx'
 

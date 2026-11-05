@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react'
-import { readGreyImage } from '../utils/image.js'
-import { laplacianVariance, meanBrightness } from '../utils/quality.js'
+import { laplacianVariance, meanBrightness, readGreyImage } from '../utils'
 
-// 4 samples a second on a 160 px frame: responsive enough to guide the operator, about 20k pixels per sample.
 const SAMPLE_INTERVAL_MS = 250
 const SAMPLE_WIDTH = 160
 
-/** Returns { brightness, sharpness } of the live video while `active`, otherwise null. */
+/** Returns { brightness, sharpness } while `active`, otherwise null. */
 export function useLiveQuality(videoRef, active) {
   const [quality, setQuality] = useState(null)
 

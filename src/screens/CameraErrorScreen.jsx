@@ -1,13 +1,6 @@
-import LockOutlined from '@mui/icons-material/LockOutlined'
-import NoPhotographyOutlined from '@mui/icons-material/NoPhotographyOutlined'
-import PhotoCameraOutlined from '@mui/icons-material/PhotoCameraOutlined'
-import ReportProblemOutlined from '@mui/icons-material/ReportProblemOutlined'
-import VideocamOff from '@mui/icons-material/VideocamOff'
-import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
-import Typography from '@mui/material/Typography'
+import { LockOutlined, NoPhotographyOutlined, PhotoCameraOutlined, ReportProblemOutlined, VideocamOff } from '@mui/icons-material'
+import { Box, Button, Typography } from '@mui/material'
 
-// Red when only the user or IT can fix it, amber when trying again may help.
 const ICONS = {
   unsupported: { Icon: LockOutlined, color: 'error.light' },
   denied: { Icon: NoPhotographyOutlined, color: 'error.light' },

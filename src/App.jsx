@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react'
-import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
+import { Box, Button } from '@mui/material'
 import CaptureScreen from './screens/CaptureScreen.jsx'
 
 function App() {
   const [photo, setPhoto] = useState(null)
 
-  // Photos are several MB; free each one when it is replaced or discarded.
   useEffect(() => {
     if (!photo) return
     return () => URL.revokeObjectURL(photo.url)

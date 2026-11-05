@@ -1,4 +1,4 @@
-import { createTheme } from '@mui/material/styles'
+import { createTheme } from '@mui/material'
 
 const shared = {
   typography: {
@@ -16,7 +16,6 @@ export const theme = createTheme({
   },
 })
 
-// Capture screens are dark so the live image stands out and the screen doesn't glare next to the line.
 export const cameraTheme = createTheme({
   ...shared,
   palette: {
@@ -28,7 +27,6 @@ export const cameraTheme = createTheme({
   },
 })
 
-// Hidden on screen but still read by screen readers.
 export const VISUALLY_HIDDEN = {
   position: 'absolute',
   width: 1,

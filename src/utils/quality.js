@@ -1,14 +1,11 @@
-// Grades are 'good' | 'warn' | 'poor'.
-
 const PIXELS_PER_MEGAPIXEL = 1_000_000
 
 export const RESOLUTION_MP = { poorBelow: 2, goodFrom: 8 }
 
-// Mean luma, 0–255. Starting values from the plan, to be checked against real photos.
+// Brightness is mean luma (0–255); sharpness is Laplacian variance on a 160 px wide frame.
+// Both are uncalibrated starting values, to be replaced with values measured on real devices.
 export const BRIGHTNESS = { tooDark: 40, dim: 70, bright: 190, tooBright: 220 }
 
-// Laplacian variance on a 160 px wide frame. Uncalibrated starting values:
-// to be replaced with values measured from sharp and blurred photos on real devices.
 export const SHARPNESS = { blurryBelow: 20, softBelow: 60 }
 
 export function megapixels(width, height) {
@@ -21,10 +18,7 @@ export function meanBrightness(pixels) {
   return pixels.length === 0 ? 0 : sum / pixels.length
 }
 
-/**
- * Variance of the Laplacian: a sharp edge gives strong responses, blur flattens them.
- * Kernel [0 1 0; 1 -4 1; 0 1 0], border pixels skipped.
- */
+// Sharp edges give strong Laplacian responses and blur flattens them, so the variance measures focus.
 export function laplacianVariance({ pixels, width, height }) {
   let sum = 0
   let sumOfSquares = 0
@@ -59,4 +53,24 @@ export function gradeBrightness(value) {
 export function gradeSharpness(value) {
   if (value < SHARPNESS.blurryBelow) return 'poor'
   return value < SHARPNESS.softBelow ? 'warn' : 'good'
+}
+
+const DEFAULT_HINT = 'Fill the frame with the door panel and hold steady'
+
+/** Worst problem first. `torch` is { supported, on, failed }. Returns { text, warn }. */
+export function getCaptureHint(quality, torch) {
+  if (torch.failed) return { text: "The torch didn't respond. Try again.", warn: true }
+  if (!quality) return { text: DEFAULT_HINT, warn: false }
+
+  if (gradeBrightness(quality.brightness) !== 'good') {
+    if (quality.brightness > BRIGHTNESS.bright) {
+      const text = torch.on ? 'Too bright. Turn off the torch or reduce glare.' : 'Too bright. Reduce glare.'
+      return { text, warn: true }
+    }
+    if (!torch.supported) return { text: 'Too dim, and this device has no torch. Move to better light.', warn: true }
+    return { text: torch.on ? 'Too dim. Move to better light.' : 'Too dim. Turn on the torch.', warn: true }
+  }
+
+  if (gradeSharpness(quality.sharpness) !== 'good') return { text: 'Slightly blurry. Hold steady.', warn: true }
+  return { text: DEFAULT_HINT, warn: false }
 }

@@ -17,6 +17,7 @@ src/
 │  └─ __tests__/
 ├─ components/
 │  ├─ StatusBadge.jsx          # ✓ / ! / ✕ — used on 3 screens
+│  ├─ LiveQualityChips.jsx     # resolution, brightness, sharpness chips
 │  ├─ AnnotationCanvas.jsx     # photo + SVG boxes + gestures
 │  ├─ DefectList.jsx
 │  └─ __tests__/
@@ -24,6 +25,7 @@ src/
 │  ├─ useCamera.js             # stream + capturePhoto
 │  ├─ useTorch.js
 │  ├─ useLiveQuality.js
+│  ├─ index.js                # re-exports, for one-line imports
 │  └─ __tests__/
 └─ utils/
    ├─ cameraErrors.js          # pure
@@ -31,13 +33,14 @@ src/
    ├─ image.js                 # canvas: blob/video → small grey pixel array
    ├─ geometry.js              # pure
    ├─ annotations.js           # pure reducer
+   ├─ index.js                 # re-exports, for one-line imports
    └─ __tests__/
 e2e/flow.spec.js               # one Playwright test, fake camera
 ```
 
 ## UI and theming
 - **Material UI** (`@mui/material` + Emotion) for components; styled with the `sx` prop and theme values.
-- **Icons** from `@mui/icons-material`, imported one per file (`@mui/icons-material/FlashlightOn`) so only used icons are bundled.
+- **Imports:** one line per package (`import { Box, Chip } from '@mui/material'`). The production build tree-shakes unused components and icons; bundle size was unchanged when we switched.
 - **Themes** in `theme.js`: light app theme plus a dark camera theme; `CssBaseline` provides the reset.
 - **Inter** loaded from Google Fonts in `index.html` (no npm package). Falls back to `system-ui` if the network blocks it.
 - **AnnotationCanvas stays custom SVG**: MUI has no drawing tools, and this logic is a core evaluation point.
@@ -49,6 +52,10 @@ e2e/flow.spec.js               # one Playwright test, fake camera
 - `screens/` combine hooks, state and components.
 - Tests in a `__tests__/` folder next to the code they test.
 - Files are created when we build them, never as empty stubs.
+- No component file over 250 lines; split out a component or pure util when it grows.
+- A private helper used in only one place is inlined. Exported `utils/` functions stay separate (pure, testable).
+- One import line per module or folder: `import { useCamera, useTorch } from '../hooks'`.
+- Comments only where the code can't say it: browser quirks, uncalibrated values, data shapes.
 
 ## Language
 - **JavaScript (JSX), no TypeScript:** chosen to cut type noise. Trade-off: no compile-time checks, so data shapes are described in short doc comments and oxlint catches common mistakes.

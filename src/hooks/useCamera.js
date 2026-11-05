@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
-import { IN_USE_ERROR, UNSUPPORTED_ERROR, toCameraError } from '../utils/cameraErrors.js'
+import { IN_USE_ERROR, UNSUPPORTED_ERROR, toCameraError } from '../utils'
 
-// `ideal` asks for the best the device offers and never rejects, unlike `exact` or `min`.
-// 4096×3072 is 4:3, the shape of most phone sensors, so the browser doesn't crop to 16:9.
+// `ideal` never rejects, unlike `exact` or `min`. 4:3 matches most phone sensors, so nothing is cropped to 16:9.
 const CONSTRAINTS = {
   audio: false,
   video: {
@@ -15,40 +14,43 @@ const CONSTRAINTS = {
 const JPEG_QUALITY = 0.92
 
 function canUseCamera() {
-  // mediaDevices is undefined on http:// pages and in old browsers.
   return window.isSecureContext && navigator.mediaDevices?.getUserMedia !== undefined
 }
 
-function initialState() {
-  return canUseCamera() ? { status: 'starting' } : { status: 'error', error: UNSUPPORTED_ERROR }
-}
-
-function getVideoTrack(video) {
-  return video.srcObject instanceof MediaStream ? (video.srcObject.getVideoTracks()[0] ?? null) : null
-}
-
-function stopTracks(stream) {
-  stream.getTracks().forEach((track) => track.stop())
+function isPageVisible() {
+  return document.visibilityState === 'visible'
 }
 
 /**
- * Streams the rear camera into `videoRef` while mounted and stops it on unmount.
+ * Streams the rear camera into `videoRef` while mounted and the page is visible.
  * `state` is one of { status: 'starting' }, { status: 'live', width, height, track }, { status: 'error', error }.
  */
 export function useCamera(videoRef) {
-  const [state, setState] = useState(initialState)
+  const [state, setState] = useState(() =>
+    canUseCamera() ? { status: 'starting' } : { status: 'error', error: UNSUPPORTED_ERROR },
+  )
   const [attempt, setAttempt] = useState(0)
+  const [visible, setVisible] = useState(isPageVisible)
+
+  // Release the camera while the page is hidden (tab switch, app in background, screen locked).
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      setVisible(isPageVisible())
+      setState((current) => (current.status === 'error' ? current : { status: 'starting' }))
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, [])
 
   // `attempt` is a dependency so that retry() runs the effect again.
   useEffect(() => {
     const video = videoRef.current
-    if (!video || !canUseCamera()) return
+    if (!video || !visible || !canUseCamera()) return
 
     const request = new AbortController()
 
-    // Fires for the first frame and again when the size changes, e.g. after rotating the device.
     const updateSize = () => {
-      const track = getVideoTrack(video)
+      const track = video.srcObject instanceof MediaStream ? video.srcObject.getVideoTracks()[0] : undefined
       if (track) setState({ status: 'live', width: video.videoWidth, height: video.videoHeight, track })
     }
     // 'ended' fires only when the browser or OS stops the camera, never after our own stop().
@@ -61,7 +63,7 @@ export function useCamera(videoRef) {
       (stream) => {
         // StrictMode, or leaving the screen quickly, can run cleanup before the request finishes.
         if (request.signal.aborted) {
-          stopTracks(stream)
+          stream.getTracks().forEach((track) => track.stop())
           return
         }
         stream.getVideoTracks()[0]?.addEventListener('ended', handleEnded)
@@ -78,11 +80,10 @@ export function useCamera(videoRef) {
       request.abort()
       video.removeEventListener('loadedmetadata', updateSize)
       video.removeEventListener('resize', updateSize)
-      // Stopped tracks never fire 'ended', so its listener needs no removal.
-      if (video.srcObject instanceof MediaStream) stopTracks(video.srcObject)
+      if (video.srcObject instanceof MediaStream) video.srcObject.getTracks().forEach((track) => track.stop())
       video.srcObject = null
     }
-  }, [videoRef, attempt])
+  }, [videoRef, attempt, visible])
 
   function retry() {
     setState({ status: 'starting' })
@@ -90,46 +91,37 @@ export function useCamera(videoRef) {
   }
 
   /** Resolves with { blob, url, width, height, method }. */
-  function capture() {
+  async function capture() {
     const video = videoRef.current
-    if (!video || state.status !== 'live') return Promise.reject(new Error('Camera is not ready'))
-    return takePhoto(video, state.track)
+    if (!video || state.status !== 'live') throw new Error('Camera is not ready')
+
+    // ImageCapture can use the full sensor (Chromium, Android). Elsewhere, including iPhone,
+    // a full-size video frame is the best available.
+    if ('ImageCapture' in window) {
+      try {
+        return await toPhoto(await new ImageCapture(state.track).takePhoto(), 'image-capture')
+      } catch (error) {
+        console.warn('ImageCapture failed, using the video frame instead', error)
+      }
+    }
+
+    const canvas = document.createElement('canvas')
+    canvas.width = video.videoWidth
+    canvas.height = video.videoHeight
+    const context = canvas.getContext('2d')
+    if (!context) throw new Error('Canvas 2D context is not available')
+    context.drawImage(video, 0, 0)
+    const blob = await new Promise((resolve, reject) => {
+      canvas.toBlob(
+        (result) => (result ? resolve(result) : reject(new Error('Could not encode the photo'))),
+        'image/jpeg',
+        JPEG_QUALITY,
+      )
+    })
+    return toPhoto(blob, 'canvas')
   }
 
   return { state, retry, capture }
-}
-
-/**
- * ImageCapture.takePhoto() can use the full sensor, above the video resolution (Chromium, Android).
- * Elsewhere, including iPhone Safari, a full-size video frame is the best available.
- */
-async function takePhoto(video, track) {
-  if ('ImageCapture' in window) {
-    try {
-      return await toPhoto(await new ImageCapture(track).takePhoto(), 'image-capture')
-    } catch (error) {
-      // Some desktop webcams reject takePhoto(); the video frame still works.
-      console.warn('ImageCapture failed, using the video frame instead', error)
-    }
-  }
-  return toPhoto(await grabVideoFrame(video), 'canvas')
-}
-
-function grabVideoFrame(video) {
-  const canvas = document.createElement('canvas')
-  canvas.width = video.videoWidth
-  canvas.height = video.videoHeight
-  const context = canvas.getContext('2d')
-  if (!context) return Promise.reject(new Error('Canvas 2D context is not available'))
-  context.drawImage(video, 0, 0)
-
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (blob) => (blob ? resolve(blob) : reject(new Error('Could not encode the photo'))),
-      'image/jpeg',
-      JPEG_QUALITY,
-    )
-  })
 }
 
 async function toPhoto(blob, method) {

@@ -1,4 +1,4 @@
-import Box from '@mui/material/Box'
+import { Box } from '@mui/material'
 import { VISUALLY_HIDDEN } from '../theme.js'
 
 const SYMBOLS = {
@@ -7,7 +7,6 @@ const SYMBOLS = {
   poor: { symbol: '✕', color: 'error.light' },
 }
 
-/** ✓ / ! / ✕ with a text label. On phones only the symbol shows, so a row of chips fits one line. */
 export default function StatusBadge({ grade, label }) {
   const { symbol, color } = SYMBOLS[grade]
 

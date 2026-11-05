@@ -1,11 +1,8 @@
-// Rec. 601 luma weights: how bright each channel looks to the eye.
+// Rec. 601 luma weights
 const LUMA = { r: 0.299, g: 0.587, b: 0.114 }
 const RGBA_CHANNELS = 4
 
-/**
- * Draws `source` scaled to `width` and returns { pixels, width, height }: one byte of luma per pixel.
- * Reuses `canvas` to avoid an allocation per frame.
- */
+/** Returns { pixels, width, height } with one byte of luma per pixel. */
 export function readGreyImage(canvas, source, sourceWidth, sourceHeight, width) {
   const height = Math.round((sourceHeight / sourceWidth) * width)
   if (canvas.width !== width) canvas.width = width

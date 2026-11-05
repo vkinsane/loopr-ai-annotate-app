@@ -41,7 +41,6 @@ const UNKNOWN_ERROR = {
   canRetry: true,
 }
 
-// Keyed by DOMException name: browser messages differ per vendor and aren't written for operators.
 const ERRORS_BY_NAME = {
   NotAllowedError: DENIED_ERROR,
   SecurityError: DENIED_ERROR, // blocked by a permissions policy, e.g. inside an iframe
@@ -50,7 +49,6 @@ const ERRORS_BY_NAME = {
   AbortError: IN_USE_ERROR, // Firefox reports a busy camera this way
 }
 
-/** Turns a getUserMedia rejection into { kind, title, message, steps?, canRetry }. */
 export function toCameraError(error) {
   const name = error instanceof Error ? error.name : ''
   return ERRORS_BY_NAME[name] ?? UNKNOWN_ERROR
