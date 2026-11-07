@@ -42,8 +42,8 @@ export const styles = {
   shutterFill: { width: '100%', height: '100%', borderRadius: '50%', bgcolor: 'common.white' },
   torch: (on) => ({
     gridArea: 'torch', width: 52, height: 52,
-    color: on ? 'background.default' : 'text.primary', bgcolor: on ? 'common.white' : 'action.selected',
-    '&:hover': { bgcolor: on ? 'grey.300' : 'action.focus' },
+    color: on ? 'primary.contrastText' : 'text.primary', bgcolor: on ? 'primary.main' : 'action.selected',
+    '&:hover': { bgcolor: on ? 'primary.dark' : 'action.focus' },
   }),
   overlay: {
     position: 'fixed', inset: 0, bgcolor: 'background.default', p: 4,

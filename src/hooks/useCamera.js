@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { IN_USE_ERROR, UNSUPPORTED_ERROR, toCameraError } from '../utils'
+import { IN_USE_ERROR, UNSUPPORTED_ERROR, canUseCamera, toCameraError } from '../utils'
 
 // `ideal` never rejects, unlike `exact` or `min`. 4:3 matches most phone sensors, so nothing is cropped to 16:9.
 const CONSTRAINTS = {
@@ -12,10 +12,6 @@ const CONSTRAINTS = {
 }
 
 const JPEG_QUALITY = 0.92
-
-function canUseCamera() {
-  return window.isSecureContext && navigator.mediaDevices?.getUserMedia !== undefined
-}
 
 function isPageVisible() {
   return document.visibilityState === 'visible'

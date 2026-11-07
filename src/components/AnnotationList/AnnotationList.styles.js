@@ -20,6 +20,11 @@ export const styles = {
     bgcolor: selected ? 'brand.tint' : 'background.paper',
     border: selected ? 2 : 1, borderColor: selected ? 'primary.main' : 'divider', py: selected ? 0.5 : '5px',
   }),
+  // Same colours as the box on the photo: indigo when selected, lime with a navy outline otherwise.
+  swatch: (selected) => ({
+    flexShrink: 0, width: 12, height: 12, borderRadius: '3px', bgcolor: selected ? 'primary.main' : 'brand.lime',
+    boxShadow: selected ? 'none' : (theme) => `0 0 0 1px ${theme.palette.brand.ink}`,
+  }),
   input: (selected) => ({ flexGrow: 1, minWidth: 0, height: 44, typography: 'body1', fontWeight: selected ? 600 : 400 }),
   size: { typography: 'caption', color: 'text.secondary', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' },
   remove: (selected) => ({ width: 44, height: 44, color: selected ? 'error.main' : 'text.secondary' }),

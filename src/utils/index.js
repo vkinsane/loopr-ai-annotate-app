@@ -1,5 +1,6 @@
 export * from './annotations.js'
 export * from './cameraErrors.js'
+export * from './exportPhoto.js'
 export * from './geometry.js'
 export * from './image.js'
 export * from './quality.js'

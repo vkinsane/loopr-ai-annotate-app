@@ -6,8 +6,8 @@ import { styles } from './AnnotationCanvas.styles.js'
 const CORNERS = ['top-left', 'top-right', 'bottom-left', 'bottom-right']
 const MIN_BOX_SCREEN_PX = 12
 const LABEL_BELOW_FROM_TOP = 0.08
-const IDLE_HINT = 'Drag on the photo to mark a defect. Drag a box to move it, or a corner to resize.'
-const DRAW_HINT = 'Release to add the box. Tiny boxes from a quick tap are ignored.'
+const IDLE_HINT = 'Drag on the photo to add an annotation. Drag a box to move it, or a corner to resize it.'
+const DRAW_HINT = 'Lift your finger to add the box. Very small boxes are not added.'
 
 /**
  * Boxes are stored in photo pixels and drawn as percentages of the frame, so they stay on the same
@@ -72,7 +72,7 @@ export default function AnnotationCanvas({ photoUrl, size, items, selectedId, on
   return (
     <div>
       <Box sx={styles.frame(size.width / size.height)}>
-        <img src={photoUrl} alt="Captured photo of the door panel" draggable={false} style={styles.photo} />
+        <img src={photoUrl} alt="Captured photo" draggable={false} style={styles.photo} />
         <Box
           ref={layerRef}
           sx={styles.layer}

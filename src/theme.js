@@ -5,7 +5,7 @@ const BRAND = {
   indigo: '#3c4fc9', indigoDark: '#303fa0', indigoLight: '#7683d9',
   ink: '#09123d', slate: '#4a5870', mist: '#f4f6fb', border: '#dde4ed', tint: '#ebedf9',
   carbon: '#05091c', carbonRaised: '#12173c', carbonBorder: '#252c4c', frost: '#c7d2ff',
-  lime: '#cefe6f', limeDark: '#a8d94a', white: '#ffffff', snow: '#f8fafc',
+  lime: '#cefe6f', limeDark: '#a8d94a', white: '#ffffff', snow: '#f8fafc', scrim: 'rgba(5, 9, 28, 0.55)',
 }
 const HEADING_FONT = "'Outfit', system-ui, sans-serif"
 
@@ -62,6 +62,8 @@ export const theme = createTheme({
     background: { default: BRAND.mist, paper: BRAND.white },
     text: { primary: BRAND.ink, secondary: BRAND.slate },
     divider: BRAND.border,
+    // Lighter than MUI's grey so a disabled button reads as "not yet", not as broken. Text still passes AA.
+    action: { disabledBackground: '#e9edf5', disabled: '#6b7b92' },
     brand: { ...BRAND, photoBackdrop: BRAND.carbonRaised },
   },
 })
@@ -76,7 +78,7 @@ export const cameraTheme = createTheme({
     background: { default: BRAND.carbon, paper: BRAND.carbonRaised },
     text: { primary: BRAND.snow, secondary: BRAND.frost },
     divider: BRAND.carbonBorder,
-    brand: { ...BRAND, scrim: 'rgba(5, 9, 28, 0.55)' },
+    brand: BRAND,
   },
 })
 

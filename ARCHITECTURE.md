@@ -1,31 +1,41 @@
 # Architecture
 
-Flow: **Capture → Preview & quality → Annotate**
+Flow: **Landing → How it works → Capture → Preview & quality → Annotate → Summary**
 
 ## Folder structure (by file type)
 
 ```
 src/
 ├─ main.jsx                    # ThemeProvider + CssBaseline
-├─ App.jsx                     # step: capture | preview | annotate
+├─ App.jsx                     # stage, photo, quality, annotations reducer; picks the screen
 ├─ theme.js                    # MUI themes (light + dark camera), shared styles
 ├─ screens/
+│  ├─ LandingScreen.jsx
+│  ├─ HowItWorksScreen.jsx     # camera permission before Capture
 │  ├─ CaptureScreen.jsx
+│  ├─ CameraErrorScreen.jsx
 │  ├─ PreviewScreen.jsx
 │  ├─ AnnotateScreen.jsx
-│  ├─ CameraErrorScreen.jsx
+│  ├─ SummaryScreen.jsx        # read-only result + download
 │  └─ __tests__/
 ├─ components/
 │  ├─ StatusBadge/             # ✓ / ! / ✕ — used on 3 screens
 │  ├─ LiveQualityChips/        # resolution, brightness, sharpness chips
 │  ├─ AnnotationCanvas/        # photo + boxes + pointer gestures
-│  ├─ DefectList/
+│  ├─ AnnotationList/
+│  ├─ QualityChecks/           # check rows: Preview (full), Annotate (compact)
+│  ├─ ZoomViewer/              # full-screen pinch / scroll / drag zoom
+│  ├─ PhotoWithBoxes/          # read-only photo + boxes (Summary)
+│  ├─ ChoosePhotoButton/       # file picker fallback when there's no camera
+│  ├─ HeroDemo/                # landing animation
 │  └─ __tests__/
 ├─ hooks/
 │  ├─ useCamera.js             # stream + capturePhoto
 │  ├─ useTorch.js
 │  ├─ useLiveQuality.js
 │  ├─ usePhotoQuality.js       # brightness + sharpness of the captured photo
+│  ├─ useCameraPermission.js   # ask once on How it works
+│  ├─ useConfirmTap.js         # second tap confirms a discard
 │  ├─ index.js                # re-exports, for one-line imports
 │  └─ __tests__/
 └─ utils/
@@ -34,6 +44,7 @@ src/
    ├─ image.js                 # canvas: blob/video → small grey pixel array
    ├─ geometry.js              # pure
    ├─ annotations.js           # pure reducer
+   ├─ exportPhoto.js           # canvas: photo + boxes → JPEG blob
    ├─ index.js                 # re-exports, for one-line imports
    └─ __tests__/
 e2e/flow.spec.js               # one Playwright test, fake camera

@@ -15,5 +15,5 @@ export const styles = {
     textAlign: 'left', typography: 'body2',
     bgcolor: 'background.paper', border: 1, borderColor: 'divider', borderRadius: CARD_RADIUS,
   },
-  retry: { maxWidth: 420, mx: 'auto', mb: 1 },
+  actions: { width: '100%', maxWidth: 420, mx: 'auto', mb: 1, display: 'flex', flexDirection: 'column', gap: 1.25 },
 }

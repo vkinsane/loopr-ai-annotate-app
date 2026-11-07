@@ -1,8 +1,8 @@
 # Loopr Annotate
 
-A mobile-first web app for a car-door production line: photograph each door at the conveyor, check the photo's quality, and mark defects with labelled boxes.
+A mobile-first web app for photo inspection: photograph a part, check the photo's quality, and annotate it with labelled boxes.
 
-**Flow:** Capture → Preview & quality → Annotate
+**Flow:** Landing → How it works (camera permission) → Capture → Preview & quality → Annotate → Summary
 
 ## Setup
 
@@ -35,16 +35,23 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
   - Live rear-camera preview at the highest resolution the device offers.
   - Live chips for resolution, brightness and sharpness, with a hint line ("Too dim. Turn on the torch.").
   - Torch toggle, shown only when the camera supports it, showing the camera's real torch state.
-  - Clear screens for blocked, missing, busy and unsupported cameras, with Try again.
+  - Clear screens for blocked, missing, busy and unsupported cameras, with Try again and "Choose a photo instead".
   - The camera is released while the page is hidden (tab switch, app in background, screen locked).
 - **Preview & quality**
   - Resolution, file size, brightness and sharpness, each graded Good / Warning / Poor.
   - A summary banner with advice, e.g. "Photo is too dark and blurry".
+  - Rows that aren't Good show the target ("Good at 60+").
+  - Full-screen zoom: pinch or scroll to zoom (up to 8×), drag to move, double-tap to fit.
   - Retake or Annotate. For a poor photo, Retake becomes the main button.
 - **Annotate**
   - Draw a box by dragging on the photo; drag a box to move it; drag a corner to resize it.
   - Label, select and delete boxes from the list. Delete / Escape keys work on desktop.
   - Works with mouse, touch and pen. Boxes stay on the same pixels at any screen size or rotation.
+  - Photo quality is shown beside the photo on tablet and desktop.
+- **Summary**
+  - The photo with all boxes, the annotation count, the quality grade, and each box's size.
+  - **Download photo:** a full-resolution JPEG with the boxes and labels drawn on (canvas). Nothing is uploaded.
+  - Back to Annotate keeps the boxes. "Take new photo" asks once more if the photo wasn't downloaded.
 
 ## Implementation decisions
 
@@ -55,7 +62,7 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
 - **MUI + Emotion** for components and theming. Emotion is MUI's required styling engine.
 - **Look:** colours and type follow loopr.ai's public site (indigo, carbon, lime; Outfit + DM Sans), so the tool reads as part of that product family. Tokens live in `src/theme.js`.
 - **Few dependencies:** react, react-dom, MUI, MUI icons, Emotion. No router, no state library, no canvas or annotation library.
-- **State:** `App` holds the step and the photo, and each screen owns its own state. Annotations use `useReducer` with a pure reducer.
+- **State:** `App` holds the stage, the photo, its measured quality and the annotations (`useReducer` with a pure reducer), so going back from Summary keeps the boxes. Other state stays in each screen.
 
 ### Camera
 - **Constraints:** `facingMode: 'environment'`, `width/height: { ideal: 4096×3072 }`.
@@ -85,7 +92,7 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
 | Brightness (0–255) | 70–190 | 40–70 or 190–220 | < 40 or > 220 |
 | Sharpness | ≥ 60 | 20–60 | < 20 |
 
-- **A poor photo warns but doesn't block:** "Annotate anyway" stays available.
+- **A poor photo warns but doesn't block:** Annotate stays available as the second button.
 - **The photo is decoded once**, on the Preview screen, which gives its true size after EXIF rotation plus the measurements. Capture skips decoding so the screen changes sooner.
 
 ### Annotation
@@ -94,7 +101,7 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
 - **Pointer Events with pointer capture:** one code path for mouse, touch and pen. `touch-action: none` on the photo stops the page from scrolling while drawing.
 - **No draw/select modes:** the gesture depends on where it starts (corner → resize, box → move, empty photo → draw). A quick tap or a box under 12 screen px is ignored.
 - **Pure logic in `utils/`:** `geometry.js` (draw, move, resize, clamp) and `annotations.js` (reducer). IDs are created outside the reducer, so it stays pure.
-- **"New photo" with boxes present needs a second tap** ("Discard 3 boxes?"), instead of a dialog.
+- **Destructive actions need a second tap** ("Discard 3 boxes?", "Discard this photo?"), instead of a dialog (`hooks/useConfirmTap.js`).
 
 ### Code conventions
 - Folders by file type: `screens/`, `components/`, `hooks/` (browser APIs and lifecycle), `utils/` (pure logic).
@@ -105,13 +112,14 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
 
 - **Thresholds are not calibrated.** The sharpness values in particular are starting points. They need measuring from sharp and deliberately blurred photos on the target devices.
 - **File size is a weak quality signal:** it depends on JPEG compression as much as on detail.
-- **Nothing is saved:** annotations live in memory only. There is no export, and reloading the page loses the photo and the boxes.
-- **No undo, zoom or pan** on the photo. Small defects on a phone screen are hard to box precisely.
+- **Nothing is saved:** annotations live in memory only, and reloading the page loses the photo and the boxes. The only export is the downloaded JPEG; there is no JSON export of the boxes.
+- **No undo, and no zoom while annotating.** Zoom exists on the Preview screen only, so small details on a phone screen are still hard to box precisely.
 - **iPhone:**
   - No `ImageCapture`, so the photo is a video frame. Its resolution depends on what the stream delivers.
   - The browser's address bar can't be hidden from a web page.
   - The "Camera access is blocked" steps describe Chrome's site settings; on iPhone the permission is in the iOS Settings app.
 - **While the photo is touched for drawing, the page can't scroll:** on a phone, scroll by touching outside the photo.
+- **Very large photos may fail to download on iPhone:** Safari limits canvas size (about 16.7 MP). The app shows "Couldn't make the photo" in that case.
 - **No automated tests yet.** The pure `utils/` (geometry, reducer, quality, error mapping) are written to be unit-tested first.
 - **Not deployed yet.** The brief requires a public HTTPS deployment.
 
@@ -123,6 +131,7 @@ Only what was actually tried is listed.
 |---|---|
 | iPhone, Chrome (iOS) | Camera preview and capture work: 3024 × 4032 (12.2 MP), 9.1 MB, all checks Good. The "Camera access is blocked" screen shows. Torch and annotation not checked yet. |
 | Headless Chrome, 390 × 844 and 844 × 390, fake camera | Capture and error-screen layouts fit the screen, with no sideways scroll, in portrait, landscape and after rotating. |
+| Headless Chrome, 390 × 844, 820 × 1180, 1440 × 900, fake camera | Full flow by script: How it works → capture → Preview → zoom (buttons + mouse drag) → draw 2 boxes → Summary → download (3840 × 2160 JPEG with labels) → back keeps boxes. Pinch and double-tap not tested (no touch input in the script). |
 | Android | Not tested yet. |
 | Desktop browsers with a webcam | Not tested yet. |
 
@@ -130,3 +139,7 @@ Only what was actually tried is listed.
 App build size details
 Optimizations done details
 etc...
+
+## Credits
+
+- Landing demo photo: 'Damaged car door' by Garitzko, Wikimedia Commons (public domain). Resized to 800 × 600.

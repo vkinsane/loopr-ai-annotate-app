@@ -6,10 +6,10 @@ import StatusBadge from '../StatusBadge/StatusBadge.jsx'
 
 const BRIGHTNESS_LABELS = {
   good: { dark: 'Good', bright: 'Good' },
-  warn: { dark: 'Dim', bright: 'Bright' },
+  warn: { dark: 'Dark', bright: 'Bright' },
   poor: { dark: 'Too dark', bright: 'Too bright' },
 }
-const SHARPNESS_LABELS = { good: 'Good', warn: 'Soft', poor: 'Blurry' }
+const SHARPNESS_LABELS = { good: 'Good', warn: 'A bit blurry', poor: 'Blurry' }
 
 /** `resolution` is { width, height } or null; `quality` is { brightness, sharpness } or null. */
 export default function LiveQualityChips({ resolution, quality }) {

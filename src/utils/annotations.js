@@ -6,7 +6,7 @@ export function annotationsReducer(state, action) {
   switch (action.type) {
     case 'add': {
       const { x, y, width, height } = action.rect
-      const item = { id: action.id, label: `Defect ${state.nextNumber}`, x, y, width, height }
+      const item = { id: action.id, label: `Annotation ${state.nextNumber}`, x, y, width, height }
       return { items: [...state.items, item], selectedId: action.id, nextNumber: state.nextNumber + 1 }
     }
     case 'change': {
@@ -26,6 +26,8 @@ export function annotationsReducer(state, action) {
       }
     case 'select':
       return { ...state, selectedId: action.id }
+    case 'reset':
+      return initialAnnotations
     default:
       throw new Error(`Unknown annotation action: ${action.type}`)
   }

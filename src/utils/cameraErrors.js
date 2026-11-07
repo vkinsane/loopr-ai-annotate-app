@@ -2,7 +2,7 @@ export const UNSUPPORTED_ERROR = {
   kind: 'unsupported',
   title: "Camera isn't available here",
   message:
-    'Camera access needs a secure page (https://) in a recent browser such as Chrome, Safari, Edge or Firefox.',
+    'The camera only works on a secure page (https://) in a new version of Chrome, Safari, Edge or Firefox.',
   canRetry: false,
 }
 
@@ -47,6 +47,10 @@ const ERRORS_BY_NAME = {
   NotFoundError: NOT_FOUND_ERROR,
   NotReadableError: IN_USE_ERROR,
   AbortError: IN_USE_ERROR, // Firefox reports a busy camera this way
+}
+
+export function canUseCamera() {
+  return window.isSecureContext && navigator.mediaDevices?.getUserMedia !== undefined
 }
 
 export function toCameraError(error) {

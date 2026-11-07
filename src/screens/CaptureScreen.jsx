@@ -11,7 +11,8 @@ import { styles } from './CaptureScreen.styles.js'
 const DEFAULT_ASPECT_RATIO = 4 / 3
 const CORNERS = [['top', 'left'], ['top', 'right'], ['bottom', 'left'], ['bottom', 'right']]
 
-export default function CaptureScreen({ onCapture }) {
+/** `onCapture` and `onPickPhoto` both receive { blob, url, method }. */
+export default function CaptureScreen({ onCapture, onPickPhoto }) {
   const videoRef = useRef(null)
   const { state, retry, capture } = useCamera(videoRef)
   const [capturing, setCapturing] = useState(false)
@@ -22,7 +23,7 @@ export default function CaptureScreen({ onCapture }) {
   if (state.status === 'error') {
     return (
       <ThemeProvider theme={cameraTheme}>
-        <CameraErrorScreen error={state.error} onRetry={retry} />
+        <CameraErrorScreen error={state.error} onRetry={retry} onPickPhoto={onPickPhoto} />
       </ThemeProvider>
     )
   }
@@ -93,11 +94,9 @@ export default function CaptureScreen({ onCapture }) {
 
         {state.status === 'starting' && (
           <Box role="status" sx={styles.overlay}>
-            <CircularProgress color="inherit" size={56} />
+            <CircularProgress size={56} />
             <Typography component="h1" sx={styles.title}>Starting camera…</Typography>
-            <Typography sx={styles.overlayText}>
-              Allow camera access when your browser asks. Photos stay on this device.
-            </Typography>
+            <Typography sx={styles.overlayText}>Opening the rear camera. Photos stay on this device.</Typography>
           </Box>
         )}
       </Box>

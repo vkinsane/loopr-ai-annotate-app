@@ -66,7 +66,7 @@ export function gradeSharpness(value) {
   return value < SHARPNESS.softBelow ? 'warn' : 'good'
 }
 
-const DEFAULT_HINT = 'Fill the frame with the door panel and hold steady'
+const DEFAULT_HINT = 'Fill the frame with the part and hold steady'
 
 /** Worst problem first. `torch` is { supported, on, failed }. Returns { text, warn }. */
 export function getCaptureHint(quality, torch) {
@@ -75,11 +75,11 @@ export function getCaptureHint(quality, torch) {
 
   if (gradeBrightness(quality.brightness) !== 'good') {
     if (quality.brightness > BRIGHTNESS.bright) {
-      const text = torch.on ? 'Too bright. Turn off the torch or reduce glare.' : 'Too bright. Reduce glare.'
+      const text = torch.on ? 'Too bright. Turn off the torch or move away from strong light.' : 'Too bright. Move away from strong light.'
       return { text, warn: true }
     }
-    if (!torch.supported) return { text: 'Too dim, and this device has no torch. Move to better light.', warn: true }
-    return { text: torch.on ? 'Too dim. Move to better light.' : 'Too dim. Turn on the torch.', warn: true }
+    if (!torch.supported) return { text: 'Too dark, and this device has no torch. Move to a brighter place.', warn: true }
+    return { text: torch.on ? 'Too dark. Move to a brighter place.' : 'Too dark. Turn on the torch.', warn: true }
   }
 
   if (gradeSharpness(quality.sharpness) !== 'good') return { text: 'Slightly blurry. Hold steady.', warn: true }
@@ -87,10 +87,10 @@ export function getCaptureHint(quality, torch) {
 }
 
 const ISSUES = {
-  resolution: { problem: 'low resolution', advice: 'move closer to the door' },
+  resolution: { problem: 'low resolution', advice: 'move closer to the part' },
   fileSize: { problem: 'low on detail', advice: 'check the camera resolution' },
-  dark: { problem: 'too dark', advice: 'turn on the torch or add light over the belt' },
-  bright: { problem: 'too bright', advice: 'reduce glare or turn off the torch' },
+  dark: { problem: 'too dark', advice: 'turn on the torch or add more light' },
+  bright: { problem: 'too bright', advice: 'turn off the torch or move away from strong light' },
   blurry: { problem: 'blurry', advice: 'hold the phone steady' },
 }
 
@@ -121,11 +121,46 @@ export function gradePhoto({ width, height, bytes, brightness, sharpness }) {
   if (poor.length > 0) {
     const problems = poor.map((issue) => issue.problem)
     const list = problems.length > 1 ? `${problems.slice(0, -1).join(', ')} and ${problems.at(-1)}` : problems[0]
-    return { grades, summary: { grade: 'poor', title: `Photo is ${list}`, advice: joinAdvice(poor, 'then retake.') } }
+    return { grades, summary: { grade: 'poor', title: `Photo is ${list}`, advice: joinAdvice(poor, 'then take the photo again.') } }
   }
   if (issues.length > 0) {
     const title = issues.length === 1 ? 'Usable, with one warning' : `Usable, with ${issues.length} warnings`
-    return { grades, summary: { grade: 'warn', title, advice: joinAdvice(issues, 'then retake for best results.') } }
+    return { grades, summary: { grade: 'warn', title, advice: joinAdvice(issues, 'then take the photo again for a better result.') } }
   }
-  return { grades, summary: { grade: 'good', title: 'Photo looks good', advice: 'Ready to mark defects.' } }
+  return { grades, summary: { grade: 'good', title: 'Photo looks good', advice: 'Ready to annotate.' } }
+}
+
+function formatFileSize(bytes) {
+  const kb = bytes / BYTES_PER_KB
+  return kb < BYTES_PER_KB ? `${Math.round(kb)} KB` : `${(kb / BYTES_PER_KB).toFixed(1)} MB`
+}
+
+/**
+ * One row per check for display: { label, value, grade, target }. `quality` is the measured
+ * { width, height, brightness, sharpness }, or null while measuring (only file size is known then).
+ * `target` names the good range, taken from the thresholds above.
+ */
+export function qualityChecks(bytes, quality) {
+  const measured = Boolean(quality)
+  return [
+    {
+      label: 'Resolution',
+      value: measured ? `${quality.width} × ${quality.height} · ${megapixels(quality.width, quality.height).toFixed(1)} MP` : '–',
+      grade: measured ? gradeResolution(quality.width, quality.height) : null,
+      target: `${RESOLUTION_MP.goodFrom} MP+`,
+    },
+    { label: 'File size', value: formatFileSize(bytes), grade: gradeFileSize(bytes), target: `${FILE_SIZE_KB.goodFrom} KB+` },
+    {
+      label: 'Brightness',
+      value: measured ? `${quality.brightness} / 255` : '–',
+      grade: measured ? gradeBrightness(quality.brightness) : null,
+      target: `${BRIGHTNESS.dim}–${BRIGHTNESS.bright}`,
+    },
+    {
+      label: 'Sharpness',
+      value: measured ? String(quality.sharpness) : '–',
+      grade: measured ? gradeSharpness(quality.sharpness) : null,
+      target: `${SHARPNESS.softBelow}+`,
+    },
+  ]
 }

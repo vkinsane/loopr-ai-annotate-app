@@ -25,7 +25,8 @@ export const styles = {
     boxShadow: variant === 'other' ? (theme) => `0 0 0 1px ${theme.palette.brand.ink}, inset 0 0 0 1px ${theme.palette.brand.ink}` : 'none',
   }),
   label: (selected, below) => ({
-    position: 'absolute', left: -2, [below ? 'top' : 'bottom']: '100%', px: 0.5, maxWidth: 160,
+    // The selected label starts after the corner handle's dot, so the dot stays visible.
+    position: 'absolute', left: selected ? 10 : -2, [below ? 'top' : 'bottom']: '100%', px: 0.5, maxWidth: 160,
     fontSize: 11, fontWeight: 600, lineHeight: '16px',
     color: selected ? 'primary.contrastText' : 'brand.ink', bgcolor: selected ? 'primary.main' : 'brand.lime',
     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', pointerEvents: 'none',
