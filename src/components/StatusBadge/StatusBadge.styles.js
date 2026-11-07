@@ -1,4 +1,4 @@
-import { VISUALLY_HIDDEN } from '../theme.js'
+import { VISUALLY_HIDDEN } from '../../theme.js'
 
 const TEXT_COLORS = { good: 'success.light', warn: 'warning.light', poor: 'error.light' }
 const PILL_COLORS = {

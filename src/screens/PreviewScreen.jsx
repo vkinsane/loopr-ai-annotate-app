@@ -1,5 +1,5 @@
 import { Alert, AlertTitle, Box, Button, CircularProgress, Paper, Typography } from '@mui/material'
-import StatusBadge from '../components/StatusBadge.jsx'
+import StatusBadge from '../components/StatusBadge/StatusBadge.jsx'
 import { usePhotoQuality } from '../hooks'
 import { gradeFileSize, gradePhoto, megapixels } from '../utils'
 import { styles } from './PreviewScreen.styles.js'

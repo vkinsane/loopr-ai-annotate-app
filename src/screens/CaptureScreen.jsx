@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { FlashlightOff, FlashlightOn } from '@mui/icons-material'
 import { Box, ButtonBase, CircularProgress, IconButton, ThemeProvider, Typography } from '@mui/material'
-import LiveQualityChips from '../components/LiveQualityChips.jsx'
+import LiveQualityChips from '../components/LiveQualityChips/LiveQualityChips.jsx'
 import { useCamera, useLiveQuality, useTorch } from '../hooks'
 import { cameraTheme } from '../theme.js'
 import { getCaptureHint } from '../utils'

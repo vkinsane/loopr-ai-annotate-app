@@ -1,8 +1,8 @@
 import { CenterFocusStrongOutlined, WbSunnyOutlined } from '@mui/icons-material'
 import { Box, Chip } from '@mui/material'
-import { BRIGHTNESS, gradeBrightness, gradeResolution, gradeSharpness, megapixels } from '../utils'
+import { BRIGHTNESS, gradeBrightness, gradeResolution, gradeSharpness, megapixels } from '../../utils'
 import { styles } from './LiveQualityChips.styles.js'
-import StatusBadge from './StatusBadge.jsx'
+import StatusBadge from '../StatusBadge/StatusBadge.jsx'
 
 const BRIGHTNESS_LABELS = {
   good: { dark: 'Good', bright: 'Good' },

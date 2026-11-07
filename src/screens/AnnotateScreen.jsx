@@ -1,7 +1,7 @@
 import { useEffect, useReducer, useState } from 'react'
 import { Box, Button, Typography } from '@mui/material'
-import AnnotationCanvas from '../components/AnnotationCanvas.jsx'
-import DefectList from '../components/DefectList.jsx'
+import AnnotationCanvas from '../components/AnnotationCanvas/AnnotationCanvas.jsx'
+import DefectList from '../components/DefectList/DefectList.jsx'
 import { annotationsReducer, initialAnnotations } from '../utils'
 import { styles } from './AnnotateScreen.styles.js'
 

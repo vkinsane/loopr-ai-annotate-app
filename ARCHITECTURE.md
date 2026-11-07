@@ -16,10 +16,10 @@ src/
 │  ├─ CameraErrorScreen.jsx
 │  └─ __tests__/
 ├─ components/
-│  ├─ StatusBadge.jsx          # ✓ / ! / ✕ — used on 3 screens
-│  ├─ LiveQualityChips.jsx     # resolution, brightness, sharpness chips
-│  ├─ AnnotationCanvas.jsx     # photo + boxes + pointer gestures
-│  ├─ DefectList.jsx
+│  ├─ StatusBadge/             # ✓ / ! / ✕ — used on 3 screens
+│  ├─ LiveQualityChips/        # resolution, brightness, sharpness chips
+│  ├─ AnnotationCanvas/        # photo + boxes + pointer gestures
+│  ├─ DefectList/
 │  └─ __tests__/
 ├─ hooks/
 │  ├─ useCamera.js             # stream + capturePhoto
@@ -52,6 +52,7 @@ e2e/flow.spec.js               # one Playwright test, fake camera
 - `utils/` has no React. Everything except `image.js` is pure.
 - `hooks/` wrap browser APIs with React lifecycle and cleanup.
 - `components/` only for UI used in 2+ places or complex enough to test alone.
+- One folder per component: `StatusBadge/StatusBadge.jsx` + `StatusBadge.styles.js`.
 - `screens/` combine hooks, state and components.
 - Tests in a `__tests__/` folder next to the code they test.
 - Files are created when we build them, never as empty stubs.

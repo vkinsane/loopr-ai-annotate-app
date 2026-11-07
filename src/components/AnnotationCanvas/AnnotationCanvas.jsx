@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { Box, Typography } from '@mui/material'
-import { clamp, isTooSmall, moveRect, rectFromPoints, resizeRect } from '../utils'
+import { clamp, isTooSmall, moveRect, rectFromPoints, resizeRect } from '../../utils'
 import { styles } from './AnnotationCanvas.styles.js'
 
 const CORNERS = ['top-left', 'top-right', 'bottom-left', 'bottom-right']

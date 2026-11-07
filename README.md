@@ -22,10 +22,12 @@ npm run lint      # oxlint
 
 ```bash
 npm run dev
-ngrok http 5173   # open the printed https://….ngrok-free.app link on the phone
+brew install cloudflared                          # once; no account needed
+cloudflared tunnel --url http://localhost:5173    # open the printed https://….trycloudflare.com link on the phone
 ```
 
-`vite.config.js` already allows `*.ngrok-free.app` hosts.
+- `ngrok http 5173` also works, but its free plan has a monthly request limit. The dev server sends each source file as a separate request, so a few sessions use up the limit.
+- `vite.config.js` already allows `*.trycloudflare.com` and `*.ngrok-free.app` hosts.
 
 ## Features
 
