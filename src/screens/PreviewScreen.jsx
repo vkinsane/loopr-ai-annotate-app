@@ -31,13 +31,14 @@ export default function PreviewScreen({ photo, onRetake, onAnnotate }) {
   const poor = summary?.grade === 'poor'
 
   const retake = (
-    <Button variant={poor ? 'contained' : 'outlined'} onClick={onRetake} sx={styles.action}>
+    <Button variant={poor ? 'contained' : 'outlined'} size="large" onClick={onRetake} sx={styles.action}>
       Retake
     </Button>
   )
   const annotate = (
     <Button
       variant={poor ? 'outlined' : 'contained'}
+      size="large"
       onClick={() => onAnnotate({ width: quality.width, height: quality.height })}
       disabled={!measured}
       sx={styles.action}

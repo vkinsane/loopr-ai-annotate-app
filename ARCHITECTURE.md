@@ -43,7 +43,12 @@ e2e/flow.spec.js               # one Playwright test, fake camera
 - **Material UI** (`@mui/material` + Emotion) for components; styled with the `sx` prop and theme values.
 - **Imports:** one line per package (`import { Box, Chip } from '@mui/material'`). The production build tree-shakes unused components and icons; bundle size was unchanged when we switched.
 - **Themes** in `theme.js`: light app theme plus a dark camera theme; `CssBaseline` provides the reset.
-- **Inter** loaded from Google Fonts in `index.html` (no npm package). Falls back to `system-ui` if the network blocks it.
+- **Design tokens live only in `theme.js`.** Style files use theme paths (`'primary.main'`, `'brand.lime'`, `typography: 'h1'`), never hex values.
+  - Palette follows loopr.ai's public site: indigo `#3c4fc9` (actions), carbon `#05091c` (camera), lime `#cefe6f` (accent, other boxes). No Loopr logo or artwork.
+  - Type scale: h1 22 · h2 17 · subtitle1 16 · body1 15 · body2 14 · caption 13 · overline 12 (uppercase labels).
+  - Radius: 6px controls (`shape.borderRadius`), 16px cards (`CARD_RADIUS`). Spacing: MUI's 8px unit, 0.5 steps for 4px.
+  - Shared component styles are theme overrides (large buttons, focus ring, alert titles), not repeated per screen.
+- **Fonts:** Outfit (headings, buttons) and DM Sans (body), from Google Fonts in `index.html`. Fall back to `system-ui`.
 - **AnnotationCanvas is custom**: MUI has no drawing tools, and this logic is a core evaluation point.
   - Boxes are stored in photo pixels and drawn as % of the frame, so they stay aligned at any size.
   - Boxes are HTML elements, not SVG: real text labels, fixed 44 px corner touch targets, free hit-testing.

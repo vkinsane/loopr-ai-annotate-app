@@ -53,6 +53,7 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
   - The brief asks for TypeScript; I removed it to cut type noise.
   - Trade-off: no compile-time checks. Data shapes are described in short doc comments, and oxlint catches common mistakes.
 - **MUI + Emotion** for components and theming. Emotion is MUI's required styling engine.
+- **Look:** colours and type follow loopr.ai's public site (indigo, carbon, lime; Outfit + DM Sans), so the tool reads as part of that product family. Tokens live in `src/theme.js`.
 - **Few dependencies:** react, react-dom, MUI, MUI icons, Emotion. No router, no state library, no canvas or annotation library.
 - **State:** `App` holds the step and the photo, and each screen owns its own state. Annotations use `useReducer` with a pure reducer.
 
@@ -124,3 +125,8 @@ Only what was actually tried is listed.
 | Headless Chrome, 390 × 844 and 844 × 390, fake camera | Capture and error-screen layouts fit the screen, with no sideways scroll, in portrait, landscape and after rotating. |
 | Android | Not tested yet. |
 | Desktop browsers with a webcam | Not tested yet. |
+
+
+App build size details
+Optimizations done details
+etc...
