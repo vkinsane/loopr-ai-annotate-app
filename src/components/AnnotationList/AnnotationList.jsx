@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { AddBoxOutlined, DeleteOutlined } from '@mui/icons-material'
+import { AddBoxOutlined, DeleteOutlined, EditOutlined } from '@mui/icons-material'
 import { Box, IconButton, InputBase, Tooltip, Typography } from '@mui/material'
 import { VISUALLY_HIDDEN } from '../../theme.js'
 import { finishText, TEXT_RULES, validateText } from '../../utils'
@@ -90,6 +90,17 @@ export default function AnnotationList({ items, selectedId, onSelect, onRename, 
                   />
                 </Tooltip>
                 <Typography sx={styles.size}>{Math.round(item.width)} × {Math.round(item.height)}</Typography>
+                <IconButton
+                  aria-label={`Edit ${name}`}
+                  onClick={(event) => {
+                    const input = event.currentTarget.closest('li').querySelector('input')
+                    input.focus()
+                    input.select()
+                  }}
+                  sx={styles.edit}
+                >
+                  <EditOutlined />
+                </IconButton>
                 <IconButton
                   aria-label={`Delete ${name}`}
                   onClick={(event) => {

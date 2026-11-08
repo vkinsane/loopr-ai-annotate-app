@@ -36,7 +36,9 @@ export const styles = {
     flexGrow: 1, minWidth: 0, height: { xs: 44, md: 40 }, typography: { xs: 'body1', md: 'body2' }, fontWeight: selected ? 600 : 500,
     '& input': { textOverflow: 'ellipsis' }, // "…" when not being edited; full name on hover (title)
   }),
-  size: { typography: 'caption', color: 'text.secondary', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' },
+  // Phones need the room for the name; the Summary screen shows the size.
+  size: { display: { xs: 'none', sm: 'block' }, typography: 'caption', color: 'text.secondary', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' },
   note: (note) => ({ typography: 'caption', fontSize: 13, bgcolor: note?.warn ? 'warning.dark' : 'brand.ink', color: 'common.white' }),
+  edit: { width: { xs: 44, md: 36 }, height: { xs: 44, md: 36 }, flexShrink: 0, color: 'text.secondary', '& svg': { fontSize: { xs: 20, md: 18 } } },
   remove: (selected) => ({ width: { xs: 44, md: 36 }, height: { xs: 44, md: 36 }, color: selected ? 'error.main' : 'text.secondary', '& svg': { fontSize: { md: 20 } } }),
 }
