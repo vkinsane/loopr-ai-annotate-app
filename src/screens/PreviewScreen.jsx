@@ -81,7 +81,7 @@ export default function PreviewScreen({ photo, boxCount, onRetake, onAnnotate })
 
       {zooming && (
         <Suspense fallback={null}>
-          <ZoomViewer photoUrl={photo.url} size={measured} onClose={() => setZooming(false)} />
+          <ZoomViewer photoUrl={photo.url} onClose={() => setZooming(false)} />
         </Suspense>
       )}
     </Box>
