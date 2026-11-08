@@ -41,7 +41,7 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
   - Resolution, file size, brightness and sharpness, each graded Good / Warning / Poor.
   - A summary banner with advice, e.g. "Photo is too dark and blurry".
   - Rows that aren't Good show the target ("Good at 60+").
-  - Full-screen zoom: pinch or scroll to zoom (up to 8×), drag to move, double-tap to fit.
+  - Full-screen zoom: pinch or scroll to zoom (up to 8×), drag to move, double-tap to zoom in and out.
   - Retake or Annotate. For a poor photo, Retake becomes the main button.
 - **Annotate**
   - Draw a box by dragging on the photo; drag a box to move it; drag a corner to resize it.
@@ -65,8 +65,8 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
   - Trade-off: no compile-time checks. Data shapes are described in short doc comments, and oxlint catches common mistakes.
 - **MUI + Emotion** for components and theming. Emotion is MUI's required styling engine.
 - **Look:** colours and type follow loopr.ai's public site (indigo, carbon, lime; Outfit + DM Sans), so the tool reads as part of that product family. Tokens live in `src/theme.js`.
-- **Few dependencies:** react, react-dom, MUI, MUI icons, Emotion. No router, no state library, no canvas or annotation library.
-- **State:** `App` holds the stage, the photo, its measured quality and the annotations (`useReducer` with a pure reducer), so going back from Summary keeps the boxes. Other state stays in each screen.
+- **Few dependencies:** react, react-dom, MUI, MUI icons, Emotion, and `react-zoom-pan-pinch` for zoom and pan on Preview and Annotate. No router, no state library, no canvas or annotation library.
+- **State:** `App` holds the photo, its measured quality, its name and the annotations (`useReducer` with a pure reducer), so moving between screens keeps them. `useScreenHistory` keeps the current screen in step with the browser's Back and Forward buttons, without a router. Other state stays in each screen.
 
 ### Camera
 - **Constraints:** `facingMode: 'environment'`, `width/height: { ideal: 4096×3072 }`.

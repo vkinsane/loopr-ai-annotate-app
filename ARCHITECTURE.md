@@ -24,7 +24,8 @@ src/
 │  ├─ AnnotationCanvas/        # photo + boxes + pointer gestures
 │  ├─ AnnotationList/
 │  ├─ QualityChecks/           # check rows: Preview (full), Annotate (compact)
-│  ├─ ZoomViewer/              # full-screen pinch / scroll / drag zoom
+│  ├─ ZoomViewer/              # full-screen zoom (react-zoom-pan-pinch)
+│  ├─ BackButton/              # back arrow used on five screens
 │  ├─ PhotoWithBoxes/          # read-only photo + boxes (Summary)
 │  ├─ ChoosePhotoButton/       # file picker fallback when there's no camera
 │  ├─ HeroDemo/                # landing animation
@@ -43,6 +44,7 @@ src/
    ├─ cameraErrors.js          # pure
    ├─ quality.js               # pure: thresholds, measures, grades, banner text
    ├─ image.js                 # canvas: blob/video → small grey pixel array
+   ├─ format.js                # toPercent, capitalize
    ├─ geometry.js              # pure
    ├─ annotations.js           # pure reducer
    ├─ exportPhoto.js           # canvas: photo + boxes → JPEG blob
