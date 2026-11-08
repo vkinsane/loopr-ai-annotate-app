@@ -46,6 +46,7 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
 - **Annotate**
   - Draw a box by dragging on the photo; drag a box to move it; drag a corner to resize it.
   - Label, select and delete boxes from the list. Delete / Escape keys work on desktop.
+  - Zoom while annotating: pinch, scroll or + and −. The hand button moves the photo. Boxes, labels and handles keep their size on screen.
   - Works with mouse, touch and pen. Boxes stay on the same pixels at any screen size or rotation.
   - Photo quality is shown beside the photo on tablet and desktop.
   - **Name checks** (`utils/validation.js`): up to 40 characters; only letters (any language), numbers, spaces and `- _ . , ( )`. Typed and pasted text is cleaned at once, with a short note saying why. Extra spaces are removed, an empty name goes back to the old one, and a repeated name gets a warning.
@@ -129,7 +130,7 @@ Measured in headless Chrome; not yet checked at these sizes on real devices.
 - **Thresholds are not calibrated.** The sharpness values in particular are starting points. They need measuring from sharp and deliberately blurred photos on the target devices.
 - **File size is a weak quality signal:** it depends on JPEG compression as much as on detail.
 - **Nothing is saved:** annotations live in memory only, and reloading the page loses the photo and the boxes. The only export is the downloaded JPEG; there is no JSON export of the boxes.
-- **No undo, and no zoom while annotating.** Zoom exists on the Preview screen only, so small details on a phone screen are still hard to box precisely.
+- **No undo.** A deleted box can't be brought back.
 - **iPhone:**
   - No `ImageCapture`, so the photo is a video frame. Its resolution depends on what the stream delivers.
   - The browser's address bar can't be hidden from a web page.
