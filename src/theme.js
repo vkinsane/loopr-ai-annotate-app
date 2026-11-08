@@ -1,4 +1,4 @@
-import { createTheme } from '@mui/material'
+import { alpha, createTheme } from '@mui/material'
 
 // Brand palette follows loopr.ai's public site (indigo, carbon, lime). Every text pair passes WCAG AA.
 const BRAND = {
@@ -49,7 +49,14 @@ const shared = {
     MuiAlert: { styleOverrides: { root: { borderRadius: 16 } } },
     MuiAlertTitle: { styleOverrides: { root: heading(16) } },
     MuiCssBaseline: {
-      styleOverrides: { '@media (prefers-reduced-motion: reduce)': { '*, *::before, *::after': { transitionDuration: '0.01ms !important' } } },
+      styleOverrides: (theme) => ({
+        '@media (prefers-reduced-motion: reduce)': { '*, *::before, *::after': { transitionDuration: '0.01ms !important' } },
+        // Always-visible scrollbars: browsers that hide them by default show these whenever an area can scroll.
+        '*::-webkit-scrollbar': { width: 8, height: 8 },
+        '*::-webkit-scrollbar-track': { background: theme.palette.brand.tint },
+        '*::-webkit-scrollbar-thumb': { background: theme.palette.primary.light, borderRadius: 4 },
+        '@supports not selector(::-webkit-scrollbar)': { '*': { scrollbarWidth: 'thin', scrollbarColor: `${theme.palette.primary.light} ${theme.palette.brand.tint}` } },
+      }),
     },
   },
 }
@@ -84,6 +91,23 @@ export const cameraTheme = createTheme({
 
 /** Photo frames, panels, alerts and empty states. Buttons and inputs use theme.shape.borderRadius (6px). */
 export const CARD_RADIUS = '16px'
+
+/**
+ * For scrolling lists. A soft shadow shows at any edge with more content, so it also works where scrollbars stay hidden (iOS).
+ * The two "local" layers scroll with the content and cover the shadows once an end is reached.
+ */
+export const SCROLL_SHADOWS = (theme) => {
+  const paper = theme.palette.background.paper
+  const shade = alpha(theme.palette.brand.ink, 0.18)
+  return {
+    background: `linear-gradient(${paper} 30%, transparent) top / 100% 28px local no-repeat,
+      linear-gradient(transparent, ${paper} 70%) bottom / 100% 28px local no-repeat,
+      linear-gradient(${shade}, transparent) top / 100% 10px scroll no-repeat,
+      linear-gradient(transparent, ${shade}) bottom / 100% 10px scroll no-repeat,
+      ${paper}`,
+    scrollbarGutter: 'stable', // room for the scrollbar is always kept, so rows don't narrow when it appears
+  }
+}
 
 // Strings, not numbers: in MUI's sx, width/height values from 0 to 1 mean a percentage (1 = 100%).
 export const VISUALLY_HIDDEN = {

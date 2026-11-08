@@ -1,4 +1,4 @@
-import { CARD_RADIUS } from '../../theme.js'
+import { CARD_RADIUS, SCROLL_SHADOWS } from '../../theme.js'
 
 export const styles = {
   // Inside a fixed-height sidebar, the list scrolls on its own and the heading stays.
@@ -16,10 +16,10 @@ export const styles = {
   emptyText: { typography: 'body2', color: 'text.secondary' },
   // One bordered card with a line between rows, like the Photo quality card.
   // position: relative keeps the visually hidden notes inside the scroll area, so they can't make the page taller.
-  list: {
+  list: (theme) => ({
     position: 'relative', m: 0, p: 0, listStyle: 'none', overflowY: 'auto', minHeight: 96, flex: 1, alignContent: 'start',
-    bgcolor: 'background.paper', border: 1, borderColor: 'divider', borderRadius: 1,
-  },
+    border: 1, borderColor: 'divider', borderRadius: 1, ...SCROLL_SHADOWS(theme),
+  }),
   // The selected row is tinted, with an indigo bar on its left edge.
   row: (selected) => ({
     display: 'flex', alignItems: 'center', columnGap: 1, pl: 1.5, pr: 0.5, cursor: 'pointer',

@@ -1,4 +1,4 @@
-import { CARD_RADIUS } from '../theme.js'
+import { CARD_RADIUS, SCROLL_SHADOWS } from '../theme.js'
 
 // One window tall, like Annotate: the photo shrinks to fit and the list scrolls inside.
 // Phone and tablet: one column. Desktop: photo on the left, details and actions on the right.
@@ -18,7 +18,7 @@ export const styles = {
   tileLabel: { typography: 'caption', color: 'text.secondary' },
   count: { typography: 'h1', fontWeight: 700, fontVariantNumeric: 'tabular-nums' },
   grade: { display: 'flex', mt: 0.25 },
-  list: { m: 0, p: 0, listStyle: 'none', borderRadius: CARD_RADIUS, overflowY: 'auto', minHeight: 96, flexShrink: 1 },
+  list: (theme) => ({ m: 0, p: 0, listStyle: 'none', borderRadius: CARD_RADIUS, overflowY: 'auto', minHeight: 96, flexShrink: 1, ...SCROLL_SHADOWS(theme) }),
   row: {
     display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, px: 1.75, py: 1.5,
     '&:not(:last-of-type)': { borderBottom: 1, borderColor: 'divider' },
