@@ -22,8 +22,8 @@ export const styles = {
   }),
   // The selected row is tinted, with an indigo bar on its left edge.
   row: (selected) => ({
-    display: 'flex', alignItems: 'center', columnGap: 1, pl: 1.5, pr: 0.5, cursor: 'pointer',
-    bgcolor: selected ? 'brand.tint' : 'transparent',
+    display: 'flex', alignItems: 'center', columnGap: 1, pl: 1.5, pr: 0.5, cursor: 'pointer', transition: 'background-color 120ms',
+    bgcolor: selected ? 'brand.tint' : 'transparent', '&:hover': { bgcolor: selected ? 'brand.tint' : 'action.hover' },
     boxShadow: selected ? (theme) => `inset 3px 0 0 ${theme.palette.primary.main}` : 'none',
     '&:not(:last-of-type)': { borderBottom: 1, borderColor: 'divider' },
   }),

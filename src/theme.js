@@ -51,6 +51,12 @@ const shared = {
     MuiCssBaseline: {
       styleOverrides: (theme) => ({
         '@media (prefers-reduced-motion: reduce)': { '*, *::before, *::after': { transitionDuration: '0.01ms !important' } },
+        '@media (prefers-reduced-motion: no-preference)': {
+          '*': { scrollBehavior: 'smooth' },
+          // A new screen fades in. Only opacity changes, so nothing shifts.
+          '#root > *': { animation: 'screen-in 180ms ease-out' },
+        },
+        '@keyframes screen-in': { from: { opacity: 0 } },
         // Always-visible scrollbars: browsers that hide them by default show these whenever an area can scroll.
         '*::-webkit-scrollbar': { width: 8, height: 8 },
         '*::-webkit-scrollbar-track': { background: theme.palette.brand.tint },
