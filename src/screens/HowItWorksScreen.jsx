@@ -74,7 +74,7 @@ export default function HowItWorksScreen({ onBack, onStart, onPickPhoto }) {
                   Waiting for your answer…
                 </Button>
                 <Typography sx={styles.noCamera}>
-                  Choose <strong>Allow</strong> in your browser&apos;s message.
+                  Choose <strong>Allow</strong> in the pop-up.
                 </Typography>
               </>
             )}

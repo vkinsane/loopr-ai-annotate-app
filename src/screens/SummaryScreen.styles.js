@@ -7,7 +7,7 @@ export const styles = {
     height: '100dvh', overflowY: 'auto', maxWidth: { xs: 600, md: 1200 }, mx: 'auto', p: 2, pt: 1, pb: { xs: 3, md: 2 },
     display: 'grid', gap: { xs: 1.5, md: 2 },
     gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 1fr) 380px' },
-    gridTemplateRows: { xs: 'auto auto minmax(0, 1fr)', md: 'auto minmax(0, 1fr)' },
+    gridTemplateRows: { xs: 'auto max-content minmax(345px, 1fr)', md: 'auto minmax(0, 1fr)' },
   },
   header: { gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: 0.5, ml: -1.5 },
   back: { width: 44, height: 44, color: 'text.primary' },

@@ -4,7 +4,7 @@ import { CARD_RADIUS } from '../theme.js'
 // Desktop: the three steps side by side, tips and Get started in one row at the bottom. Nothing is vertically centred: centring moves the page when a step grows.
 export const styles = {
   root: {
-    minHeight: '100dvh', maxWidth: { xs: 480, sm: 608, md: 1168 }, mx: 'auto', px: { xs: 2, sm: 3 }, py: { sm: 5 },
+    height: '100dvh', overflowY: 'auto', maxWidth: { xs: 480, sm: 608, md: 1168 }, mx: 'auto', px: { xs: 2, sm: 3 }, pt: { sm: 5 }, pb: { md: 5 },
     display: 'flex', flexDirection: 'column',
   },
   header: { display: 'flex', alignItems: 'center', gap: 0.5, ml: -1.5, py: 1, mb: { sm: 1.5, md: 2.5 } },
@@ -48,8 +48,11 @@ export const styles = {
   },
   tipIcon: { fontSize: 22, color: 'primary.dark' },
   footer: {
-    mt: { xs: 'auto', md: 0 }, width: { md: 300 }, flexShrink: 0, pt: { xs: 2, md: 0 }, pb: { xs: 4, sm: 0 },
+    mt: { xs: 'auto', md: 0 }, width: { md: 300 }, flexShrink: 0, pt: { xs: 2, md: 0 }, pb: { xs: 4, md: 0 },
     display: 'flex', flexDirection: 'column', gap: 1,
+    // Phone and tablet: stays pinned to the bottom while the steps scroll on short screens.
+    position: { xs: 'sticky', md: 'static' }, bottom: 0, zIndex: 1, bgcolor: { xs: 'background.default', md: 'transparent' },
+    mx: { xs: -2, sm: -3, md: 0 }, px: { xs: 2, sm: 3, md: 0 },
   },
   footerHint: { typography: 'caption', color: 'text.secondary', textAlign: 'center' },
 }

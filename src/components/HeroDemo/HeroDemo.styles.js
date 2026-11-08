@@ -26,6 +26,8 @@ const labelBase = { position: 'absolute', px: 0.625, fontSize: 11, fontWeight: 6
 export const styles = {
   root: { display: 'flex', flexDirection: 'column', gap: 1.25, mt: 0.5 },
   frame: (theme) => ({
+    // Phone: shrinks on short screens so the page still fits. The steps below keep their full width.
+    width: { xs: 'min(100%, max(120px, 100dvh - 500px) * 4 / 3)', sm: '100%' }, mx: 'auto',
     position: 'relative', aspectRatio: '4 / 3', borderRadius: CARD_RADIUS, overflow: 'hidden', bgcolor: 'brand.photoBackdrop',
     boxShadow: `0 12px 32px ${alpha(theme.palette.brand.ink, 0.18)}`,
   }),

@@ -53,17 +53,19 @@ export default function PreviewScreen({ photo, onRetake, onAnnotate }) {
         )}
       </Box>
 
-      <Alert severity={SEVERITY[summary.grade]} role={poor ? 'alert' : 'status'}>
-        <AlertTitle>{summary.title}</AlertTitle>
-        {summary.advice}
-      </Alert>
+      <Box sx={styles.side}>
+        <Alert severity={SEVERITY[summary.grade]} role={poor ? 'alert' : 'status'}>
+          <AlertTitle>{summary.title}</AlertTitle>
+          {summary.advice}
+        </Alert>
 
-      <QualityChecks checks={qualityChecks(photo.blob.size, measured)} />
+        <QualityChecks checks={qualityChecks(photo.blob.size, measured)} />
 
-      {/* The recommended action is always on the right, as the filled button. */}
-      <Box sx={styles.actions}>
-        {poor ? annotate : retake}
-        {poor ? retake : annotate}
+        {/* The recommended action is always on the right, as the filled button. */}
+        <Box sx={styles.actions}>
+          {poor ? annotate : retake}
+          {poor ? retake : annotate}
+        </Box>
       </Box>
 
       {zooming && (

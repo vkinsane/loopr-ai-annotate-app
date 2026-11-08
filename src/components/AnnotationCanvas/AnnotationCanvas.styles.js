@@ -12,7 +12,7 @@ export const styles = {
   // Largest box with the photo's shape that fits: full width, capped by screen height.
   frame: (ratio) => ({
     position: 'relative', aspectRatio: String(ratio), mx: 'auto', gridArea: { md: 'photo' }, alignSelf: 'start', borderRadius: CARD_RADIUS, overflow: 'hidden', bgcolor: 'brand.photoBackdrop',
-    width: { xs: `min(100%, 50dvh * ${ratio})`, md: `min(100%, (100dvh - 140px) * ${ratio})` },
+    width: { xs: `min(100%, max(100px, min(50dvh, 100dvh - 360px)) * ${ratio})`, sm: `min(100%, 50dvh * ${ratio})`, md: `min(100%, (100dvh - 140px) * ${ratio})` },
     userSelect: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none',
   }),
   photo: { display: 'block', width: '100%', height: '100%', pointerEvents: 'none' },

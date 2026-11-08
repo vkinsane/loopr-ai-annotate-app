@@ -5,7 +5,8 @@ export const styles = {
   root: {
     height: '100dvh', overflowY: 'auto', maxWidth: 1200, mx: 'auto', p: 2, pb: { xs: 0, md: 2 }, display: 'grid', gap: 2,
     gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 1fr) 340px' },
-    gridTemplateRows: { xs: 'auto auto minmax(0, 1fr)', md: 'auto auto auto' }, alignContent: { md: 'start' },
+    // The minimums stop the sidebar being squeezed on very short screens: the screen scrolls instead of overlapping.
+    gridTemplateRows: { xs: 'auto auto minmax(201px, 1fr)', sm: 'auto auto minmax(381px, 1fr)', md: 'auto auto auto' }, alignContent: { md: 'start' },
     gridTemplateAreas: { md: '"header header" "photo side" "hint ."' },
   },
   header: { gridColumn: '1 / -1', gridArea: { md: 'header' }, display: 'flex', alignItems: 'center', gap: 1.5, mt: -0.75 },
