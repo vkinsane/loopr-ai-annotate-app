@@ -1,8 +1,8 @@
 import { CARD_RADIUS } from '../theme.js'
+import { capitalize } from '../utils'
 
 const LANDSCAPE = '@media (orientation: landscape)'
 const GUIDE = { size: 32, inset: 24, line: '3px solid' }
-const capitalize = (word) => word[0].toUpperCase() + word.slice(1)
 
 export const styles = {
   root: {
@@ -13,7 +13,7 @@ export const styles = {
   main: { flex: 1, minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column' },
   topBar: { display: 'flex', alignItems: 'flex-start' },
   // Above the "Starting camera" overlay, so the user can leave if the camera never opens.
-  back: { position: 'relative', zIndex: 1, flexShrink: 0, width: 44, height: 44, mt: 1.25, ml: 1, color: 'text.primary' },
+  back: { position: 'relative', zIndex: 1, mt: 1.25, ml: 1 },
   // Size container: the frame is the largest box with the camera's aspect ratio, so what you see is what gets captured.
   viewport: { flex: 1, minHeight: 0, mx: 2, containerType: 'size', display: 'grid', placeItems: 'center' },
   // Hidden until live: the real aspect ratio is only known then, and a visible resize would shift the layout.

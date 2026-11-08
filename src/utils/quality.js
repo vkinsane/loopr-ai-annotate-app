@@ -2,6 +2,7 @@ const PIXELS_PER_MEGAPIXEL = 1_000_000
 const BYTES_PER_KB = 1024
 
 // Live frames and photos are measured at the same width, so one set of sharpness thresholds fits both.
+export const GRADE_LABELS = { good: 'Good', warn: 'Warning', poor: 'Poor' }
 export const ANALYSIS_WIDTH = 320
 
 export const RESOLUTION_MP = { poorBelow: 2, goodFrom: 8 }

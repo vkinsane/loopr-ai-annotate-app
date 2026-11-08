@@ -1,13 +1,13 @@
 import { useRef, useState } from 'react'
-import { ChevronLeft, EditOutlined, FileDownloadOutlined } from '@mui/icons-material'
+import { EditOutlined, FileDownloadOutlined } from '@mui/icons-material'
 import { Box, Button, IconButton, InputAdornment, Paper, TextField, Typography, useTheme } from '@mui/material'
+import BackButton from '../components/BackButton/BackButton.jsx'
 import ConfirmDialog from '../components/ConfirmDialog/ConfirmDialog.jsx'
 import PhotoWithBoxes from '../components/PhotoWithBoxes/PhotoWithBoxes.jsx'
 import StatusBadge from '../components/StatusBadge/StatusBadge.jsx'
-import { exportAnnotatedPhoto, finishText, gradePhoto, TEXT_RULES, validateText } from '../utils'
+import { exportAnnotatedPhoto, finishText, GRADE_LABELS, gradePhoto, TEXT_RULES, validateText } from '../utils'
 import { styles } from './SummaryScreen.styles.js'
 
-const GRADE_LABELS = { good: 'Good', warn: 'Warning', poor: 'Poor' }
 const DEFAULT_NAME = 'annotated-photo'
 const NAME_RULE = TEXT_RULES.photoName
 
@@ -40,9 +40,7 @@ export default function SummaryScreen({ photo, quality, items, photoName, onPhot
   return (
     <Box component="main" sx={styles.root}>
       <Box sx={styles.header}>
-        <IconButton aria-label="Back to Annotate" onClick={onBack} sx={styles.back}>
-          <ChevronLeft />
-        </IconButton>
+        <BackButton label="Back to Annotate" onClick={onBack} />
         <Typography component="h1" sx={styles.title}>Inspection summary</Typography>
       </Box>
 

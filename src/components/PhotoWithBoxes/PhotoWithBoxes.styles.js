@@ -1,7 +1,6 @@
 import { alpha } from '@mui/material'
 import { CARD_RADIUS } from '../../theme.js'
-
-const toPercent = (value, total) => `${(value / total) * 100}%`
+import { toPercent } from '../../utils'
 
 export const styles = {
   frame: (ratio) => ({

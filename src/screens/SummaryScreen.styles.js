@@ -10,7 +10,6 @@ export const styles = {
     gridTemplateRows: { xs: 'auto max-content minmax(395px, 1fr)', md: 'auto minmax(0, 1fr)' },
   },
   header: { gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: 0.5, ml: -1.5 },
-  back: { width: 44, height: 44, color: 'text.primary' },
   title: { typography: 'h1' },
   side: { display: 'flex', flexDirection: 'column', gap: 1.5, minHeight: 0 },
   tiles: { display: 'flex', gap: 1, flexShrink: 0 },

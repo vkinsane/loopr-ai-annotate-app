@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { ChevronLeft } from '@mui/icons-material'
-import { Box, Button, IconButton, Typography } from '@mui/material'
+import { Box, Button, Typography } from '@mui/material'
 import AnnotationCanvas from '../components/AnnotationCanvas/AnnotationCanvas.jsx'
 import AnnotationList from '../components/AnnotationList/AnnotationList.jsx'
+import BackButton from '../components/BackButton/BackButton.jsx'
 import ConfirmDialog from '../components/ConfirmDialog/ConfirmDialog.jsx'
 import QualityChecks from '../components/QualityChecks/QualityChecks.jsx'
 import StatusBadge from '../components/StatusBadge/StatusBadge.jsx'
@@ -36,9 +36,7 @@ export default function AnnotateScreen({ photo, quality, annotations, dispatch, 
   return (
     <Box component="main" sx={styles.root}>
       <Box sx={styles.header}>
-        <IconButton aria-label="Back to Preview" onClick={onBack} sx={styles.back}>
-          <ChevronLeft />
-        </IconButton>
+        <BackButton label="Back to Preview" onClick={onBack} />
         <Typography component="h1" sx={styles.title}>Annotate</Typography>
         {issues > 0 && (
           <Box sx={styles.qualityPill}>

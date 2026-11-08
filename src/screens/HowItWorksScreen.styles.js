@@ -8,7 +8,6 @@ export const styles = {
     display: 'flex', flexDirection: 'column',
   },
   header: { display: 'flex', alignItems: 'center', gap: 0.5, ml: -1.5, py: 1, mb: { sm: 1.5, md: 2.5 } },
-  back: { width: 44, height: 44, color: 'text.primary' },
   title: { typography: 'h1', fontSize: { md: 28 } },
   steps: {
     listStyle: 'none', m: 0, mt: { xs: 1, sm: 0 }, p: 0, gap: { xs: 1.5, md: 2.5 },

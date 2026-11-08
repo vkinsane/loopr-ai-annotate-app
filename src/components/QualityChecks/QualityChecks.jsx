@@ -1,8 +1,7 @@
 import { Box, Typography } from '@mui/material'
+import { GRADE_LABELS } from '../../utils'
 import StatusBadge from '../StatusBadge/StatusBadge.jsx'
 import { styles } from './QualityChecks.styles.js'
-
-const GRADE_LABELS = { good: 'Good', warn: 'Warning', poor: 'Poor' }
 
 /**
  * The quality check rows from `qualityChecks()`. Rows that aren't good show their target, so the number makes sense.

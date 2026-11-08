@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
-import { ArrowBackIosNew, FlashlightOff, FlashlightOn } from '@mui/icons-material'
+import { FlashlightOff, FlashlightOn } from '@mui/icons-material'
 import { Box, ButtonBase, CircularProgress, IconButton, ThemeProvider, Typography } from '@mui/material'
+import BackButton from '../components/BackButton/BackButton.jsx'
 import LiveQualityChips from '../components/LiveQualityChips/LiveQualityChips.jsx'
 import { useCamera, useLiveQuality, useTorch } from '../hooks'
 import { cameraTheme } from '../theme.js'
@@ -49,9 +50,7 @@ export default function CaptureScreen({ onBack, onCapture, onPickPhoto }) {
       <Box component="main" sx={styles.root}>
         <Box sx={styles.main}>
           <Box sx={styles.topBar}>
-            <IconButton aria-label="Back" disabled={capturing} onClick={onBack} sx={styles.back}>
-              <ArrowBackIosNew fontSize="small" />
-            </IconButton>
+            <BackButton disabled={capturing} onClick={onBack} sx={styles.back} />
             <LiveQualityChips
               resolution={state.status === 'live' ? { width: state.width, height: state.height } : null}
               quality={quality}

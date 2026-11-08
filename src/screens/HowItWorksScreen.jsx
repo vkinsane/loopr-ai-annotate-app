@@ -1,5 +1,6 @@
-import { ArrowBackIosNew, Check, CheckCircleOutlined, CropFree, PanToolOutlined, PhotoCameraOutlined, WbSunnyOutlined } from '@mui/icons-material'
-import { Alert, AlertTitle, Box, Button, CircularProgress, IconButton, Paper, Typography } from '@mui/material'
+import { Check, CheckCircleOutlined, CropFree, PanToolOutlined, PhotoCameraOutlined, WbSunnyOutlined } from '@mui/icons-material'
+import { Alert, AlertTitle, Box, Button, CircularProgress, Paper, Typography } from '@mui/material'
+import BackButton from '../components/BackButton/BackButton.jsx'
 import ChoosePhotoButton from '../components/ChoosePhotoButton/ChoosePhotoButton.jsx'
 import { useCameraPermission } from '../hooks'
 import { VISUALLY_HIDDEN } from '../theme.js'
@@ -36,9 +37,7 @@ export default function HowItWorksScreen({ onBack, onStart, onPickPhoto }) {
   return (
     <Box sx={styles.root}>
       <Box sx={styles.header}>
-        <IconButton aria-label="Back" onClick={onBack} sx={styles.back}>
-          <ArrowBackIosNew fontSize="small" />
-        </IconButton>
+        <BackButton onClick={onBack} />
         <Typography component="h1" sx={styles.title}>
           How it works
         </Typography>

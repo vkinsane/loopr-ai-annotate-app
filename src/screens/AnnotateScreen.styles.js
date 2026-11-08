@@ -10,7 +10,6 @@ export const styles = {
     gridTemplateAreas: { md: '"header header" "photo side" "hint ."' },
   },
   header: { gridColumn: '1 / -1', gridArea: { md: 'header' }, display: 'flex', alignItems: 'center', gap: 0.5, mt: -0.75, ml: -1.5 },
-  back: { width: 44, height: 44, color: 'text.primary' },
   title: { typography: 'h1', flexGrow: 1 },
   qualityPill: { display: { xs: 'none', sm: 'block' } },
   newPhoto: { flexShrink: 0, ml: 1 },

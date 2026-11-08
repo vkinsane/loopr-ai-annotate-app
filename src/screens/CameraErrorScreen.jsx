@@ -1,5 +1,6 @@
-import { ArrowBackIosNew, LockOutlined, NoPhotographyOutlined, PhotoCameraOutlined, ReportProblemOutlined, VideocamOff } from '@mui/icons-material'
-import { Box, Button, IconButton, Typography } from '@mui/material'
+import { LockOutlined, NoPhotographyOutlined, PhotoCameraOutlined, ReportProblemOutlined, VideocamOff } from '@mui/icons-material'
+import { Box, Button, Typography } from '@mui/material'
+import BackButton from '../components/BackButton/BackButton.jsx'
 import ChoosePhotoButton from '../components/ChoosePhotoButton/ChoosePhotoButton.jsx'
 import { styles } from './CameraErrorScreen.styles.js'
 
@@ -17,9 +18,7 @@ export default function CameraErrorScreen({ error, onBack, onRetry, onPickPhoto 
 
   return (
     <Box sx={styles.root}>
-      <IconButton aria-label="Back" onClick={onBack} sx={styles.back}>
-        <ArrowBackIosNew fontSize="small" />
-      </IconButton>
+      <BackButton onClick={onBack} sx={styles.back} />
       <Box role="alert" sx={styles.content}>
         <Box sx={styles.iconCircle}>
           <Icon sx={styles.icon(color)} />

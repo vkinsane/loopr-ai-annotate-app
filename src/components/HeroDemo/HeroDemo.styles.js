@@ -1,5 +1,6 @@
 import { alpha, keyframes } from '@mui/material'
 import { CARD_RADIUS } from '../../theme.js'
+import { capitalize } from '../../utils'
 
 // Timeline (% of 6 s): aim 0–20, shutter flash ~20, quality pill from 30, boxes drawn at ~55 and ~67, fade out 92–100.
 const LOOP = '6s infinite'
@@ -18,7 +19,6 @@ const CONNECTOR = 20 // px of dotted line between two step boxes
 // Animations run only when the user hasn't asked for reduced motion; the static styles are the final frame.
 const animate = (animation) => ({ '@media (prefers-reduced-motion: no-preference)': { animation } })
 
-const capitalize = (word) => word[0].toUpperCase() + word.slice(1)
 // Box positions are % of the sample photo, matching the damage in it.
 const boxBase = { position: 'absolute', boxSizing: 'border-box' }
 const labelBase = { position: 'absolute', px: 0.625, fontSize: 11, fontWeight: 600, lineHeight: '16px' }
