@@ -45,58 +45,60 @@ export default function SummaryScreen({ photo, quality, items, onBack, onNewPhot
 
       <PhotoWithBoxes photoUrl={photo.url} size={quality} items={items} />
 
-      <Box sx={styles.tiles}>
-        <Paper variant="outlined" sx={styles.tile}>
-          <Typography sx={styles.tileLabel}>Annotations</Typography>
-          <Typography sx={styles.count}>{items.length}</Typography>
-        </Paper>
-        <Paper variant="outlined" sx={styles.tile}>
-          <Typography sx={styles.tileLabel}>Photo quality</Typography>
-          <Box sx={styles.grade}>
-            <StatusBadge grade={grade} label={GRADE_LABELS[grade]} pill />
-          </Box>
-        </Paper>
-      </Box>
-
-      {items.length > 0 && (
-        <Paper variant="outlined" component="ul" aria-label="Annotations" sx={styles.list}>
-          {items.map((item) => (
-            <Box component="li" key={item.id} sx={styles.row}>
-              <Box component="span" sx={styles.name}>
-                <Box component="span" aria-hidden sx={styles.swatch} />
-                {item.label || 'Untitled'}
-              </Box>
-              <Typography sx={styles.size}>{Math.round(item.width)} × {Math.round(item.height)} px</Typography>
+      <Box sx={styles.side}>
+        <Box sx={styles.tiles}>
+          <Paper variant="outlined" sx={styles.tile}>
+            <Typography sx={styles.tileLabel}>Annotations</Typography>
+            <Typography sx={styles.count}>{items.length}</Typography>
+          </Paper>
+          <Paper variant="outlined" sx={styles.tile}>
+            <Typography sx={styles.tileLabel}>Photo quality</Typography>
+            <Box sx={styles.grade}>
+              <StatusBadge grade={grade} label={GRADE_LABELS[grade]} pill />
             </Box>
-          ))}
-        </Paper>
-      )}
+          </Paper>
+        </Box>
 
-      <Box sx={styles.actions}>
-        <Button
-          variant="outlined"
-          size="large"
-          fullWidth
-          startIcon={<FileDownloadOutlined />}
-          disabled={download === 'working'}
-          onClick={handleDownload}
-        >
-          {download === 'working' ? 'Preparing photo…' : 'Download photo'}
-        </Button>
-        <Typography role={download === 'failed' ? 'alert' : undefined} sx={styles.caption(download === 'failed')}>
-          {download === 'failed'
-            ? "Couldn't make the photo. Try again."
-            : 'The photo includes the boxes and labels. Nothing is uploaded.'}
-        </Typography>
-        <Button
-          variant="contained"
-          size="large"
-          fullWidth
-          color={confirming ? 'error' : 'primary'}
-          onClick={() => confirm(onNewPhoto, items.length > 0 && download !== 'done')}
-        >
-          {confirming ? 'Discard this photo?' : 'Take new photo'}
-        </Button>
+        {items.length > 0 && (
+          <Paper variant="outlined" component="ul" aria-label="Annotations" sx={styles.list}>
+            {items.map((item) => (
+              <Box component="li" key={item.id} sx={styles.row}>
+                <Box component="span" sx={styles.name}>
+                  <Box component="span" aria-hidden sx={styles.swatch} />
+                  <Box component="span" title={item.label || 'Untitled'} sx={styles.nameText}>{item.label || 'Untitled'}</Box>
+                </Box>
+                <Typography sx={styles.size}>{Math.round(item.width)} × {Math.round(item.height)} px</Typography>
+              </Box>
+            ))}
+          </Paper>
+        )}
+
+        <Box sx={styles.actions}>
+          <Button
+            variant="outlined"
+            size="large"
+            fullWidth
+            startIcon={<FileDownloadOutlined />}
+            disabled={download === 'working'}
+            onClick={handleDownload}
+          >
+            {download === 'working' ? 'Preparing photo…' : 'Download photo'}
+          </Button>
+          <Typography role={download === 'failed' ? 'alert' : undefined} sx={styles.caption(download === 'failed')}>
+            {download === 'failed'
+              ? "Couldn't make the photo. Try again."
+              : 'The photo includes the boxes and labels. Nothing is uploaded.'}
+          </Typography>
+          <Button
+            variant="contained"
+            size="large"
+            fullWidth
+            color={confirming ? 'error' : 'primary'}
+            onClick={() => confirm(onNewPhoto, items.length > 0 && download !== 'done')}
+          >
+            {confirming ? 'Discard this photo?' : 'Take new photo'}
+          </Button>
+        </Box>
       </Box>
     </Box>
   )

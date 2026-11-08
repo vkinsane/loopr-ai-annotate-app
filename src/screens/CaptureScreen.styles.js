@@ -13,8 +13,9 @@ export const styles = {
   main: { flex: 1, minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column' },
   // Size container: the frame is the largest box with the camera's aspect ratio, so what you see is what gets captured.
   viewport: { flex: 1, minHeight: 0, mx: 2, containerType: 'size', display: 'grid', placeItems: 'center' },
-  frame: (aspectRatio) => ({
-    position: 'relative', aspectRatio: String(aspectRatio), width: `min(100cqw, 100cqh * ${aspectRatio})`,
+  // Hidden until live: the real aspect ratio is only known then, and a visible resize would shift the layout.
+  frame: (aspectRatio, live) => ({
+    visibility: live ? 'visible' : 'hidden', position: 'relative', aspectRatio: String(aspectRatio), width: `min(100cqw, 100cqh * ${aspectRatio})`,
     borderRadius: CARD_RADIUS, overflow: 'hidden', bgcolor: 'background.paper',
   }),
   video: { display: 'block', width: '100%', height: '100%' },
@@ -34,7 +35,8 @@ export const styles = {
       width: 140, gridTemplateColumns: 'auto', gridTemplateAreas: '"torch" "shutter" "hint"', alignContent: 'center', p: 2,
     },
   },
-  hint: (warn) => ({ gridArea: 'hint', typography: 'body2', textAlign: 'center', color: warn ? 'warning.light' : 'text.secondary' }),
+  // Two lines are always reserved, so a longer hint doesn't move the shutter.
+  hint: (warn) => ({ gridArea: 'hint', minHeight: '2.9em', display: 'flex', alignItems: 'center', typography: 'body2', textAlign: 'center', color: warn ? 'warning.light' : 'text.secondary' }),
   shutter: {
     gridArea: 'shutter', width: 76, height: 76, p: 0.5,
     borderRadius: '50%', border: 4, borderColor: 'common.white', '&.Mui-disabled': { opacity: 0.4 },

@@ -3,7 +3,8 @@ import { VISUALLY_HIDDEN } from '../../theme.js'
 const GRADE_DOT_COLORS = { good: 'success.light', warn: 'warning.light', poor: 'error.light' }
 
 export const styles = {
-  row: { minHeight: 56, px: 2, pt: 2, pb: 1.5, display: 'flex', gap: 0.75, flexWrap: 'nowrap' },
+  // Reserves the chips' height (32 + padding), so they appear without moving the camera view.
+  row: { minHeight: 60, px: 2, pt: 2, pb: 1.5, display: 'flex', gap: 0.75, flexWrap: 'nowrap' },
   chip: { fontWeight: 600, fontVariantNumeric: 'tabular-nums' },
   icon: { display: 'flex', '& svg': { fontSize: 16 } },
   name: (theme) => ({ fontWeight: 500, color: 'text.secondary', mr: 0.75, [theme.breakpoints.down('sm')]: VISUALLY_HIDDEN }),

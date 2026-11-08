@@ -1,11 +1,42 @@
+import { useEffect, useRef, useState } from 'react'
 import { AddBoxOutlined, DeleteOutlined } from '@mui/icons-material'
-import { Box, IconButton, InputBase, Typography } from '@mui/material'
+import { Box, IconButton, InputBase, Tooltip, Typography } from '@mui/material'
+import { VISUALLY_HIDDEN } from '../../theme.js'
+import { finishText, TEXT_RULES, validateText } from '../../utils'
 import { styles } from './AnnotationList.styles.js'
 
-/** One row per box: editable label, size in photo pixels, delete. Focusing a row selects its box. */
+const RULE = TEXT_RULES.annotationName
+
+/**
+ * One row per box: editable label, size in photo pixels, delete. Focusing a row selects its box.
+ * Labels are checked with `validateText` while typing or pasting and `finishText` on blur. Their message floats as a
+ * tooltip under the field, so no row moves; a hidden live region reads it to screen readers.
+ */
 export default function AnnotationList({ items, selectedId, onSelect, onRename, onRemove }) {
+  const listRef = useRef(null)
+  const labelBeforeEdit = useRef('')
+  const [note, setNote] = useState(null) // { id, text, warn }: the message from validation
+
+  // A new or selected box may be below the fold of the scrolling list.
+  useEffect(() => {
+    listRef.current?.querySelector(`[data-id="${selectedId}"]`)?.scrollIntoView({ block: 'nearest' })
+  }, [selectedId])
+
+  function handleChange(item, raw) {
+    const { value, message } = validateText(raw, RULE)
+    onRename(item.id, value)
+    setNote(message && { id: item.id, ...message })
+  }
+
+  function handleBlur(item) {
+    const others = items.filter((other) => other.id !== item.id).map((other) => other.label)
+    const { value, message } = finishText(item.label, RULE, { previous: labelBeforeEdit.current, others })
+    if (value !== item.label) onRename(item.id, value)
+    setNote(message && { id: item.id, ...message })
+  }
+
   return (
-    <section aria-labelledby="annotations-heading">
+    <Box component="section" aria-labelledby="annotations-heading" sx={styles.root}>
       <Box sx={styles.header}>
         <Typography id="annotations-heading" component="h2" sx={styles.title}>Annotations</Typography>
         <Typography sx={styles.count}>{items.length}</Typography>
@@ -18,21 +49,46 @@ export default function AnnotationList({ items, selectedId, onSelect, onRename, 
           <Typography sx={styles.emptyText}>Drag on the photo to draw a box.</Typography>
         </Box>
       ) : (
-        <Box component="ul" sx={styles.list}>
+        <Box component="ul" ref={listRef} sx={styles.list}>
           {items.map((item, index) => {
             const selected = item.id === selectedId
             const name = item.label || `annotation ${index + 1}`
+            const noteId = `annotation-note-${item.id}`
+            const rowNote = note?.id === item.id ? note : null
             return (
-              <Box component="li" key={item.id} sx={styles.row(selected)} onClick={() => onSelect(item.id)}>
+              <Box component="li" key={item.id} data-id={item.id} sx={styles.row(selected)} onClick={() => onSelect(item.id)}>
                 <Box component="span" aria-hidden sx={styles.swatch(selected)} />
-                <InputBase
-                  value={item.label}
-                  placeholder="Untitled"
-                  onChange={(event) => onRename(item.id, event.target.value)}
-                  onFocus={() => onSelect(item.id)}
-                  inputProps={{ 'aria-label': `Name of annotation ${index + 1}` }}
-                  sx={styles.input(selected)}
-                />
+                <Tooltip
+                  open={Boolean(rowNote)}
+                  title={rowNote?.text ?? ''}
+                  placement="bottom-start"
+                  describeChild
+                  disableHoverListener
+                  disableFocusListener
+                  disableTouchListener
+                  slotProps={{ tooltip: { sx: styles.note(rowNote) } }}
+                >
+                  <InputBase
+                    value={item.label}
+                    placeholder="Untitled"
+                    onChange={(event) => handleChange(item, event.target.value)}
+                    onFocus={() => {
+                      labelBeforeEdit.current = item.label
+                      onSelect(item.id)
+                    }}
+                    onBlur={() => handleBlur(item)}
+                    onKeyDown={(event) => event.key === 'Enter' && event.currentTarget.blur()}
+                    inputProps={{
+                      'aria-label': `Name of annotation ${index + 1}`,
+                      title: item.label,
+                      'aria-describedby': noteId,
+                      enterKeyHint: 'done',
+                      autoComplete: 'off',
+                      spellCheck: false,
+                    }}
+                    sx={styles.input(selected)}
+                  />
+                </Tooltip>
                 <Typography sx={styles.size}>{Math.round(item.width)} × {Math.round(item.height)}</Typography>
                 <IconButton
                   aria-label={`Delete ${name}`}
@@ -44,11 +100,13 @@ export default function AnnotationList({ items, selectedId, onSelect, onRename, 
                 >
                   <DeleteOutlined />
                 </IconButton>
+                {/* Always in the DOM, so screen readers announce a note when it appears. */}
+                <Box component="span" id={noteId} aria-live="polite" sx={VISUALLY_HIDDEN}>{rowNote?.text}</Box>
               </Box>
             )
           })}
         </Box>
       )}
-    </section>
+    </Box>
   )
 }

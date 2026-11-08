@@ -13,11 +13,11 @@ export default function QualityChecks({ checks, compact = false }) {
     <Box component="ul" aria-label="Quality checks" sx={compact ? styles.compactList : styles.list}>
       {checks.map(({ label, value, grade, target }) => (
         <Box component="li" key={label} sx={compact ? styles.compactRow : styles.row}>
-          <div>
-            <Typography sx={styles.label}>{label}</Typography>
+          <Box sx={compact ? styles.compactText : undefined}>
+            <Typography sx={compact ? styles.compactLabel : styles.label}>{label}</Typography>
             <Typography sx={compact ? styles.compactValue : styles.value}>{value}</Typography>
             {!compact && grade && grade !== 'good' && <Typography sx={styles.target}>Good at {target}</Typography>}
-          </div>
+          </Box>
           {grade && <StatusBadge grade={grade} label={GRADE_LABELS[grade]} pill />}
         </Box>
       ))}

@@ -5,7 +5,8 @@ const toPercent = (value, total) => `${(value / total) * 100}%`
 
 export const styles = {
   frame: (ratio) => ({
-    position: 'relative', aspectRatio: String(ratio), width: `min(100%, 45dvh * ${ratio})`, mx: 'auto',
+    position: 'relative', aspectRatio: String(ratio), mx: 'auto', alignSelf: 'start',
+    width: { xs: `min(100%, 36dvh * ${ratio})`, md: `min(100%, (100dvh - 90px) * ${ratio})` },
     borderRadius: CARD_RADIUS, overflow: 'hidden', bgcolor: 'brand.photoBackdrop',
   }),
   photo: { display: 'block', width: '100%', height: '100%' },

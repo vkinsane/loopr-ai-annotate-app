@@ -1,11 +1,11 @@
 import { CARD_RADIUS } from '../theme.js'
 
-// Phone: one column, Get started pinned to the bottom. Tablet: the phone column at 560 px, centred on the screen.
-// Desktop: the three steps side by side, tips and Get started in one row below.
+// Phone and tablet: one column, Get started pinned to the bottom (tablet column 560 px).
+// Desktop: the three steps side by side, tips and Get started in one row at the bottom. Nothing is vertically centred: centring moves the page when a step grows.
 export const styles = {
   root: {
     minHeight: '100dvh', maxWidth: { xs: 480, sm: 608, md: 1168 }, mx: 'auto', px: { xs: 2, sm: 3 }, py: { sm: 5 },
-    display: 'flex', flexDirection: 'column', justifyContent: { sm: 'center' },
+    display: 'flex', flexDirection: 'column',
   },
   header: { display: 'flex', alignItems: 'center', gap: 0.5, ml: -1.5, py: 1, mb: { sm: 1.5, md: 2.5 } },
   back: { width: 44, height: 44, color: 'text.primary' },
@@ -15,6 +15,7 @@ export const styles = {
     display: { xs: 'flex', md: 'grid' }, flexDirection: 'column', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
   },
   step: { borderRadius: CARD_RADIUS, p: { xs: 2, sm: 2.5, md: 3 }, display: 'flex', flexDirection: 'column', gap: { xs: 1.75, md: 2 } },
+  laterStep: (hideOnSmall) => ({ ...styles.step, display: { xs: hideOnSmall ? 'none' : 'flex', md: 'flex' } }),
   stepHeading: { display: 'flex', flexDirection: { md: 'column' }, gap: 1.75 },
   stepNumber: (done) => ({
     flexShrink: 0, width: 32, height: 32, borderRadius: '50%', display: 'grid', placeItems: 'center',
@@ -23,20 +24,19 @@ export const styles = {
   }),
   stepTitle: { typography: 'h2', mb: 0.5 },
   stepText: { typography: 'body2', color: 'text.secondary' },
+  // Each state is one 52 px control plus one line, so the page doesn't move when the state changes.
   permission: { display: 'flex', flexDirection: 'column', gap: 1.5 },
   noCamera: { typography: 'body2', color: 'text.secondary', textAlign: 'center' },
   allowed: {
-    height: 48, borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1,
+    height: 52, borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1,
     bgcolor: 'success.tint', color: 'success.dark', typography: 'button', fontSize: 15,
   },
   errorSteps: { m: 0, pl: 2.25, display: 'flex', flexDirection: 'column', gap: 0.5 },
-  // On phones this grows to fill the screen so the footer's auto margin can push Get started to the bottom.
-  bottom: {
-    flexGrow: { xs: 1, sm: 0 }, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: { md: 'center' },
-    gap: { md: 3 }, mt: { xs: 1.5, md: 2.5 },
-  },
+  // Desktop: tips and Get started in one row at the bottom. Phone and tablet: the wrapper drops out of the layout
+  // (display: contents) and Get started is pinned to the bottom, so hiding steps for the blocked-camera help moves nothing.
+  bottom: { display: { xs: 'contents', md: 'flex' }, alignItems: 'center', gap: 3, mt: 'auto', pt: 2.5 },
   tips: (hideOnSmall) => ({
-    display: { xs: hideOnSmall ? 'none' : 'flex', md: 'flex' }, flexGrow: { md: 1 },
+    display: { xs: hideOnSmall ? 'none' : 'flex', md: 'flex' }, flexGrow: { md: 1 }, mt: { xs: 1.5, md: 0 },
     px: { xs: 2, md: 3 }, py: { xs: 1.75, md: 2.25 }, borderRadius: CARD_RADIUS, bgcolor: 'brand.tint',
     flexDirection: { xs: 'column', md: 'row' }, alignItems: { md: 'center' }, gap: { xs: 1.5, md: 4 },
   }),
@@ -48,7 +48,7 @@ export const styles = {
   },
   tipIcon: { fontSize: 22, color: 'primary.dark' },
   footer: {
-    mt: { xs: 'auto', sm: 4, md: 0 }, width: { md: 300 }, flexShrink: 0, pt: { xs: 2, sm: 0 }, pb: { xs: 4, sm: 0 },
+    mt: { xs: 'auto', md: 0 }, width: { md: 300 }, flexShrink: 0, pt: { xs: 2, md: 0 }, pb: { xs: 4, sm: 0 },
     display: 'flex', flexDirection: 'column', gap: 1,
   },
   footerHint: { typography: 'caption', color: 'text.secondary', textAlign: 'center' },

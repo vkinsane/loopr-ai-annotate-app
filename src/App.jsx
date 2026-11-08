@@ -1,11 +1,13 @@
-import { useEffect, useReducer, useState } from 'react'
-import AnnotateScreen from './screens/AnnotateScreen.jsx'
+import { lazy, Suspense, useEffect, useReducer, useState } from 'react'
 import CaptureScreen from './screens/CaptureScreen.jsx'
 import HowItWorksScreen from './screens/HowItWorksScreen.jsx'
 import LandingScreen from './screens/LandingScreen.jsx'
 import PreviewScreen from './screens/PreviewScreen.jsx'
-import SummaryScreen from './screens/SummaryScreen.jsx'
 import { annotationsReducer, initialAnnotations } from './utils'
+
+// Loaded when first needed, so the first screen downloads less. Each takes a moment only the first time.
+const AnnotateScreen = lazy(() => import('./screens/AnnotateScreen.jsx'))
+const SummaryScreen = lazy(() => import('./screens/SummaryScreen.jsx'))
 
 function App() {
   // 'landing' → 'how-it-works' → 'inspect'. Inside 'inspect', the state below picks the screen:
@@ -43,7 +45,12 @@ function App() {
   }
   if (!photo) return <CaptureScreen onCapture={setPhoto} onPickPhoto={setPhoto} />
   if (!quality) return <PreviewScreen photo={photo} onRetake={startOver} onAnnotate={setQuality} />
-  if (!finished) {
+  return <Suspense fallback={null}>{renderAnnotateOrSummary()}</Suspense>
+
+  function renderAnnotateOrSummary() {
+    if (finished) {
+      return <SummaryScreen photo={photo} quality={quality} items={annotations.items} onBack={() => setFinished(false)} onNewPhoto={startOver} />
+    }
     return (
       <AnnotateScreen
         photo={photo}
@@ -55,9 +62,6 @@ function App() {
       />
     )
   }
-  return (
-    <SummaryScreen photo={photo} quality={quality} items={annotations.items} onBack={() => setFinished(false)} onNewPhoto={startOver} />
-  )
 }
 
 export default App

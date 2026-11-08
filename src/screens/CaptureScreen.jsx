@@ -53,7 +53,7 @@ export default function CaptureScreen({ onCapture, onPickPhoto }) {
             quality={quality}
           />
           <Box sx={styles.viewport}>
-            <Box sx={styles.frame(aspectRatio)}>
+            <Box sx={styles.frame(aspectRatio, state.status === 'live')}>
               {/* playsInline and muted are required for inline autoplay on iOS Safari. */}
               <video ref={videoRef} autoPlay playsInline muted aria-label="Live camera view" style={styles.video} />
               {CORNERS.map(([vertical, horizontal]) => (

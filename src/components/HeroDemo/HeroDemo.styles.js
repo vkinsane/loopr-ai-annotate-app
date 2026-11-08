@@ -11,8 +11,9 @@ const drawAt = (start) => keyframes`
 // Each step is highlighted during its window, with a 2% fade either side. `on` is listed last so it wins at 0% and 100%.
 const STEP_WINDOWS = [[0, 26], [29, 50], [53, 100]]
 const stepHighlight = ([from, to], on, off) => keyframes`
-  0%, ${Math.max(from - 2, 0)}%, ${Math.min(to + 2, 100)}%, 100% { background: ${off.bg}; color: ${off.color} }
-  ${from}%, ${to}% { background: ${on.bg}; color: ${on.color} }`
+  0%, ${Math.max(from - 2, 0)}%, ${Math.min(to + 2, 100)}%, 100% { background: ${off.bg}; color: ${off.color}; border-color: ${off.border} }
+  ${from}%, ${to}% { background: ${on.bg}; color: ${on.color}; border-color: ${on.border} }`
+const CONNECTOR = 20 // px of dotted line between two step boxes
 
 // Animations run only when the user hasn't asked for reduced motion; the static styles are the final frame.
 const animate = (animation) => ({ '@media (prefers-reduced-motion: no-preference)': { animation } })
@@ -54,18 +55,20 @@ export const styles = {
     typography: 'caption', fontWeight: 600, bgcolor: 'success.tint', color: 'success.dark',
     ...animate(`${pill} ${LOOP}`),
   },
-  steps: {
-    listStyle: 'none', m: 0, p: 0.5, display: 'flex', gap: 0.5,
-    bgcolor: 'background.paper', border: 1, borderColor: 'divider', borderRadius: 999,
-  },
+  // Three boxes joined by a dotted line, like steps on a path.
+  steps: { listStyle: 'none', m: 0, p: 0, display: 'flex', gap: `${CONNECTOR}px` },
   step: (index) => (theme) => {
-    const on = { bg: theme.palette.primary.main, color: theme.palette.primary.contrastText }
-    const off = { bg: theme.palette.background.paper, color: theme.palette.text.secondary }
-    const last = index === STEP_WINDOWS.length - 1
+    const on = { bg: theme.palette.brand.tint, color: theme.palette.primary.dark, border: theme.palette.primary.main }
+    const off = { bg: theme.palette.background.paper, color: theme.palette.text.secondary, border: theme.palette.divider }
+    const current = index === STEP_WINDOWS.length - 1 ? on : off
     return {
-      flex: 1, textAlign: 'center', borderRadius: 999, py: 0.75,
+      position: 'relative', flex: 1, textAlign: 'center', borderRadius: 1, py: 0.75,
       fontFamily: theme.typography.h2.fontFamily, fontSize: 13, fontWeight: 600,
-      bgcolor: last ? on.bg : off.bg, color: last ? on.color : off.color,
+      border: '1.5px solid', bgcolor: current.bg, color: current.color, borderColor: current.border,
+      '&:not(:last-of-type)::after': {
+        content: '""', position: 'absolute', top: '50%', left: '100%', width: CONNECTOR, ml: '1.5px',
+        borderTop: `2px dotted ${theme.palette.primary.light}`,
+      },
       ...animate(`${stepHighlight(STEP_WINDOWS[index], on, off)} ${LOOP}`),
     }
   },

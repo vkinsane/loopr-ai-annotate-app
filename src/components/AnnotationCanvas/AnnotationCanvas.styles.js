@@ -7,10 +7,12 @@ const HANDLE = { hit: 44, dot: 14 }
 const toPercent = (value, total) => `${(value / total) * 100}%`
 
 export const styles = {
+  // Desktop: the frame and hint join the screen's grid (areas "photo" and "hint"), so a sidebar can end where the photo ends.
+  root: { display: { md: 'contents' } },
   // Largest box with the photo's shape that fits: full width, capped by screen height.
   frame: (ratio) => ({
-    position: 'relative', aspectRatio: String(ratio), mx: 'auto', borderRadius: CARD_RADIUS, overflow: 'hidden', bgcolor: 'brand.photoBackdrop',
-    width: { xs: `min(100%, 55dvh * ${ratio})`, md: `min(100%, (100dvh - 120px) * ${ratio})` },
+    position: 'relative', aspectRatio: String(ratio), mx: 'auto', gridArea: { md: 'photo' }, alignSelf: 'start', borderRadius: CARD_RADIUS, overflow: 'hidden', bgcolor: 'brand.photoBackdrop',
+    width: { xs: `min(100%, 50dvh * ${ratio})`, md: `min(100%, (100dvh - 140px) * ${ratio})` },
     userSelect: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none',
   }),
   photo: { display: 'block', width: '100%', height: '100%', pointerEvents: 'none' },
@@ -49,5 +51,5 @@ export const styles = {
     bgcolor: (theme) => alpha(theme.palette.brand.carbon, 0.8), color: 'brand.snow', typography: 'caption', fontWeight: 500,
     fontVariantNumeric: 'tabular-nums',
   },
-  hint: { mt: 1.25, typography: 'body2', color: 'text.secondary' },
+  hint: { mt: { xs: 1.25, md: 0 }, gridArea: { md: 'hint' }, typography: 'body2', color: 'text.secondary' },
 }

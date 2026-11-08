@@ -1,7 +1,13 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { ImageOutlined } from '@mui/icons-material'
-import { Button, Link } from '@mui/material'
+import { Alert, Button, Link, Snackbar } from '@mui/material'
+import { validatePhotoFile } from '../../utils'
 import { styles } from './ChoosePhotoButton.styles.js'
+
+// The picker shows only these; `validatePhotoFile` still checks the file's content, since `accept` is only a hint.
+const ACCEPT = 'image/jpeg,image/png,image/webp,image/heic,image/heif'
+const ERROR_SHOW_MS = 6000
+const ERROR_POSITION = { vertical: 'bottom', horizontal: 'center' }
 
 /**
  * Fallback when the camera can't be used: picks an existing photo from the device.
@@ -10,11 +16,20 @@ import { styles } from './ChoosePhotoButton.styles.js'
  */
 export default function ChoosePhotoButton({ onPick, asLink = false, variant = 'outlined' }) {
   const inputRef = useRef(null)
+  const [error, setError] = useState(null)
 
-  function handleChange(event) {
+  async function handleChange(event) {
     const file = event.target.files?.[0]
     event.target.value = '' // lets the same file be picked again after Retake
-    if (file) onPick({ blob: file, url: URL.createObjectURL(file), method: 'upload' })
+    if (!file) return
+    try {
+      const { message } = await validatePhotoFile(file)
+      setError(message?.text ?? null)
+      if (!message) onPick({ blob: file, url: URL.createObjectURL(file), method: 'upload' })
+    } catch (readError) {
+      console.error('Could not read the picked file', readError)
+      setError("Couldn't open this file. Choose another photo.")
+    }
   }
 
   const open = () => inputRef.current?.click()
@@ -22,7 +37,7 @@ export default function ChoosePhotoButton({ onPick, asLink = false, variant = 'o
 
   return (
     <>
-      <input ref={inputRef} type="file" accept="image/*" hidden onChange={handleChange} />
+      <input ref={inputRef} type="file" accept={ACCEPT} hidden onChange={handleChange} />
       {asLink ? (
         <Link component="button" type="button" onClick={open} sx={styles.link}>
           {label}
@@ -32,6 +47,10 @@ export default function ChoosePhotoButton({ onPick, asLink = false, variant = 'o
           {label}
         </Button>
       )}
+      {/* Floats over the page, so showing it moves nothing. The Alert's role="alert" reads it out. */}
+      <Snackbar open={Boolean(error)} autoHideDuration={ERROR_SHOW_MS} onClose={() => setError(null)} anchorOrigin={ERROR_POSITION}>
+        <Alert severity="error" variant="filled" onClose={() => setError(null)} sx={styles.error}>{error}</Alert>
+      </Snackbar>
     </>
   )
 }

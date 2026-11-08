@@ -48,6 +48,9 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
   - Label, select and delete boxes from the list. Delete / Escape keys work on desktop.
   - Works with mouse, touch and pen. Boxes stay on the same pixels at any screen size or rotation.
   - Photo quality is shown beside the photo on tablet and desktop.
+  - **Name checks** (`utils/validation.js`): up to 40 characters; only letters (any language), numbers, spaces and `- _ . , ( )`. Typed and pasted text is cleaned at once, with a short note saying why. Extra spaces are removed, an empty name goes back to the old one, and a repeated name gets a warning.
+- **Choose a photo** (no camera): only JPEG, PNG, WebP or HEIC, checked from the file's first bytes, not its name; not empty; up to 30 MB.
+- **No page scroll on Annotate and Summary:** the photo shrinks to fit and the annotation list scrolls inside its card.
 - **Summary**
   - The photo with all boxes, the annotation count, the quality grade, and each box's size.
   - **Download photo:** a full-resolution JPEG with the boxes and labels drawn on (canvas). Nothing is uploaded.
@@ -120,6 +123,7 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
   - The "Camera access is blocked" steps describe Chrome's site settings; on iPhone the permission is in the iOS Settings app.
 - **While the photo is touched for drawing, the page can't scroll:** on a phone, scroll by touching outside the photo.
 - **Very large photos may fail to download on iPhone:** Safari limits canvas size (about 16.7 MP). The app shows "Couldn't make the photo" in that case.
+- **Checks run in the browser only.** Browser checks can be bypassed, so a future backend must repeat them (OWASP). Today there is no server, so nothing leaves the device.
 - **No automated tests yet.** The pure `utils/` (geometry, reducer, quality, error mapping) are written to be unit-tested first.
 - **Not deployed yet.** The brief requires a public HTTPS deployment.
 

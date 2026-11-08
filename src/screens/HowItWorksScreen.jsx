@@ -73,16 +73,19 @@ export default function HowItWorksScreen({ onBack, onStart, onPickPhoto }) {
                 <Button variant="outlined" size="large" disabled startIcon={<CircularProgress size={18} color="inherit" />}>
                   Waiting for your answer…
                 </Button>
-                <Typography sx={styles.stepText}>
-                  Your browser is asking to use the camera. Choose <strong>Allow</strong>.
+                <Typography sx={styles.noCamera}>
+                  Choose <strong>Allow</strong> in your browser&apos;s message.
                 </Typography>
               </>
             )}
             {allowed && (
-              <Box sx={styles.allowed}>
-                <CheckCircleOutlined fontSize="small" />
-                Camera allowed
-              </Box>
+              <>
+                <Box sx={styles.allowed}>
+                  <CheckCircleOutlined fontSize="small" />
+                  Camera allowed
+                </Box>
+                <Typography sx={styles.noCamera}>You are ready. Tap Get started.</Typography>
+              </>
             )}
             {state.status === 'error' && (
               <>
@@ -114,7 +117,7 @@ export default function HowItWorksScreen({ onBack, onStart, onPickPhoto }) {
         </Paper>
 
         {LATER_STEPS.map(({ title, text }, index) => (
-          <Paper component="li" variant="outlined" key={title} sx={styles.step}>
+          <Paper component="li" variant="outlined" key={title} sx={styles.laterStep(state.status === 'error')}>
             <Box sx={styles.stepHeading}>
               <Box component="span" sx={styles.stepNumber(false)}>
                 {index + 2}
@@ -131,7 +134,7 @@ export default function HowItWorksScreen({ onBack, onStart, onPickPhoto }) {
       </Box>
 
       <Box sx={styles.bottom}>
-        {/* On small screens the blocked-camera help needs the room, so the tips step aside while it shows. */}
+        {/* On small screens the blocked-camera help needs the room, so steps 2–3 and the tips step aside while it shows. */}
         <Box component="section" aria-labelledby="tips-title" sx={styles.tips(state.status === 'error')}>
           <Typography id="tips-title" component="h2" sx={styles.tipsTitle}>
             For a good photo
@@ -147,7 +150,7 @@ export default function HowItWorksScreen({ onBack, onStart, onPickPhoto }) {
         </Box>
 
         <Box sx={styles.footer}>
-          {!allowed && <Typography sx={styles.footerHint}>Allow the camera to continue.</Typography>}
+          <Typography sx={styles.footerHint}>{allowed ? 'You can start now.' : 'Allow the camera to continue.'}</Typography>
           <Button variant="contained" size="large" fullWidth disabled={!allowed} onClick={onStart}>
             Get started
           </Button>

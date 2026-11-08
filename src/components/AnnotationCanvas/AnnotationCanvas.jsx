@@ -70,7 +70,7 @@ export default function AnnotationCanvas({ photoUrl, size, items, selectedId, on
   }
 
   return (
-    <div>
+    <Box sx={styles.root}>
       <Box sx={styles.frame(size.width / size.height)}>
         <img src={photoUrl} alt="Captured photo" draggable={false} style={styles.photo} />
         <Box
@@ -84,7 +84,7 @@ export default function AnnotationCanvas({ photoUrl, size, items, selectedId, on
           {items.map((item) => {
             const selected = item.id === selectedId
             return (
-              <Box key={item.id} data-id={item.id} sx={styles.box(item, size, selected ? 'selected' : 'other')}>
+              <Box key={item.id} data-id={item.id} title={item.label || 'Untitled'} sx={styles.box(item, size, selected ? 'selected' : 'other')}>
                 <Box component="span" sx={styles.label(selected, item.y / size.height < LABEL_BELOW_FROM_TOP)}>
                   {item.label || 'Untitled'}
                 </Box>
@@ -97,6 +97,6 @@ export default function AnnotationCanvas({ photoUrl, size, items, selectedId, on
         <Box component="span" sx={styles.sizeBadge}>{size.width} × {size.height} px</Box>
       </Box>
       <Typography sx={styles.hint}>{draft ? DRAW_HINT : IDLE_HINT}</Typography>
-    </div>
+    </Box>
   )
 }

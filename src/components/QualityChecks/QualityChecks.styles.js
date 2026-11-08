@@ -15,9 +15,15 @@ export const styles = {
     border: { md: 1 }, borderColor: { md: 'divider' }, borderRadius: { md: 1 }, bgcolor: { md: 'background.paper' },
   },
   compactRow: {
-    ...row, px: 1.5, py: 1,
+    ...row, px: 1.5, py: { xs: 1, md: 0.75 },
     bgcolor: { sm: 'background.paper', md: 'transparent' }, border: { sm: 1, md: 0 }, borderColor: { sm: 'divider' }, borderRadius: { sm: 1, md: 0 },
     '&:not(:last-of-type)': { borderBottom: { md: 1 }, borderColor: { md: 'divider' } },
   },
-  compactValue: { typography: 'body2', fontWeight: 500, fontVariantNumeric: 'tabular-nums' },
+  // Desktop rows are one line (label · value · grade) so the sidebar has more room for the annotation list.
+  compactText: { minWidth: 0, display: { md: 'flex' }, alignItems: 'baseline', gap: 1 },
+  compactLabel: { typography: 'caption', color: 'text.secondary', flexShrink: 0, width: { md: 72 } },
+  compactValue: {
+    typography: 'body2', fontWeight: 500, fontVariantNumeric: 'tabular-nums',
+    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: { md: 'nowrap' },
+  },
 }

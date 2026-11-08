@@ -1,12 +1,13 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { ZoomIn } from '@mui/icons-material'
 import { Alert, AlertTitle, Box, Button, CircularProgress, Typography } from '@mui/material'
 import QualityChecks from '../components/QualityChecks/QualityChecks.jsx'
-import ZoomViewer from '../components/ZoomViewer/ZoomViewer.jsx'
 import { usePhotoQuality } from '../hooks'
 import { gradePhoto, qualityChecks } from '../utils'
 import { styles } from './PreviewScreen.styles.js'
 
+// Loaded on the first Zoom tap; most photos are never zoomed.
+const ZoomViewer = lazy(() => import('../components/ZoomViewer/ZoomViewer.jsx'))
 const SEVERITY = { good: 'success', warn: 'warning', poor: 'error' }
 const MEASURE_FAILED = { grade: 'poor', title: "Couldn't read this photo", advice: 'Take the photo again to continue.' }
 
@@ -17,6 +18,16 @@ export default function PreviewScreen({ photo, onRetake, onAnnotate }) {
   const measured = quality && !quality.failed ? quality : null
   const summary = quality?.failed ? MEASURE_FAILED : measured && gradePhoto({ bytes: photo.blob.size, ...measured }).summary
   const poor = summary?.grade === 'poor'
+
+  // Drawn only once measured: the summary can be 1–4 lines, so showing it later would move the page.
+  if (!quality) {
+    return (
+      <Box component="main" role="status" sx={styles.checking}>
+        <CircularProgress />
+        Checking photo quality…
+      </Box>
+    )
+  }
 
   const retake = (
     <Button variant={poor ? 'contained' : 'outlined'} size="large" onClick={onRetake} sx={styles.action}>
@@ -33,7 +44,7 @@ export default function PreviewScreen({ photo, onRetake, onAnnotate }) {
     <Box component="main" sx={styles.root}>
       <Typography component="h1" sx={styles.title}>Preview &amp; quality</Typography>
 
-      <Box sx={styles.photoFrame}>
+      <Box sx={styles.photoFrame(measured && measured.width / measured.height)}>
         <Box component="img" src={photo.url} alt="Captured photo" sx={styles.photo} />
         {measured && (
           <Button aria-label="Zoom photo" startIcon={<ZoomIn />} onClick={() => setZooming(true)} sx={styles.zoom}>
@@ -42,17 +53,10 @@ export default function PreviewScreen({ photo, onRetake, onAnnotate }) {
         )}
       </Box>
 
-      {summary ? (
-        <Alert severity={SEVERITY[summary.grade]} role={poor ? 'alert' : 'status'}>
-          <AlertTitle>{summary.title}</AlertTitle>
-          {summary.advice}
-        </Alert>
-      ) : (
-        <Box role="status" sx={styles.checking}>
-          <CircularProgress size={20} color="inherit" />
-          Checking photo quality…
-        </Box>
-      )}
+      <Alert severity={SEVERITY[summary.grade]} role={poor ? 'alert' : 'status'}>
+        <AlertTitle>{summary.title}</AlertTitle>
+        {summary.advice}
+      </Alert>
 
       <QualityChecks checks={qualityChecks(photo.blob.size, measured)} />
 
@@ -62,7 +66,11 @@ export default function PreviewScreen({ photo, onRetake, onAnnotate }) {
         {poor ? retake : annotate}
       </Box>
 
-      {zooming && <ZoomViewer photoUrl={photo.url} size={measured} onClose={() => setZooming(false)} />}
+      {zooming && (
+        <Suspense fallback={null}>
+          <ZoomViewer photoUrl={photo.url} size={measured} onClose={() => setZooming(false)} />
+        </Suspense>
+      )}
     </Box>
   )
 }
