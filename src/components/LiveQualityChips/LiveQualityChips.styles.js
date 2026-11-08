@@ -4,7 +4,7 @@ const GRADE_DOT_COLORS = { good: 'success.light', warn: 'warning.light', poor: '
 
 export const styles = {
   // Reserves the chips' height (32 + padding), so they appear without moving the camera view.
-  row: { minHeight: 60, px: 2, pt: 2, pb: 1.5, display: 'flex', gap: 0.75, flexWrap: 'nowrap' },
+  row: { minHeight: 60, minWidth: 0, pl: 0.5, pr: 2, pt: 2, pb: 1.5, display: 'flex', gap: 0.75, flexWrap: 'nowrap' },
   chip: { fontWeight: 600, fontVariantNumeric: 'tabular-nums' },
   icon: { display: 'flex', '& svg': { fontSize: 16 } },
   name: (theme) => ({ fontWeight: 500, color: 'text.secondary', mr: 0.75, [theme.breakpoints.down('sm')]: VISUALLY_HIDDEN }),

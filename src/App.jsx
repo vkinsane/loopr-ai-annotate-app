@@ -43,7 +43,7 @@ function App() {
       <HowItWorksScreen onBack={() => setStage('landing')} onStart={() => setStage('inspect')} onPickPhoto={handlePickedPhoto} />
     )
   }
-  if (!photo) return <CaptureScreen onCapture={setPhoto} onPickPhoto={setPhoto} />
+  if (!photo) return <CaptureScreen onBack={() => setStage('how-it-works')} onCapture={setPhoto} onPickPhoto={setPhoto} />
   if (!quality) return <PreviewScreen photo={photo} onRetake={startOver} onAnnotate={setQuality} />
   return <Suspense fallback={null}>{renderAnnotateOrSummary()}</Suspense>
 

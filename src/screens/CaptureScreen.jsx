@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { FlashlightOff, FlashlightOn } from '@mui/icons-material'
+import { ArrowBackIosNew, FlashlightOff, FlashlightOn } from '@mui/icons-material'
 import { Box, ButtonBase, CircularProgress, IconButton, ThemeProvider, Typography } from '@mui/material'
 import LiveQualityChips from '../components/LiveQualityChips/LiveQualityChips.jsx'
 import { useCamera, useLiveQuality, useTorch } from '../hooks'
@@ -12,7 +12,7 @@ const DEFAULT_ASPECT_RATIO = 4 / 3
 const CORNERS = [['top', 'left'], ['top', 'right'], ['bottom', 'left'], ['bottom', 'right']]
 
 /** `onCapture` and `onPickPhoto` both receive { blob, url, method }. */
-export default function CaptureScreen({ onCapture, onPickPhoto }) {
+export default function CaptureScreen({ onBack, onCapture, onPickPhoto }) {
   const videoRef = useRef(null)
   const { state, retry, capture } = useCamera(videoRef)
   const [capturing, setCapturing] = useState(false)
@@ -23,7 +23,7 @@ export default function CaptureScreen({ onCapture, onPickPhoto }) {
   if (state.status === 'error') {
     return (
       <ThemeProvider theme={cameraTheme}>
-        <CameraErrorScreen error={state.error} onRetry={retry} onPickPhoto={onPickPhoto} />
+        <CameraErrorScreen error={state.error} onBack={onBack} onRetry={retry} onPickPhoto={onPickPhoto} />
       </ThemeProvider>
     )
   }
@@ -48,10 +48,15 @@ export default function CaptureScreen({ onCapture, onPickPhoto }) {
     <ThemeProvider theme={cameraTheme}>
       <Box component="main" sx={styles.root}>
         <Box sx={styles.main}>
-          <LiveQualityChips
-            resolution={state.status === 'live' ? { width: state.width, height: state.height } : null}
-            quality={quality}
-          />
+          <Box sx={styles.topBar}>
+            <IconButton aria-label="Back" disabled={capturing} onClick={onBack} sx={styles.back}>
+              <ArrowBackIosNew fontSize="small" />
+            </IconButton>
+            <LiveQualityChips
+              resolution={state.status === 'live' ? { width: state.width, height: state.height } : null}
+              quality={quality}
+            />
+          </Box>
           <Box sx={styles.viewport}>
             <Box sx={styles.frame(aspectRatio, state.status === 'live')}>
               {/* playsInline and muted are required for inline autoplay on iOS Safari. */}
