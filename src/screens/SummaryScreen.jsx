@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { EditOutlined, FileDownloadOutlined } from '@mui/icons-material'
 import { Box, Button, IconButton, InputAdornment, Paper, TextField, Typography, useTheme } from '@mui/material'
+import AnnotationList from '../components/AnnotationList/AnnotationList.jsx'
 import BackButton from '../components/BackButton/BackButton.jsx'
 import ConfirmDialog from '../components/ConfirmDialog/ConfirmDialog.jsx'
 import PhotoWithBoxes from '../components/PhotoWithBoxes/PhotoWithBoxes.jsx'
@@ -60,19 +61,7 @@ export default function SummaryScreen({ photo, quality, items, photoName, onPhot
           </Paper>
         </Box>
 
-        {items.length > 0 && (
-          <Paper variant="outlined" component="ul" aria-label="Annotations" sx={styles.list}>
-            {items.map((item) => (
-              <Box component="li" key={item.id} sx={styles.row}>
-                <Box component="span" sx={styles.name}>
-                  <Box component="span" aria-hidden sx={styles.swatch} />
-                  <Box component="span" title={item.label || 'Untitled'} sx={styles.nameText}>{item.label || 'Untitled'}</Box>
-                </Box>
-                <Typography sx={styles.size}>{Math.round(item.width)} × {Math.round(item.height)} px</Typography>
-              </Box>
-            ))}
-          </Paper>
-        )}
+        {items.length > 0 && <AnnotationList readOnly items={items} />}
 
         <Box sx={styles.actions}>
           <TextField

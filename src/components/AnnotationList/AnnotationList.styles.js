@@ -3,7 +3,7 @@ import { CARD_RADIUS, SCROLL_SHADOWS } from '../../theme.js'
 export const styles = {
   // Inside a fixed-height sidebar, the list scrolls on its own and the heading stays.
   // Takes all spare height, empty or not, so adding the first box doesn't move what is below.
-  root: { display: 'flex', flexDirection: 'column', minHeight: 0, flex: '1 1 0' },
+  root: (readOnly) => ({ display: 'flex', flexDirection: 'column', minHeight: 0, flex: readOnly ? '0 1 auto' : '1 1 0' }),
   header: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', mb: 1 },
   title: { typography: 'h2' },
   count: { typography: 'caption', color: 'text.secondary' },
@@ -16,8 +16,8 @@ export const styles = {
   emptyText: { typography: 'body2', color: 'text.secondary' },
   // One bordered card with a line between rows, like the Photo quality card.
   // position: relative keeps the visually hidden notes inside the scroll area, so they can't make the page taller.
-  list: (theme) => ({
-    position: 'relative', m: 0, p: 0, listStyle: 'none', overflowY: 'auto', minHeight: 96, flex: 1, alignContent: 'start',
+  list: (readOnly) => (theme) => ({
+    position: 'relative', m: 0, p: 0, listStyle: 'none', overflowY: 'auto', minHeight: 96, flex: readOnly ? '0 1 auto' : 1, alignContent: 'start',
     border: 1, borderColor: 'divider', borderRadius: 1, ...SCROLL_SHADOWS(theme),
   }),
   // The selected row is tinted, with an indigo bar on its left edge.
@@ -27,6 +27,9 @@ export const styles = {
     boxShadow: selected ? (theme) => `inset 3px 0 0 ${theme.palette.primary.main}` : 'none',
     '&:not(:last-of-type)': { borderBottom: 1, borderColor: 'divider' },
   }),
+  readOnlyRow: { display: 'flex', alignItems: 'center', gap: 1.25, px: 1.75, py: 1.5, '&:not(:last-of-type)': { borderBottom: 1, borderColor: 'divider' } },
+  readOnlyName: { flexGrow: 1, minWidth: 0, typography: 'body1', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
+  readOnlySize: { flexShrink: 0, typography: 'caption', color: 'text.secondary', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' },
   // Same colours as the box on the photo: indigo when selected, lime with a navy outline otherwise.
   swatch: (selected) => ({
     flexShrink: 0, width: 12, height: 12, borderRadius: '3px', bgcolor: selected ? 'primary.main' : 'brand.lime',

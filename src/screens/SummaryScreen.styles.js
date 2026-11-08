@@ -1,4 +1,4 @@
-import { CARD_RADIUS, SCROLL_SHADOWS } from '../theme.js'
+import { CARD_RADIUS } from '../theme.js'
 
 // One window tall, like Annotate: the photo shrinks to fit and the list scrolls inside.
 // Phone and tablet: one column. Desktop: photo on the left, details and actions on the right.
@@ -17,19 +17,6 @@ export const styles = {
   tileLabel: { typography: 'caption', color: 'text.secondary' },
   count: { typography: 'h1', fontWeight: 700, fontVariantNumeric: 'tabular-nums' },
   grade: { display: 'flex', mt: 0.25 },
-  list: (theme) => ({ m: 0, p: 0, listStyle: 'none', borderRadius: CARD_RADIUS, overflowY: 'auto', minHeight: 96, flexShrink: 1, ...SCROLL_SHADOWS(theme) }),
-  row: {
-    display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, px: 1.75, py: 1.5,
-    '&:not(:last-of-type)': { borderBottom: 1, borderColor: 'divider' },
-  },
-  name: { display: 'flex', alignItems: 'center', gap: 1.25, minWidth: 0, typography: 'body1', fontWeight: 500 },
-  // Long names stay on one line and end in "…"; the full name shows on hover (title).
-  nameText: { minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
-  swatch: {
-    flexShrink: 0, width: 12, height: 12, borderRadius: '3px', bgcolor: 'brand.lime',
-    boxShadow: (theme) => `0 0 0 1px ${theme.palette.brand.ink}`,
-  },
-  size: { typography: 'caption', color: 'text.secondary', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' },
   actions: { mt: { xs: 'auto', md: 0 }, pt: 1, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 1.25 },
   editName: { width: 36, height: 36, ml: 0.25, color: 'text.secondary' },
   // Two lines reserved: the normal and the failed text differ in length.
