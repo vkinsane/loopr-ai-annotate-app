@@ -111,6 +111,19 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
 - No component file over 250 lines. Styles live in a `*.styles.js` file next to each component.
 - See [ARCHITECTURE.md](ARCHITECTURE.md) for the full structure and rules.
 
+## Supported screens
+
+Measured in headless Chrome; not yet checked at these sizes on real devices.
+
+| Screen | What happens |
+|---|---|
+| **Portrait phones, 320 × 568 and up** | The page doesn't scroll. Photos shrink to fit. On short phones the Preview details and How it works steps scroll inside, with the main buttons pinned. |
+| **Under 620 px tall** | The Landing demo is hidden so the text and button fit. |
+| **Tablets, 600 px wide and up** | No page scroll in portrait or landscape. |
+| **Laptops and desktops, 1280 × 720 to 1920 × 1080** | No page scroll. Content stops growing at 1200 px and stays centred. |
+| **Phones held sideways** | Everything is reachable and nothing overlaps, but screens scroll. Capture fits without scrolling. |
+| **Narrower than 320 px** | Not designed for. |
+
 ## Known limitations
 
 - **Thresholds are not calibrated.** The sharpness values in particular are starting points. They need measuring from sharp and deliberately blurred photos on the target devices.
