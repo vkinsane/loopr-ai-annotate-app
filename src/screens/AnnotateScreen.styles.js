@@ -13,8 +13,7 @@ export const styles = {
   back: { width: 44, height: 44, color: 'text.primary' },
   title: { typography: 'h1', flexGrow: 1 },
   qualityPill: { display: { xs: 'none', sm: 'block' } },
-  // Fits "Discard 99 boxes?", so the longer label doesn't push the quality pill.
-  newPhoto: (confirming) => ({ minWidth: 150, ml: 1, justifyContent: 'flex-end', color: confirming ? 'error.main' : 'primary.main' }),
+  newPhoto: { flexShrink: 0, ml: 1 },
   // Desktop: height 0 + min-height 100% means the photo alone sets the row height; a long list scrolls instead of growing it.
   sidebar: { display: 'flex', flexDirection: 'column', gap: 2, minHeight: { xs: 0, md: '100%' }, height: { md: 0 }, gridArea: { md: 'side' } },
   quality: { display: { xs: 'none', sm: 'block' }, flexShrink: 0 },

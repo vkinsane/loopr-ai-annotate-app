@@ -1,6 +1,7 @@
 import { lazy, Suspense, useState } from 'react'
 import { ZoomIn } from '@mui/icons-material'
 import { Alert, AlertTitle, Box, Button, CircularProgress, Typography } from '@mui/material'
+import ConfirmDialog from '../components/ConfirmDialog/ConfirmDialog.jsx'
 import QualityChecks from '../components/QualityChecks/QualityChecks.jsx'
 import { usePhotoQuality } from '../hooks'
 import { gradePhoto, qualityChecks } from '../utils'
@@ -12,8 +13,9 @@ const SEVERITY = { good: 'success', warn: 'warning', poor: 'error' }
 const MEASURE_FAILED = { grade: 'poor', title: "Couldn't read this photo", advice: 'Take the photo again to continue.' }
 
 /** `photo` is { blob, url, method }. `onAnnotate` receives the measured quality { width, height, brightness, sharpness }. */
-export default function PreviewScreen({ photo, onRetake, onAnnotate }) {
+export default function PreviewScreen({ photo, boxCount, onRetake, onAnnotate }) {
   const [zooming, setZooming] = useState(false)
+  const [confirming, setConfirming] = useState(false)
   const quality = usePhotoQuality(photo)
   const measured = quality && !quality.failed ? quality : null
   const summary = quality?.failed ? MEASURE_FAILED : measured && gradePhoto({ bytes: photo.blob.size, ...measured }).summary
@@ -30,7 +32,7 @@ export default function PreviewScreen({ photo, onRetake, onAnnotate }) {
   }
 
   const retake = (
-    <Button variant={poor ? 'contained' : 'outlined'} size="large" onClick={onRetake} sx={styles.action}>
+    <Button variant={poor ? 'contained' : 'outlined'} size="large" onClick={() => (boxCount > 0 ? setConfirming(true) : onRetake())} sx={styles.action}>
       Retake
     </Button>
   )
@@ -67,6 +69,15 @@ export default function PreviewScreen({ photo, onRetake, onAnnotate }) {
           {poor ? retake : annotate}
         </Box>
       </Box>
+
+      <ConfirmDialog
+        open={confirming}
+        title="Discard this photo?"
+        message="The boxes you drew on this photo will be lost."
+        confirmLabel="Discard"
+        onConfirm={onRetake}
+        onCancel={() => setConfirming(false)}
+      />
 
       {zooming && (
         <Suspense fallback={null}>

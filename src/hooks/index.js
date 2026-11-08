@@ -1,6 +1,5 @@
 export { useCamera } from './useCamera.js'
 export { useCameraPermission } from './useCameraPermission.js'
-export { useConfirmTap } from './useConfirmTap.js'
 export { useLiveQuality } from './useLiveQuality.js'
 export { usePhotoQuality } from './usePhotoQuality.js'
 export { useScreenHistory } from './useScreenHistory.js'

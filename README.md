@@ -104,7 +104,7 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
 - **Pointer Events with pointer capture:** one code path for mouse, touch and pen. `touch-action: none` on the photo stops the page from scrolling while drawing.
 - **No draw/select modes:** the gesture depends on where it starts (corner → resize, box → move, empty photo → draw). A quick tap or a box under 12 screen px is ignored.
 - **Pure logic in `utils/`:** `geometry.js` (draw, move, resize, clamp) and `annotations.js` (reducer). IDs are created outside the reducer, so it stays pure.
-- **Destructive actions need a second tap** ("Discard 3 boxes?", "Discard this photo?"), instead of a dialog (`hooks/useConfirmTap.js`).
+- **A confirmation dialog appears before work is lost** (`components/ConfirmDialog`): "Keep working" is the safe default. It only appears when there are boxes that would be lost.
 
 ### Code conventions
 - Folders by file type: `screens/`, `components/`, `hooks/` (browser APIs and lifecycle), `utils/` (pure logic).

@@ -7,7 +7,7 @@ Flow: **Landing → How it works → Capture → Preview & quality → Annotate 
 ```
 src/
 ├─ main.jsx                    # ThemeProvider + CssBaseline
-├─ App.jsx                     # stage, photo, quality, annotations reducer; picks the screen
+├─ App.jsx                     # screen history, photo, quality, annotations reducer; picks the screen
 ├─ theme.js                    # MUI themes (light + dark camera), shared styles
 ├─ screens/
 │  ├─ LandingScreen.jsx
@@ -28,6 +28,7 @@ src/
 │  ├─ PhotoWithBoxes/          # read-only photo + boxes (Summary)
 │  ├─ ChoosePhotoButton/       # file picker fallback when there's no camera
 │  ├─ HeroDemo/                # landing animation
+│  ├─ ConfirmDialog/           # asks before work is lost
 │  └─ __tests__/
 ├─ hooks/
 │  ├─ useCamera.js             # stream + capturePhoto
@@ -35,7 +36,7 @@ src/
 │  ├─ useLiveQuality.js
 │  ├─ usePhotoQuality.js       # brightness + sharpness of the captured photo
 │  ├─ useCameraPermission.js   # ask once on How it works
-│  ├─ useConfirmTap.js         # second tap confirms a discard
+│  ├─ useScreenHistory.js      # current screen, in step with browser Back / Forward
 │  ├─ index.js                # re-exports, for one-line imports
 │  └─ __tests__/
 └─ utils/

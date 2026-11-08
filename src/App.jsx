@@ -55,7 +55,7 @@ function App() {
   if (screen === 'capture') {
     return <CaptureScreen onBack={() => go('how-it-works')} onCapture={handleNewPhoto} onPickPhoto={handleNewPhoto} />
   }
-  if (screen === 'preview') return <PreviewScreen photo={photo} onRetake={startOver} onAnnotate={handleMeasured} />
+  if (screen === 'preview') return <PreviewScreen photo={photo} boxCount={annotations.items.length} onRetake={startOver} onAnnotate={handleMeasured} />
 
   return (
     <Suspense fallback={null}>

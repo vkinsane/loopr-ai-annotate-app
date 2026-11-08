@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { ChevronLeft, FileDownloadOutlined } from '@mui/icons-material'
 import { Box, Button, IconButton, Paper, Typography, useTheme } from '@mui/material'
+import ConfirmDialog from '../components/ConfirmDialog/ConfirmDialog.jsx'
 import PhotoWithBoxes from '../components/PhotoWithBoxes/PhotoWithBoxes.jsx'
 import StatusBadge from '../components/StatusBadge/StatusBadge.jsx'
-import { useConfirmTap } from '../hooks'
 import { exportAnnotatedPhoto, gradePhoto } from '../utils'
 import { styles } from './SummaryScreen.styles.js'
 
@@ -14,7 +14,7 @@ const DOWNLOAD_NAME = 'annotated-photo.jpg'
 export default function SummaryScreen({ photo, quality, items, onBack, onNewPhoto }) {
   const theme = useTheme()
   const [download, setDownload] = useState('idle') // 'idle' | 'working' | 'done' | 'failed'
-  const { confirming, confirm } = useConfirmTap()
+  const [confirming, setConfirming] = useState(false)
   const grade = gradePhoto({ bytes: photo.blob.size, ...quality }).summary.grade
 
   async function handleDownload() {
@@ -93,13 +93,21 @@ export default function SummaryScreen({ photo, quality, items, onBack, onNewPhot
             variant="contained"
             size="large"
             fullWidth
-            color={confirming ? 'error' : 'primary'}
-            onClick={() => confirm(onNewPhoto, items.length > 0 && download !== 'done')}
+            onClick={() => (items.length > 0 && download !== 'done' ? setConfirming(true) : onNewPhoto())}
           >
-            {confirming ? 'Discard this photo?' : 'Take new photo'}
+            Take new photo
           </Button>
         </Box>
       </Box>
+
+      <ConfirmDialog
+        open={confirming}
+        title="Discard this photo?"
+        message="You haven't downloaded it, so the photo and its boxes will be lost."
+        confirmLabel="Discard"
+        onConfirm={onNewPhoto}
+        onCancel={() => setConfirming(false)}
+      />
     </Box>
   )
 }

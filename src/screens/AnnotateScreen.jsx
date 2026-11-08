@@ -1,11 +1,11 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { ChevronLeft } from '@mui/icons-material'
 import { Box, Button, IconButton, Typography } from '@mui/material'
 import AnnotationCanvas from '../components/AnnotationCanvas/AnnotationCanvas.jsx'
 import AnnotationList from '../components/AnnotationList/AnnotationList.jsx'
+import ConfirmDialog from '../components/ConfirmDialog/ConfirmDialog.jsx'
 import QualityChecks from '../components/QualityChecks/QualityChecks.jsx'
 import StatusBadge from '../components/StatusBadge/StatusBadge.jsx'
-import { useConfirmTap } from '../hooks'
 import { gradePhoto, qualityChecks } from '../utils'
 import { styles } from './AnnotateScreen.styles.js'
 
@@ -17,7 +17,7 @@ const plural = (count, one, many = `${one}s`) => `${count} ${count === 1 ? one :
  */
 export default function AnnotateScreen({ photo, quality, annotations, dispatch, onBack, onNewPhoto, onDone }) {
   const { items, selectedId } = annotations
-  const { confirming, confirm } = useConfirmTap()
+  const [confirming, setConfirming] = useState(false)
   const checks = qualityChecks(photo.blob.size, quality)
   const issues = checks.filter((check) => check.grade !== 'good').length
   const overall = gradePhoto({ bytes: photo.blob.size, ...quality }).summary.grade
@@ -45,9 +45,7 @@ export default function AnnotateScreen({ photo, quality, annotations, dispatch, 
             <StatusBadge grade={overall} label={`Quality: ${plural(issues, 'warning')}`} pill />
           </Box>
         )}
-        <Button onClick={() => confirm(onNewPhoto, items.length > 0)} sx={styles.newPhoto(confirming)}>
-          {confirming ? `Discard ${plural(items.length, 'box', 'boxes')}?` : 'New photo'}
-        </Button>
+        <Button onClick={() => (items.length > 0 ? setConfirming(true) : onNewPhoto())} sx={styles.newPhoto}>New photo</Button>
       </Box>
 
       <AnnotationCanvas
@@ -80,6 +78,15 @@ export default function AnnotateScreen({ photo, quality, annotations, dispatch, 
           </Button>
         </Box>
       </Box>
+
+      <ConfirmDialog
+        open={confirming}
+        title="Discard this photo?"
+        message={`This photo and its ${plural(items.length, 'box', 'boxes')} will be lost.`}
+        confirmLabel="Discard"
+        onConfirm={onNewPhoto}
+        onCancel={() => setConfirming(false)}
+      />
     </Box>
   )
 }
