@@ -111,7 +111,7 @@ export const SCROLL_SHADOWS = (theme) => {
       linear-gradient(${shade}, transparent) top / 100% 10px scroll no-repeat,
       linear-gradient(transparent, ${shade}) bottom / 100% 10px scroll no-repeat,
       ${paper}`,
-    scrollbarGutter: 'stable', // room for the scrollbar is always kept, so rows don't narrow when it appears
+    overflowY: 'scroll', // the scrollbar's track is always there, so rows don't narrow when the list gets long
   }
 }
 

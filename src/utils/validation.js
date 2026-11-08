@@ -13,6 +13,13 @@ export const TEXT_RULES = {
     name: 'A name',
     duplicateText: 'Another annotation has the same name.',
   },
+  // No dots or slashes: the name becomes a file name, and the app adds ".jpg" itself.
+  photoName: {
+    maxLength: 60,
+    notAllowed: /[^\p{L}\p{M}\p{N} _()-]/gu,
+    allowedText: 'letters, numbers, spaces and - _ ( )',
+    name: 'A photo name',
+  },
 }
 
 export const PHOTO_RULES = { maxMb: 30, types: 'JPEG, PNG, WebP or HEIC' }

@@ -1,19 +1,22 @@
-import { useState } from 'react'
-import { ChevronLeft, FileDownloadOutlined } from '@mui/icons-material'
-import { Box, Button, IconButton, Paper, Typography, useTheme } from '@mui/material'
+import { useRef, useState } from 'react'
+import { ChevronLeft, EditOutlined, FileDownloadOutlined } from '@mui/icons-material'
+import { Box, Button, IconButton, InputAdornment, Paper, TextField, Typography, useTheme } from '@mui/material'
 import ConfirmDialog from '../components/ConfirmDialog/ConfirmDialog.jsx'
 import PhotoWithBoxes from '../components/PhotoWithBoxes/PhotoWithBoxes.jsx'
 import StatusBadge from '../components/StatusBadge/StatusBadge.jsx'
-import { exportAnnotatedPhoto, gradePhoto } from '../utils'
+import { exportAnnotatedPhoto, finishText, gradePhoto, TEXT_RULES, validateText } from '../utils'
 import { styles } from './SummaryScreen.styles.js'
 
 const GRADE_LABELS = { good: 'Good', warn: 'Warning', poor: 'Poor' }
-const DOWNLOAD_NAME = 'annotated-photo.jpg'
+const DEFAULT_NAME = 'annotated-photo'
+const NAME_RULE = TEXT_RULES.photoName
 
 /** Read-only result: the annotated photo, a short summary, and a download of the photo with the boxes drawn on. */
-export default function SummaryScreen({ photo, quality, items, onBack, onNewPhoto }) {
+export default function SummaryScreen({ photo, quality, items, photoName, onPhotoNameChange, onBack, onNewPhoto }) {
   const theme = useTheme()
   const [download, setDownload] = useState('idle') // 'idle' | 'working' | 'done' | 'failed'
+  const [nameNote, setNameNote] = useState(null) // the message from validation: shown in place of the caption, so nothing moves
+  const nameInput = useRef(null)
   const [confirming, setConfirming] = useState(false)
   const grade = gradePhoto({ bytes: photo.blob.size, ...quality }).summary.grade
 
@@ -23,7 +26,7 @@ export default function SummaryScreen({ photo, quality, items, onBack, onNewPhot
       const { lime, ink } = theme.palette.brand
       const blob = await exportAnnotatedPhoto(photo.blob, items, { box: lime, outline: ink })
       const url = URL.createObjectURL(blob)
-      const link = Object.assign(document.createElement('a'), { href: url, download: DOWNLOAD_NAME })
+      const link = Object.assign(document.createElement('a'), { href: url, download: `${photoName.trim() || DEFAULT_NAME}.jpg` })
       link.click()
       // Some browsers start the download after click() returns, so the URL is freed a little later.
       window.setTimeout(() => URL.revokeObjectURL(url), 1000)
@@ -74,6 +77,47 @@ export default function SummaryScreen({ photo, quality, items, onBack, onNewPhot
         )}
 
         <Box sx={styles.actions}>
+          <TextField
+            label="Photo name"
+            size="small"
+            fullWidth
+            value={photoName}
+            placeholder={DEFAULT_NAME}
+            inputRef={nameInput}
+            onChange={(event) => {
+              const { value, message } = validateText(event.target.value, NAME_RULE)
+              onPhotoNameChange(value)
+              setNameNote(message)
+            }}
+            onBlur={() => {
+              const { value, message } = finishText(photoName, NAME_RULE)
+              onPhotoNameChange(value)
+              setNameNote(message)
+            }}
+            onKeyDown={(event) => event.key === 'Enter' && event.currentTarget.querySelector('input')?.blur()}
+            slotProps={{
+              inputLabel: { shrink: true },
+              htmlInput: { autoComplete: 'off', spellCheck: false, enterKeyHint: 'done' },
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    .jpg
+                    <IconButton
+                      aria-label="Edit photo name"
+                      edge="end"
+                      onClick={() => {
+                        nameInput.current.focus()
+                        nameInput.current.select()
+                      }}
+                      sx={styles.editName}
+                    >
+                      <EditOutlined fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
           <Button
             variant="outlined"
             size="large"
@@ -84,10 +128,10 @@ export default function SummaryScreen({ photo, quality, items, onBack, onNewPhot
           >
             {download === 'working' ? 'Preparing photo…' : 'Download photo'}
           </Button>
-          <Typography role={download === 'failed' ? 'alert' : undefined} sx={styles.caption(download === 'failed')}>
+          <Typography role={download === 'failed' ? 'alert' : undefined} aria-live="polite" sx={styles.caption(download === 'failed' || nameNote?.warn)}>
             {download === 'failed'
               ? "Couldn't make the photo. Try again."
-              : 'The photo includes the boxes and labels. Nothing is uploaded.'}
+              : (nameNote?.text ?? 'The photo includes the boxes and labels. Nothing is uploaded.')}
           </Typography>
           <Button
             variant="contained"

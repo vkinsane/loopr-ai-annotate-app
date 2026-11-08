@@ -13,6 +13,7 @@ const SummaryScreen = lazy(() => import('./screens/SummaryScreen.jsx'))
 function App() {
   const [photo, setPhoto] = useState(null)
   const [quality, setQuality] = useState(null)
+  const [photoName, setPhotoName] = useState('')
   // Everything lives here, not in the screens, so moving back and forward keeps the photo and the boxes.
   const [annotations, dispatch] = useReducer(annotationsReducer, initialAnnotations)
   const [screen, go] = useScreenHistory('landing', canShow)
@@ -31,6 +32,7 @@ function App() {
   function startOver() {
     setPhoto(null)
     setQuality(null)
+    setPhotoName('')
     dispatch({ type: 'reset' })
     go('capture')
   }
@@ -39,6 +41,7 @@ function App() {
   function handleNewPhoto(newPhoto) {
     setPhoto(newPhoto)
     setQuality(null)
+    setPhotoName('')
     dispatch({ type: 'reset' })
     go('preview')
   }
@@ -60,7 +63,15 @@ function App() {
   return (
     <Suspense fallback={null}>
       {screen === 'summary' ? (
-        <SummaryScreen photo={photo} quality={quality} items={annotations.items} onBack={() => go('annotate')} onNewPhoto={startOver} />
+        <SummaryScreen
+          photo={photo}
+          quality={quality}
+          items={annotations.items}
+          photoName={photoName}
+          onPhotoNameChange={setPhotoName}
+          onBack={() => go('annotate')}
+          onNewPhoto={startOver}
+        />
       ) : (
         <AnnotateScreen
           photo={photo}

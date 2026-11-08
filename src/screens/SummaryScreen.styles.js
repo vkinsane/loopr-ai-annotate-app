@@ -7,7 +7,7 @@ export const styles = {
     height: '100dvh', overflowY: 'auto', maxWidth: { xs: 600, md: 1200 }, mx: 'auto', p: 2, pt: 1, pb: { xs: 3, md: 2 },
     display: 'grid', gap: { xs: 1.5, md: 2 },
     gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 1fr) 380px' },
-    gridTemplateRows: { xs: 'auto max-content minmax(345px, 1fr)', md: 'auto minmax(0, 1fr)' },
+    gridTemplateRows: { xs: 'auto max-content minmax(395px, 1fr)', md: 'auto minmax(0, 1fr)' },
   },
   header: { gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: 0.5, ml: -1.5 },
   back: { width: 44, height: 44, color: 'text.primary' },
@@ -31,7 +31,8 @@ export const styles = {
     boxShadow: (theme) => `0 0 0 1px ${theme.palette.brand.ink}`,
   },
   size: { typography: 'caption', color: 'text.secondary', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' },
-  actions: { mt: 'auto', pt: 1, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 1.25 },
+  actions: { mt: { xs: 'auto', md: 0 }, pt: 1, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 1.25 },
+  editName: { width: 36, height: 36, ml: 0.25, color: 'text.secondary' },
   // Two lines reserved: the normal and the failed text differ in length.
   caption: (failed) => ({ minHeight: '2.8em', typography: 'caption', textAlign: 'center', color: failed ? 'error.main' : 'text.secondary', mb: 0.5 }),
 }
