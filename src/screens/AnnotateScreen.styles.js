@@ -9,11 +9,12 @@ export const styles = {
     gridTemplateRows: { xs: 'auto auto minmax(201px, 1fr)', sm: 'auto auto minmax(381px, 1fr)', md: 'auto auto auto' }, alignContent: { md: 'start' },
     gridTemplateAreas: { md: '"header header" "photo side" "hint ."' },
   },
-  header: { gridColumn: '1 / -1', gridArea: { md: 'header' }, display: 'flex', alignItems: 'center', gap: 1.5, mt: -0.75 },
+  header: { gridColumn: '1 / -1', gridArea: { md: 'header' }, display: 'flex', alignItems: 'center', gap: 0.5, mt: -0.75, ml: -1.5 },
+  back: { width: 44, height: 44, color: 'text.primary' },
   title: { typography: 'h1', flexGrow: 1 },
   qualityPill: { display: { xs: 'none', sm: 'block' } },
   // Fits "Discard 99 boxes?", so the longer label doesn't push the quality pill.
-  newPhoto: (confirming) => ({ minWidth: 150, justifyContent: 'flex-end', color: confirming ? 'error.main' : 'primary.main' }),
+  newPhoto: (confirming) => ({ minWidth: 150, ml: 1, justifyContent: 'flex-end', color: confirming ? 'error.main' : 'primary.main' }),
   // Desktop: height 0 + min-height 100% means the photo alone sets the row height; a long list scrolls instead of growing it.
   sidebar: { display: 'flex', flexDirection: 'column', gap: 2, minHeight: { xs: 0, md: '100%' }, height: { md: 0 }, gridArea: { md: 'side' } },
   quality: { display: { xs: 'none', sm: 'block' }, flexShrink: 0 },

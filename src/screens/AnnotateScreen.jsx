@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
-import { Box, Button, Typography } from '@mui/material'
+import { ChevronLeft } from '@mui/icons-material'
+import { Box, Button, IconButton, Typography } from '@mui/material'
 import AnnotationCanvas from '../components/AnnotationCanvas/AnnotationCanvas.jsx'
 import AnnotationList from '../components/AnnotationList/AnnotationList.jsx'
 import QualityChecks from '../components/QualityChecks/QualityChecks.jsx'
@@ -14,7 +15,7 @@ const plural = (count, one, many = `${one}s`) => `${count} ${count === 1 ? one :
  * `photo` is { blob, url }, `quality` the measured { width, height, brightness, sharpness }.
  * `annotations` and `dispatch` come from App's annotations reducer.
  */
-export default function AnnotateScreen({ photo, quality, annotations, dispatch, onNewPhoto, onDone }) {
+export default function AnnotateScreen({ photo, quality, annotations, dispatch, onBack, onNewPhoto, onDone }) {
   const { items, selectedId } = annotations
   const { confirming, confirm } = useConfirmTap()
   const checks = qualityChecks(photo.blob.size, quality)
@@ -35,6 +36,9 @@ export default function AnnotateScreen({ photo, quality, annotations, dispatch, 
   return (
     <Box component="main" sx={styles.root}>
       <Box sx={styles.header}>
+        <IconButton aria-label="Back to Preview" onClick={onBack} sx={styles.back}>
+          <ChevronLeft />
+        </IconButton>
         <Typography component="h1" sx={styles.title}>Annotate</Typography>
         {issues > 0 && (
           <Box sx={styles.qualityPill}>

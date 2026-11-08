@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useReducer, useState } from 'react'
+import { useScreenHistory } from './hooks'
 import CaptureScreen from './screens/CaptureScreen.jsx'
 import HowItWorksScreen from './screens/HowItWorksScreen.jsx'
 import LandingScreen from './screens/LandingScreen.jsx'
@@ -10,58 +11,69 @@ const AnnotateScreen = lazy(() => import('./screens/AnnotateScreen.jsx'))
 const SummaryScreen = lazy(() => import('./screens/SummaryScreen.jsx'))
 
 function App() {
-  // 'landing' → 'how-it-works' → 'inspect'. Inside 'inspect', the state below picks the screen:
-  // no photo → Capture, not measured → Preview, not finished → Annotate, finished → Summary.
-  const [stage, setStage] = useState('landing')
   const [photo, setPhoto] = useState(null)
   const [quality, setQuality] = useState(null)
-  const [finished, setFinished] = useState(false)
-  // Lives here, not in Annotate, so going back from Summary keeps the boxes.
+  // Everything lives here, not in the screens, so moving back and forward keeps the photo and the boxes.
   const [annotations, dispatch] = useReducer(annotationsReducer, initialAnnotations)
+  const [screen, go] = useScreenHistory('landing', canShow)
 
   useEffect(() => {
     if (!photo) return
     return () => URL.revokeObjectURL(photo.url)
   }, [photo])
 
+  function canShow(target) {
+    if (target === 'preview') return Boolean(photo)
+    if (target === 'annotate' || target === 'summary') return Boolean(photo && quality)
+    return true
+  }
+
   function startOver() {
     setPhoto(null)
     setQuality(null)
-    setFinished(false)
     dispatch({ type: 'reset' })
+    go('capture')
   }
 
-  // A picked photo skips the camera and goes straight to the quality check.
-  function handlePickedPhoto(picked) {
-    setPhoto(picked)
-    setStage('inspect')
+  // A new photo replaces the old one and its boxes. A picked photo skips the camera.
+  function handleNewPhoto(newPhoto) {
+    setPhoto(newPhoto)
+    setQuality(null)
+    dispatch({ type: 'reset' })
+    go('preview')
   }
 
-  if (stage === 'landing') return <LandingScreen onNext={() => setStage('how-it-works')} />
-  if (stage === 'how-it-works') {
-    return (
-      <HowItWorksScreen onBack={() => setStage('landing')} onStart={() => setStage('inspect')} onPickPhoto={handlePickedPhoto} />
-    )
+  function handleMeasured(measured) {
+    setQuality(measured)
+    go('annotate')
   }
-  if (!photo) return <CaptureScreen onBack={() => setStage('how-it-works')} onCapture={setPhoto} onPickPhoto={setPhoto} />
-  if (!quality) return <PreviewScreen photo={photo} onRetake={startOver} onAnnotate={setQuality} />
-  return <Suspense fallback={null}>{renderAnnotateOrSummary()}</Suspense>
 
-  function renderAnnotateOrSummary() {
-    if (finished) {
-      return <SummaryScreen photo={photo} quality={quality} items={annotations.items} onBack={() => setFinished(false)} onNewPhoto={startOver} />
-    }
-    return (
-      <AnnotateScreen
-        photo={photo}
-        quality={quality}
-        annotations={annotations}
-        dispatch={dispatch}
-        onNewPhoto={startOver}
-        onDone={() => setFinished(true)}
-      />
-    )
+  if (screen === 'landing') return <LandingScreen onNext={() => go('how-it-works')} />
+  if (screen === 'how-it-works') {
+    return <HowItWorksScreen onBack={() => go('landing')} onStart={() => go('capture')} onPickPhoto={handleNewPhoto} />
   }
+  if (screen === 'capture') {
+    return <CaptureScreen onBack={() => go('how-it-works')} onCapture={handleNewPhoto} onPickPhoto={handleNewPhoto} />
+  }
+  if (screen === 'preview') return <PreviewScreen photo={photo} onRetake={startOver} onAnnotate={handleMeasured} />
+
+  return (
+    <Suspense fallback={null}>
+      {screen === 'summary' ? (
+        <SummaryScreen photo={photo} quality={quality} items={annotations.items} onBack={() => go('annotate')} onNewPhoto={startOver} />
+      ) : (
+        <AnnotateScreen
+          photo={photo}
+          quality={quality}
+          annotations={annotations}
+          dispatch={dispatch}
+          onBack={() => go('preview')}
+          onNewPhoto={startOver}
+          onDone={() => go('summary')}
+        />
+      )}
+    </Suspense>
+  )
 }
 
 export default App
