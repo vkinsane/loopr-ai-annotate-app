@@ -106,13 +106,11 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
   - The on/off state is read from `getSettings()` on every render, never stored, so the button shows the real hardware state.
 - **Errors:** browser error names are mapped to operator-friendly messages (`utils/cameraErrors.js`).
 - **Cleanup:**
-  - React StrictMode runs effects twice in development; an `AbortController` stops a camera request that finishes after cleanup.
   - Tracks are stopped on unmount and when the page is hidden.
 
 ### Quality
-- **Brightness** = mean luma (Rec. 601) of a greyscale copy.
-- **Sharpness** = variance of the Laplacian: sharp edges give strong responses and blur flattens them.
-- **Both are measured at 320 px wide**, for the live preview (4 times a second) and for the captured photo alike, so one set of thresholds fits both.
+- **Brightness** is how light or dark the photo is overall. The app makes a greyscale copy, where every pixel is a number from 0 (black) to 255 (white), and takes the average. A low average means the photo is too dark; a very high one means it is overexposed.
+- **Sharpness** is how clearly the photo shows edges and fine detail. The app compares each pixel with the four around it (the Laplacian method): in a sharp photo, neighbouring pixels differ strongly at edges, while blur smooths those differences away. The score is how much these differences vary across the photo, so a higher score means a sharper photo.
 - **Thresholds** (`utils/quality.js`):
 
 | Check | Good | Warning | Poor |
@@ -122,38 +120,14 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
 | Brightness (0–255; shown as %) | 70–190 | 40–70 or 190–220 | < 40 or > 220 |
 | Sharpness | ≥ 60 | 20–60 | < 20 |
 
-- **A poor photo warns but doesn't block:** Annotate stays available as the second button.
-- **The photo is decoded once**, on the Preview screen, which gives its true size after EXIF rotation plus the measurements. Capture skips decoding so the screen changes sooner.
-
 ### Annotation
 - **Boxes are stored in photo pixels and drawn as percentages of the frame.** A box at `left: 25%` stays on the same pixels at any size or rotation, without resize listeners.
 - **HTML elements, not SVG or canvas:** real text labels, fixed 44 px corner touch targets, and hit-testing from the DOM.
-- **Pointer Events with pointer capture:** one code path for mouse, touch and pen. `touch-action: none` on the photo stops the page from scrolling while drawing.
-- **No draw/select modes:** the gesture depends on where it starts (corner → resize, box → move, empty photo → draw). A quick tap or a box under 12 screen px is ignored.
-- **Pure logic in `utils/`:** `geometry.js` (draw, move, resize, clamp) and `annotations.js` (reducer). IDs are created outside the reducer, so it stays pure.
-- **A confirmation dialog appears before work is lost** (`components/ConfirmDialog`): "Keep photo" is the safe default. It only appears when there are boxes that would be lost.
-- **Done with no boxes asks first:** "You have not added any annotations. Do you want to proceed?"
 
 ### Code conventions
 - Folders by file type: `screens/`, `components/`, `hooks/` (browser APIs and lifecycle), `utils/` (pure logic).
 - No component file over 250 lines. Styles live in a `*.styles.js` file next to each component.
 - See [ARCHITECTURE.md](ARCHITECTURE.md) for the full structure and rules.
-
-</details>
-
-<details>
-<summary><strong>Supported screens</strong></summary>
-
-Measured in headless Chrome.
-
-| Screen | What happens |
-|---|---|
-| **Portrait phones, 320 × 568 and up** | The page doesn't scroll. Photos shrink to fit. On short phones the Preview details and Before you start steps scroll inside, with the main buttons pinned. |
-| **Under 620 px tall** | The Landing demo is hidden so the text and button fit. |
-| **Tablets, 600 px wide and up** | No page scroll in portrait or landscape. |
-| **Laptops and desktops, 1280 × 720 to 1920 × 1080** | No page scroll. Content stops growing at 1200 px and stays centred. |
-| **Phones held sideways** | Everything is reachable and nothing overlaps, but screens scroll. Capture fits without scrolling. |
-| **Narrower than 320 px** | Not designed for. |
 
 </details>
 
@@ -199,23 +173,5 @@ Playwright 1.65, Chromium with a fake camera, against the production build. **17
 - Under 44 px on a phone: "Choose a photo instead" link (20 px high), New photo (32), zoom tools (40).
 
 **Not applicable:** login, sessions, CSRF, API errors, server-side validation and multi-user load, because the app has no backend.
-
-</details>
-
-<details>
-<summary><strong>Device testing</strong></summary>
-
-| Device / browser | Result |
-|---|---|
-| iPhone, Chrome (iOS) | Camera preview and capture work: 3024 × 4032 (12.2 MP), 9.1 MB, all checks Good. The "Camera access is blocked" screen shows. |
-| Headless Chrome, 390 × 844 and 844 × 390, fake camera | Capture and error-screen layouts fit the screen, with no sideways scroll, in portrait, landscape and after rotating. |
-| Headless Chrome, 390 × 844, 820 × 1180, 1440 × 900, fake camera | Full flow by script: Before you start → capture → Preview → zoom (buttons + mouse drag) → draw 2 boxes → Summary → download (3840 × 2160 JPEG with labels) → back keeps boxes. |
-
-</details>
-
-<details>
-<summary><strong>Credits</strong></summary>
-
-- Landing demo photo: 'Damaged car door' by Garitzko, Wikimedia Commons (public domain). Resized to 800 × 600.
 
 </details>
