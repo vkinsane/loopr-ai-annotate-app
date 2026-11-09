@@ -1,14 +1,13 @@
 import { CARD_RADIUS } from '../theme.js'
 
-// Phone and tablet: one column, Get started pinned to the bottom (tablet column 560 px).
-// Desktop: the three steps side by side, tips and Get started in one row at the bottom. Nothing is vertically centred: centring moves the page when a step grows.
+// Phone and tablet: one column, Open camera pinned to the bottom (tablet column 560 px).
+// Desktop: the three steps side by side, tips and Open camera in one row at the bottom. Nothing is vertically centred: centring moves the page when a step grows.
 export const styles = {
   root: {
-    height: '100dvh', overflowY: 'auto', maxWidth: { xs: 480, sm: 608, md: 1168 }, mx: 'auto', px: { xs: 2, sm: 3 }, pt: { sm: 5 }, pb: { md: 5 },
+    flex: 1, minHeight: 0, width: '100%', overflowY: 'auto', maxWidth: { xs: 480, sm: 608, md: 1168 }, mx: 'auto', px: { xs: 2, sm: 3 }, pt: { xs: 1, sm: 3 }, pb: { md: 5 },
     display: 'flex', flexDirection: 'column',
   },
-  header: { display: 'flex', alignItems: 'center', gap: 0.5, ml: -1.5, py: 1, mb: { sm: 1.5, md: 2.5 } },
-  title: { typography: 'h1', fontSize: { md: 28 } },
+  headerWidth: { maxWidth: { xs: 480, sm: 608, md: 1168 }, px: { xs: 2, sm: 3 } },
   steps: {
     listStyle: 'none', m: 0, mt: { xs: 1, sm: 0 }, p: 0, gap: { xs: 1.5, md: 2.5 },
     display: { xs: 'flex', md: 'grid' }, flexDirection: 'column', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
@@ -31,12 +30,12 @@ export const styles = {
     bgcolor: 'success.tint', color: 'success.dark', typography: 'button', fontSize: 15,
   },
   errorSteps: { m: 0, pl: 2.25, display: 'flex', flexDirection: 'column', gap: 0.5 },
-  // Desktop: tips and Get started in one row at the bottom. Phone and tablet: the wrapper drops out of the layout
-  // (display: contents) and Get started is pinned to the bottom, so hiding steps for the blocked-camera help moves nothing.
-  bottom: { display: { xs: 'contents', md: 'flex' }, alignItems: 'center', gap: 3, mt: 'auto', pt: 2.5 },
+  // Desktop: tips and Open camera in one row at the bottom. Phone and tablet: the wrapper drops out of the layout
+  // (display: contents) and Open camera is pinned to the bottom, so hiding steps for the blocked-camera help moves nothing.
+  bottom: { display: { xs: 'contents', md: 'flex' }, alignItems: 'flex-end', gap: 3, mt: 'auto', pt: 2.5 },
   tips: (hideOnSmall) => ({
     display: { xs: hideOnSmall ? 'none' : 'flex', md: 'flex' }, flexGrow: { md: 1 }, mt: { xs: 1.5, md: 0 },
-    px: { xs: 2, md: 3 }, py: { xs: 1.75, md: 2.25 }, borderRadius: CARD_RADIUS, bgcolor: 'brand.tint',
+    px: { xs: 2, md: 3 }, py: { xs: 1.75, md: 0 }, height: { md: 52 }, borderRadius: CARD_RADIUS, bgcolor: 'brand.tint',
     flexDirection: { xs: 'column', md: 'row' }, alignItems: { md: 'center' }, gap: { xs: 1.5, md: 4 },
   }),
   tipsTitle: { typography: 'overline', textTransform: 'uppercase', color: 'primary.dark' },

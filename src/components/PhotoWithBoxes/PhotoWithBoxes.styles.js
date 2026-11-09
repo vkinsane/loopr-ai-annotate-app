@@ -5,8 +5,8 @@ import { toPercent } from '../../utils'
 export const styles = {
   frame: (ratio) => ({
     position: 'relative', aspectRatio: String(ratio), mx: 'auto', alignSelf: 'start',
-    width: { xs: `min(100%, max(72px, min(36dvh, 100dvh - 500px)) * ${ratio})`, sm: `min(100%, 36dvh * ${ratio})`, md: `min(100%, (100dvh - 90px) * ${ratio})` },
-    borderRadius: CARD_RADIUS, overflow: 'hidden', bgcolor: 'brand.photoBackdrop',
+    width: { xs: `min(100%, max(60px, min(42dvh, 100dvh - 520px)) * ${ratio})`, sm: `min(100%, 36dvh * ${ratio})`, md: `min(100%, (100dvh - 90px) * ${ratio})` },
+    border: 1, borderColor: 'divider', borderRadius: CARD_RADIUS, overflow: 'hidden', bgcolor: 'brand.photoBackdrop',
   }),
   photo: { display: 'block', width: '100%', height: '100%' },
   box: (rect, size) => ({

@@ -13,6 +13,8 @@ export const FILE_SIZE_KB = { poorBelow: 150, goodFrom: 500 }
 export const BRIGHTNESS = { tooDark: 40, dim: 70, bright: 190, tooBright: 220 }
 
 export const SHARPNESS = { blurryBelow: 20, softBelow: 60 }
+// The raw score has no meaning to people and no upper limit, so they see a word.
+export const SHARPNESS_WORDS = { good: 'Sharp', warn: 'A bit blurry', poor: 'Blurry' }
 
 export function megapixels(width, height) {
   return (width * height) / PIXELS_PER_MEGAPIXEL
@@ -71,34 +73,33 @@ const DEFAULT_HINT = 'Fill the frame with the part and hold steady'
 
 /** Worst problem first. `torch` is { supported, on, failed }. Returns { text, warn }. */
 export function getCaptureHint(quality, torch) {
-  if (torch.failed) return { text: "The torch didn't respond. Try again.", warn: true }
+  if (torch.failed) return { text: "The torch didn't respond, so try again.", warn: true }
   if (!quality) return { text: DEFAULT_HINT, warn: false }
 
   if (gradeBrightness(quality.brightness) !== 'good') {
     if (quality.brightness > BRIGHTNESS.bright) {
-      const text = torch.on ? 'Too bright. Turn off the torch or move away from strong light.' : 'Too bright. Move away from strong light.'
+      const text = torch.on ? 'Too bright, so turn off the torch or move away from strong light.' : 'Too bright, so move away from strong light.'
       return { text, warn: true }
     }
-    if (!torch.supported) return { text: 'Too dark, and this device has no torch. Move to a brighter place.', warn: true }
-    return { text: torch.on ? 'Too dark. Move to a brighter place.' : 'Too dark. Turn on the torch.', warn: true }
+    if (!torch.supported) return { text: 'Too dark, so move to a brighter place.', warn: true }
+    return { text: torch.on ? 'Too dark, so move to a brighter place.' : 'Too dark, so turn on the torch.', warn: true }
   }
 
-  if (gradeSharpness(quality.sharpness) !== 'good') return { text: 'Slightly blurry. Hold steady.', warn: true }
+  if (gradeSharpness(quality.sharpness) !== 'good') return { text: 'Slightly blurry, so hold the phone steady.', warn: true }
   return { text: DEFAULT_HINT, warn: false }
 }
 
 const ISSUES = {
-  resolution: { problem: 'low resolution', advice: 'move closer to the part' },
-  fileSize: { problem: 'low on detail', advice: 'check the camera resolution' },
-  dark: { problem: 'too dark', advice: 'turn on the torch or add more light' },
-  bright: { problem: 'too bright', advice: 'turn off the torch or move away from strong light' },
-  blurry: { problem: 'blurry', advice: 'hold the phone steady' },
+  resolution: { problem: 'low resolution', advice: 'move closer to the part', tip: 'This photo has low resolution, so move closer to the part.' },
+  fileSize: { problem: 'low on detail', advice: 'move closer to the part', tip: 'This file is small, so fine details may be missing.' },
+  dark: { problem: 'too dark', advice: 'turn on the torch or add more light', tip: 'This photo is too dark, so turn on the torch or add more light.' },
+  bright: { problem: 'too bright', advice: 'turn off the torch or move away from strong light', tip: 'This photo is too bright, so turn off the torch or move away from strong light.' },
+  blurry: { problem: 'blurry', advice: 'hold the phone steady', tip: 'This photo is blurry, so hold the phone steady.' },
 }
 
-function joinAdvice(issues, ending) {
-  const text = issues.map((issue) => issue.advice).join(', ')
-  return `${text[0].toUpperCase()}${text.slice(1)}, ${ending}`
-}
+const joinList = (items) => (items.length > 1 ? `${items.slice(0, -1).join(', ')} and ${items.at(-1)}` : items[0])
+// Two checks can share the same advice, and it should only be said once.
+const joinAdvice = (issues) => joinList([...new Set(issues.map((issue) => issue.advice))])
 
 /**
  * Takes { width, height, bytes, brightness, sharpness }.
@@ -120,13 +121,12 @@ export function gradePhoto({ width, height, bytes, brightness, sharpness }) {
 
   const poor = issues.filter((issue) => issue.grade === 'poor')
   if (poor.length > 0) {
-    const problems = poor.map((issue) => issue.problem)
-    const list = problems.length > 1 ? `${problems.slice(0, -1).join(', ')} and ${problems.at(-1)}` : problems[0]
-    return { grades, summary: { grade: 'poor', title: `Photo is ${list}`, advice: joinAdvice(poor, 'then take the photo again.') } }
+    const list = joinList(poor.map((issue) => issue.problem))
+    return { grades, summary: { grade: 'poor', title: `Photo is ${list}`, advice: `Take the photo again and ${joinAdvice(poor)}.` } }
   }
   if (issues.length > 0) {
     const title = issues.length === 1 ? 'Usable, with one warning' : `Usable, with ${issues.length} warnings`
-    return { grades, summary: { grade: 'warn', title, advice: joinAdvice(issues, 'then take the photo again for a better result.') } }
+    return { grades, summary: { grade: 'warn', title, advice: `You can continue, or take the photo again and ${joinAdvice(issues)}.` } }
   }
   return { grades, summary: { grade: 'good', title: 'Photo looks good', advice: 'Ready to annotate.' } }
 }
@@ -136,10 +136,13 @@ function formatFileSize(bytes) {
   return kb < BYTES_PER_KB ? `${Math.round(kb)} KB` : `${(kb / BYTES_PER_KB).toFixed(1)} MB`
 }
 
+/** Brightness is measured 0–255 and shown to people as 0–100%. */
+export const brightnessPercent = (value) => Math.round((value / 255) * 100)
+
 /**
- * One row per check for display: { label, value, grade, target }. `quality` is the measured
+ * One row per check for display: { label, value, grade, tip }. `quality` is the measured
  * { width, height, brightness, sharpness }, or null while measuring (only file size is known then).
- * `target` names the good range, taken from the thresholds above.
+ * `tip` says how to improve the check.
  */
 export function qualityChecks(bytes, quality) {
   const measured = Boolean(quality)
@@ -148,20 +151,25 @@ export function qualityChecks(bytes, quality) {
       label: 'Resolution',
       value: measured ? `${quality.width} × ${quality.height} · ${megapixels(quality.width, quality.height).toFixed(1)} MP` : '–',
       grade: measured ? gradeResolution(quality.width, quality.height) : null,
-      target: `${RESOLUTION_MP.goodFrom} MP+`,
+      tip: ISSUES.resolution.tip,
     },
-    { label: 'File size', value: formatFileSize(bytes), grade: gradeFileSize(bytes), target: `${FILE_SIZE_KB.goodFrom} KB+` },
+    {
+      label: 'File size',
+      value: formatFileSize(bytes),
+      grade: gradeFileSize(bytes),
+      tip: ISSUES.fileSize.tip,
+    },
     {
       label: 'Brightness',
-      value: measured ? `${quality.brightness} / 255` : '–',
+      value: measured ? `${brightnessPercent(quality.brightness)}%` : '–',
       grade: measured ? gradeBrightness(quality.brightness) : null,
-      target: `${BRIGHTNESS.dim}–${BRIGHTNESS.bright}`,
+      tip: measured ? (quality.brightness < BRIGHTNESS.dim ? ISSUES.dark : ISSUES.bright).tip : null,
     },
     {
       label: 'Sharpness',
-      value: measured ? String(quality.sharpness) : '–',
+      value: measured ? SHARPNESS_WORDS[gradeSharpness(quality.sharpness)] : '–',
       grade: measured ? gradeSharpness(quality.sharpness) : null,
-      target: `${SHARPNESS.softBelow}+`,
+      tip: ISSUES.blurry.tip,
     },
   ]
 }

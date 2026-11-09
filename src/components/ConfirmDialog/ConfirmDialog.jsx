@@ -10,7 +10,7 @@ export default function ConfirmDialog({ open, title, message, confirmLabel, onCo
         <DialogContentText id="confirm-message">{message}</DialogContentText>
       </DialogContent>
       <DialogActions sx={styles.actions}>
-        <Button autoFocus onClick={onCancel} sx={styles.action}>Keep working</Button>
+        <Button autoFocus onClick={onCancel} sx={styles.action}>Keep photo</Button>
         <Button variant="contained" color="error" onClick={onConfirm} sx={styles.action}>{confirmLabel}</Button>
       </DialogActions>
     </Dialog>

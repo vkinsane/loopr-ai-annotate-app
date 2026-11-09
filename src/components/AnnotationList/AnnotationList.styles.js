@@ -1,14 +1,14 @@
-import { CARD_RADIUS, SCROLL_SHADOWS } from '../../theme.js'
+import { SCROLL_SHADOWS, TABLE_BODY_RADIUS, TABLE_HEADER } from '../../theme.js'
 
 export const styles = {
   // Inside a fixed-height sidebar, the list scrolls on its own and the heading stays.
   // Takes all spare height, empty or not, so adding the first box doesn't move what is below.
   root: (readOnly) => ({ display: 'flex', flexDirection: 'column', minHeight: 0, flex: readOnly ? '0 1 auto' : '1 1 0' }),
-  header: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', mb: 1 },
-  title: { typography: 'h2' },
+  header: TABLE_HEADER,
+  title: { font: 'inherit' },
   count: { typography: 'caption', color: 'text.secondary' },
   empty: {
-    border: '1.5px dashed', borderColor: 'primary.light', borderRadius: CARD_RADIUS, bgcolor: 'background.paper', px: 2.5, py: 3.5,
+    border: '1.5px dashed', borderColor: 'primary.light', borderRadius: TABLE_BODY_RADIUS, bgcolor: 'background.paper', px: 2.5, py: 3.5,
     flex: 1, minHeight: 96, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1, textAlign: 'center',
   },
   emptyIcon: { fontSize: 28, color: 'primary.main' },
@@ -17,8 +17,8 @@ export const styles = {
   // One bordered card with a line between rows, like the Photo quality card.
   // position: relative keeps the visually hidden notes inside the scroll area, so they can't make the page taller.
   list: (readOnly) => (theme) => ({
-    position: 'relative', m: 0, p: 0, listStyle: 'none', overflowY: 'auto', minHeight: 96, flex: readOnly ? '0 1 auto' : 1, alignContent: 'start',
-    border: 1, borderColor: 'divider', borderRadius: 1, ...SCROLL_SHADOWS(theme),
+    position: 'relative', m: 0, p: 0, listStyle: 'none', overflowY: 'auto', minHeight: readOnly ? 52 : 96, flex: readOnly ? '0 1 auto' : 1, alignContent: 'start',
+    border: 1, borderColor: 'divider', borderRadius: readOnly ? 1 : TABLE_BODY_RADIUS, ...SCROLL_SHADOWS(theme),
   }),
   // The selected row is tinted, with an indigo bar on its left edge.
   row: (selected) => ({

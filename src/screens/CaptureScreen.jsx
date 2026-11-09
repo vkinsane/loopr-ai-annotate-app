@@ -43,7 +43,7 @@ export default function CaptureScreen({ onBack, onCapture, onPickPhoto }) {
   }
 
   const aspectRatio = state.status === 'live' ? state.width / state.height : DEFAULT_ASPECT_RATIO
-  const hint = captureFailed ? { text: "Couldn't take the photo. Try again.", warn: true } : getCaptureHint(quality, torch)
+  const hint = captureFailed ? { text: "Couldn't take the photo, so try again.", warn: true } : getCaptureHint(quality, torch)
 
   return (
     <ThemeProvider theme={cameraTheme}>

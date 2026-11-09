@@ -1,6 +1,6 @@
 import { CenterFocusStrongOutlined, WbSunnyOutlined } from '@mui/icons-material'
 import { Box, Chip } from '@mui/material'
-import { BRIGHTNESS, gradeBrightness, gradeResolution, gradeSharpness, megapixels } from '../../utils'
+import { BRIGHTNESS, brightnessPercent, gradeBrightness, gradeResolution, gradeSharpness, megapixels, SHARPNESS_WORDS } from '../../utils'
 import { styles } from './LiveQualityChips.styles.js'
 import StatusBadge from '../StatusBadge/StatusBadge.jsx'
 
@@ -9,7 +9,6 @@ const BRIGHTNESS_LABELS = {
   warn: { dark: 'Dark', bright: 'Bright' },
   poor: { dark: 'Too dark', bright: 'Too bright' },
 }
-const SHARPNESS_LABELS = { good: 'Good', warn: 'A bit blurry', poor: 'Blurry' }
 
 /** `resolution` is { width, height } or null; `quality` is { brightness, sharpness } or null. */
 export default function LiveQualityChips({ resolution, quality }) {
@@ -19,15 +18,14 @@ export default function LiveQualityChips({ resolution, quality }) {
       {quality && (
         <>
           <MetricChip icon={<WbSunnyOutlined />} name="Brightness">
-            {quality.brightness}{' '}
+            {brightnessPercent(quality.brightness)}%{' '}
             <StatusBadge
               grade={gradeBrightness(quality.brightness)}
               label={BRIGHTNESS_LABELS[gradeBrightness(quality.brightness)][quality.brightness < BRIGHTNESS.dim ? 'dark' : 'bright']}
             />
           </MetricChip>
           <MetricChip icon={<CenterFocusStrongOutlined />} name="Sharpness">
-            {quality.sharpness}{' '}
-            <StatusBadge grade={gradeSharpness(quality.sharpness)} label={SHARPNESS_LABELS[gradeSharpness(quality.sharpness)]} />
+            {SHARPNESS_WORDS[gradeSharpness(quality.sharpness)]} <StatusBadge grade={gradeSharpness(quality.sharpness)} label="" />
           </MetricChip>
         </>
       )}

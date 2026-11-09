@@ -7,6 +7,7 @@ const BRAND = {
   carbon: '#05091c', carbonRaised: '#12173c', carbonBorder: '#252c4c', frost: '#c7d2ff',
   lime: '#cefe6f', limeDark: '#a8d94a', white: '#ffffff', snow: '#f8fafc', scrim: 'rgba(5, 9, 28, 0.55)',
 }
+const SCROLLBAR_PX = 8
 const HEADING_FONT = "'Outfit', system-ui, sans-serif"
 
 // Shared by both themes. `tint` is a pale background for status pills; `light` is for status text on dark.
@@ -57,8 +58,8 @@ const shared = {
           '#root > *': { animation: 'screen-in 180ms ease-out' },
         },
         '@keyframes screen-in': { from: { opacity: 0 } },
-        // Always-visible scrollbars: browsers that hide them by default show these whenever an area can scroll.
-        '*::-webkit-scrollbar': { width: 8, height: 8 },
+        // Shown only when an area's content overflows, and then always, even in browsers that hide scrollbars until you scroll.
+        '*::-webkit-scrollbar': { width: SCROLLBAR_PX, height: SCROLLBAR_PX },
         '*::-webkit-scrollbar-track': { background: theme.palette.brand.tint },
         '*::-webkit-scrollbar-thumb': { background: theme.palette.primary.light, borderRadius: 4 },
         '@supports not selector(::-webkit-scrollbar)': { '*': { scrollbarWidth: 'thin', scrollbarColor: `${theme.palette.primary.light} ${theme.palette.brand.tint}` } },
@@ -95,6 +96,16 @@ export const cameraTheme = createTheme({
   },
 })
 
+/** The full-width bar at the top of each screen. */
+export const HEADER_BAR = { flexShrink: 0, bgcolor: 'background.paper', borderBottom: 1, borderColor: 'divider' }
+
+/** The title strip on top of a list, like a table header. The list below it squares its top corners with TABLE_BODY_RADIUS. */
+export const TABLE_HEADER = {
+  display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: 40, px: 1.75, typography: 'h2', fontSize: 14,
+  bgcolor: 'brand.tint', border: 1, borderBottom: 0, borderColor: 'divider', borderRadius: '6px 6px 0 0',
+}
+export const TABLE_BODY_RADIUS = '0 0 6px 6px'
+
 /** Photo frames, panels, alerts and empty states. Buttons and inputs use theme.shape.borderRadius (6px). */
 export const CARD_RADIUS = '16px'
 
@@ -108,10 +119,10 @@ export const SCROLL_SHADOWS = (theme) => {
   return {
     background: `linear-gradient(${paper} 30%, transparent) top / 100% 28px local no-repeat,
       linear-gradient(transparent, ${paper} 70%) bottom / 100% 28px local no-repeat,
-      linear-gradient(${shade}, transparent) top / 100% 10px scroll no-repeat,
-      linear-gradient(transparent, ${shade}) bottom / 100% 10px scroll no-repeat,
+      linear-gradient(${shade}, transparent) top left / calc(100% - ${SCROLLBAR_PX}px) 10px scroll no-repeat,
+      linear-gradient(transparent, ${shade}) bottom left / calc(100% - ${SCROLLBAR_PX}px) 10px scroll no-repeat,
       ${paper}`,
-    overflowY: 'scroll', // the scrollbar's track is always there, so rows don't narrow when the list gets long
+    scrollbarGutter: 'stable', // room is kept for the scrollbar, so rows don't narrow when it appears
   }
 }
 

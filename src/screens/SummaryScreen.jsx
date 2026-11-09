@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import { EditOutlined, FileDownloadOutlined } from '@mui/icons-material'
 import { Box, Button, IconButton, InputAdornment, Paper, TextField, Typography, useTheme } from '@mui/material'
 import AnnotationList from '../components/AnnotationList/AnnotationList.jsx'
-import BackButton from '../components/BackButton/BackButton.jsx'
+import ScreenLayout from '../components/ScreenLayout/ScreenLayout.jsx'
 import ConfirmDialog from '../components/ConfirmDialog/ConfirmDialog.jsx'
 import PhotoWithBoxes from '../components/PhotoWithBoxes/PhotoWithBoxes.jsx'
 import StatusBadge from '../components/StatusBadge/StatusBadge.jsx'
@@ -39,106 +39,103 @@ export default function SummaryScreen({ photo, quality, items, photoName, onPhot
   }
 
   return (
-    <Box component="main" sx={styles.root}>
-      <Box sx={styles.header}>
-        <BackButton label="Back to Annotate" onClick={onBack} />
-        <Typography component="h1" sx={styles.title}>Inspection summary</Typography>
-      </Box>
+    <ScreenLayout title="Inspection summary" onBack={onBack} backLabel="Back to Annotate" headerSx={styles.headerWidth}>
+      <Box component="main" sx={styles.root}>
+        <PhotoWithBoxes photoUrl={photo.url} size={quality} items={items} />
 
-      <PhotoWithBoxes photoUrl={photo.url} size={quality} items={items} />
+        <Box sx={styles.side}>
+          <Box sx={styles.tiles}>
+            <Paper variant="outlined" sx={styles.tile}>
+              <Typography sx={styles.tileLabel}>Annotations</Typography>
+              <Typography sx={styles.count}>{items.length}</Typography>
+            </Paper>
+            <Paper variant="outlined" sx={styles.tile}>
+              <Typography sx={styles.tileLabel}>Photo quality</Typography>
+              <Box sx={styles.grade}>
+                <StatusBadge grade={grade} label={GRADE_LABELS[grade]} pill />
+              </Box>
+            </Paper>
+          </Box>
 
-      <Box sx={styles.side}>
-        <Box sx={styles.tiles}>
-          <Paper variant="outlined" sx={styles.tile}>
-            <Typography sx={styles.tileLabel}>Annotations</Typography>
-            <Typography sx={styles.count}>{items.length}</Typography>
-          </Paper>
-          <Paper variant="outlined" sx={styles.tile}>
-            <Typography sx={styles.tileLabel}>Photo quality</Typography>
-            <Box sx={styles.grade}>
-              <StatusBadge grade={grade} label={GRADE_LABELS[grade]} pill />
-            </Box>
-          </Paper>
+          {items.length > 0 && <AnnotationList readOnly items={items} />}
+
+          <Box sx={styles.actions}>
+            <TextField
+              label="Photo name"
+              size="small"
+              fullWidth
+              value={photoName}
+              placeholder={DEFAULT_NAME}
+              inputRef={nameInput}
+              onChange={(event) => {
+                const { value, message } = validateText(event.target.value, NAME_RULE)
+                onPhotoNameChange(value)
+                setNameNote(message)
+              }}
+              onBlur={() => {
+                const { value, message } = finishText(photoName, NAME_RULE)
+                onPhotoNameChange(value)
+                setNameNote(message)
+              }}
+              onKeyDown={(event) => event.key === 'Enter' && event.currentTarget.querySelector('input')?.blur()}
+              slotProps={{
+                inputLabel: { shrink: true },
+                htmlInput: { autoComplete: 'off', spellCheck: false, enterKeyHint: 'done' },
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      .jpg
+                      <IconButton
+                        aria-label="Edit photo name"
+                        edge="end"
+                        onClick={() => {
+                          nameInput.current.focus()
+                          nameInput.current.select()
+                        }}
+                        sx={styles.editName}
+                      >
+                        <EditOutlined fontSize="small" />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
+            <Button
+              variant="outlined"
+              size="large"
+              fullWidth
+              startIcon={<FileDownloadOutlined />}
+              disabled={download === 'working'}
+              onClick={handleDownload}
+            >
+              {download === 'working' ? 'Preparing photo…' : 'Download photo'}
+            </Button>
+            <Typography role={download === 'failed' ? 'alert' : undefined} aria-live="polite" sx={styles.caption(download === 'failed' || nameNote?.warn)}>
+              {download === 'failed'
+                ? "Couldn't make the photo, so try again."
+                : (nameNote?.text ?? 'The photo includes the boxes and labels. Nothing is uploaded.')}
+            </Typography>
+            <Button
+              variant="contained"
+              size="large"
+              fullWidth
+              onClick={() => (items.length > 0 && download !== 'done' ? setConfirming(true) : onNewPhoto())}
+            >
+              Take new photo
+            </Button>
+          </Box>
         </Box>
 
-        {items.length > 0 && <AnnotationList readOnly items={items} />}
-
-        <Box sx={styles.actions}>
-          <TextField
-            label="Photo name"
-            size="small"
-            fullWidth
-            value={photoName}
-            placeholder={DEFAULT_NAME}
-            inputRef={nameInput}
-            onChange={(event) => {
-              const { value, message } = validateText(event.target.value, NAME_RULE)
-              onPhotoNameChange(value)
-              setNameNote(message)
-            }}
-            onBlur={() => {
-              const { value, message } = finishText(photoName, NAME_RULE)
-              onPhotoNameChange(value)
-              setNameNote(message)
-            }}
-            onKeyDown={(event) => event.key === 'Enter' && event.currentTarget.querySelector('input')?.blur()}
-            slotProps={{
-              inputLabel: { shrink: true },
-              htmlInput: { autoComplete: 'off', spellCheck: false, enterKeyHint: 'done' },
-              input: {
-                endAdornment: (
-                  <InputAdornment position="end">
-                    .jpg
-                    <IconButton
-                      aria-label="Edit photo name"
-                      edge="end"
-                      onClick={() => {
-                        nameInput.current.focus()
-                        nameInput.current.select()
-                      }}
-                      sx={styles.editName}
-                    >
-                      <EditOutlined fontSize="small" />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-          <Button
-            variant="outlined"
-            size="large"
-            fullWidth
-            startIcon={<FileDownloadOutlined />}
-            disabled={download === 'working'}
-            onClick={handleDownload}
-          >
-            {download === 'working' ? 'Preparing photo…' : 'Download photo'}
-          </Button>
-          <Typography role={download === 'failed' ? 'alert' : undefined} aria-live="polite" sx={styles.caption(download === 'failed' || nameNote?.warn)}>
-            {download === 'failed'
-              ? "Couldn't make the photo. Try again."
-              : (nameNote?.text ?? 'The photo includes the boxes and labels. Nothing is uploaded.')}
-          </Typography>
-          <Button
-            variant="contained"
-            size="large"
-            fullWidth
-            onClick={() => (items.length > 0 && download !== 'done' ? setConfirming(true) : onNewPhoto())}
-          >
-            Take new photo
-          </Button>
-        </Box>
+        <ConfirmDialog
+          open={confirming}
+          title="Discard this photo?"
+          message="You haven't downloaded it, so the photo and its boxes will be lost."
+          confirmLabel="Discard"
+          onConfirm={onNewPhoto}
+          onCancel={() => setConfirming(false)}
+        />
       </Box>
-
-      <ConfirmDialog
-        open={confirming}
-        title="Discard this photo?"
-        message="You haven't downloaded it, so the photo and its boxes will be lost."
-        confirmLabel="Discard"
-        onConfirm={onNewPhoto}
-        onCancel={() => setConfirming(false)}
-      />
-    </Box>
+    </ScreenLayout>
   )
 }

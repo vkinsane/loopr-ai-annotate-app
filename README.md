@@ -2,7 +2,7 @@
 
 A mobile-first web app for photo inspection: photograph a part, check the photo's quality, and annotate it with labelled boxes.
 
-**Flow:** Landing → How it works (camera permission) → Capture → Preview & quality → Annotate → Summary
+**Flow:** Landing → Before you start (camera permission) → Capture → Preview & quality → Annotate → Summary
 
 ## Setup
 
@@ -33,14 +33,14 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
 
 - **Capture**
   - Live rear-camera preview at the highest resolution the device offers.
-  - Live chips for resolution, brightness and sharpness, with a hint line ("Too dim. Turn on the torch.").
+  - Live chips for resolution, brightness and sharpness, with a hint line ("Too dark, so turn on the torch.").
   - Torch toggle, shown only when the camera supports it, showing the camera's real torch state.
   - Clear screens for blocked, missing, busy and unsupported cameras, with Try again and "Choose a photo instead".
   - The camera is released while the page is hidden (tab switch, app in background, screen locked).
 - **Preview & quality**
   - Resolution, file size, brightness and sharpness, each graded Good / Warning / Poor.
   - A summary banner with advice, e.g. "Photo is too dark and blurry".
-  - Rows that aren't Good show the target ("Good at 60+").
+  - Rows that aren't Good have an (i) button that says how to improve. Sharpness is shown as a word (Sharp / A bit blurry / Blurry), not a score.
   - Full-screen zoom: pinch or scroll to zoom (up to 8×), drag to move, double-tap to zoom in and out.
   - Retake or Annotate. For a poor photo, Retake becomes the main button.
 - **Annotate**
@@ -93,7 +93,7 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
 |---|---|---|---|
 | Resolution | ≥ 8 MP | 2–8 MP | < 2 MP |
 | File size | ≥ 500 KB | 150–500 KB | < 150 KB |
-| Brightness (0–255) | 70–190 | 40–70 or 190–220 | < 40 or > 220 |
+| Brightness (0–255; shown as %) | 70–190 | 40–70 or 190–220 | < 40 or > 220 |
 | Sharpness | ≥ 60 | 20–60 | < 20 |
 
 - **A poor photo warns but doesn't block:** Annotate stays available as the second button.
@@ -105,7 +105,7 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
 - **Pointer Events with pointer capture:** one code path for mouse, touch and pen. `touch-action: none` on the photo stops the page from scrolling while drawing.
 - **No draw/select modes:** the gesture depends on where it starts (corner → resize, box → move, empty photo → draw). A quick tap or a box under 12 screen px is ignored.
 - **Pure logic in `utils/`:** `geometry.js` (draw, move, resize, clamp) and `annotations.js` (reducer). IDs are created outside the reducer, so it stays pure.
-- **A confirmation dialog appears before work is lost** (`components/ConfirmDialog`): "Keep working" is the safe default. It only appears when there are boxes that would be lost.
+- **A confirmation dialog appears before work is lost** (`components/ConfirmDialog`): "Keep photo" is the safe default. It only appears when there are boxes that would be lost.
 
 ### Code conventions
 - Folders by file type: `screens/`, `components/`, `hooks/` (browser APIs and lifecycle), `utils/` (pure logic).
@@ -118,7 +118,7 @@ Measured in headless Chrome; not yet checked at these sizes on real devices.
 
 | Screen | What happens |
 |---|---|
-| **Portrait phones, 320 × 568 and up** | The page doesn't scroll. Photos shrink to fit. On short phones the Preview details and How it works steps scroll inside, with the main buttons pinned. |
+| **Portrait phones, 320 × 568 and up** | The page doesn't scroll. Photos shrink to fit. On short phones the Preview details and Before you start steps scroll inside, with the main buttons pinned. |
 | **Under 620 px tall** | The Landing demo is hidden so the text and button fit. |
 | **Tablets, 600 px wide and up** | No page scroll in portrait or landscape. |
 | **Laptops and desktops, 1280 × 720 to 1920 × 1080** | No page scroll. Content stops growing at 1200 px and stays centred. |
@@ -149,7 +149,7 @@ Only what was actually tried is listed.
 |---|---|
 | iPhone, Chrome (iOS) | Camera preview and capture work: 3024 × 4032 (12.2 MP), 9.1 MB, all checks Good. The "Camera access is blocked" screen shows. Torch and annotation not checked yet. |
 | Headless Chrome, 390 × 844 and 844 × 390, fake camera | Capture and error-screen layouts fit the screen, with no sideways scroll, in portrait, landscape and after rotating. |
-| Headless Chrome, 390 × 844, 820 × 1180, 1440 × 900, fake camera | Full flow by script: How it works → capture → Preview → zoom (buttons + mouse drag) → draw 2 boxes → Summary → download (3840 × 2160 JPEG with labels) → back keeps boxes. Pinch and double-tap not tested (no touch input in the script). |
+| Headless Chrome, 390 × 844, 820 × 1180, 1440 × 900, fake camera | Full flow by script: Before you start → capture → Preview → zoom (buttons + mouse drag) → draw 2 boxes → Summary → download (3840 × 2160 JPEG with labels) → back keeps boxes. Pinch and double-tap not tested (no touch input in the script). |
 | Android | Not tested yet. |
 | Desktop browsers with a webcam | Not tested yet. |
 

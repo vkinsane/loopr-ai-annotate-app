@@ -28,7 +28,7 @@ export default function ChoosePhotoButton({ onPick, asLink = false, variant = 'o
       if (!message) onPick({ blob: file, url: URL.createObjectURL(file), method: 'upload' })
     } catch (readError) {
       console.error('Could not read the picked file', readError)
-      setError("Couldn't open this file. Choose another photo.")
+      setError("Couldn't open this file, so choose another photo.")
     }
   }
 

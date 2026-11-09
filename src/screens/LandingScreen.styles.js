@@ -1,3 +1,5 @@
+import { HEADER_BAR } from '../theme.js'
+
 // The frost-to-mist fade echoes the hero sections on loopr.ai.
 const HERO_FADE_PX = { xs: 420, md: 560 }
 const CONTENT_WIDTH = { xs: 480, sm: 608, md: 1168 } // 24px gutters inside → 560 tablet, 1120 desktop
@@ -12,7 +14,8 @@ export const styles = {
       background: `linear-gradient(180deg, ${theme.palette.brand.frost} 0px, ${theme.palette.background.default} ${HERO_FADE_PX.md}px)`,
     },
   }),
-  header: { width: '100%', maxWidth: CONTENT_WIDTH, mx: 'auto', display: 'flex', alignItems: 'center', gap: 1.25, px: 3, py: { xs: 2, sm: 2.5 } },
+  bar: HEADER_BAR,
+  header: { width: '100%', maxWidth: CONTENT_WIDTH, mx: 'auto', display: 'flex', alignItems: 'center', gap: 1.25, px: 3, minHeight: 56 },
   logo: { width: 32, height: 32, borderRadius: 1, bgcolor: 'primary.main', display: 'grid', placeItems: 'center' },
   logoIcon: { fontSize: 20, color: 'primary.contrastText' },
   brand: { typography: 'h2' },

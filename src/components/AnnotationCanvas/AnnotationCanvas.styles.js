@@ -10,12 +10,12 @@ const unzoomed = (px) => `calc(${px}px / var(--zoom, 1))`
 const UNZOOM = 'scale(calc(1 / var(--zoom, 1)))'
 
 export const styles = {
-  // Desktop: the frame and hint join the screen's grid (areas "photo" and "hint"), so a sidebar can end where the photo ends.
-  root: { display: { md: 'contents' } },
+  // One bordered card: the photo, with the hint as its footer. The backdrop fills the sides of a portrait photo.
+  root: { gridArea: { md: 'photo' }, alignSelf: 'start', border: 1, borderColor: 'divider', borderRadius: CARD_RADIUS, overflow: 'hidden', bgcolor: 'brand.photoBackdrop' },
   // Largest box with the photo's shape that fits: full width, capped by screen height.
   frame: (ratio, moving) => ({
-    position: 'relative', aspectRatio: String(ratio), mx: 'auto', gridArea: { md: 'photo' }, alignSelf: 'start', borderRadius: CARD_RADIUS, overflow: 'hidden', bgcolor: 'brand.photoBackdrop',
-    width: { xs: `min(100%, max(100px, min(50dvh, 100dvh - 360px)) * ${ratio})`, sm: `min(100%, 50dvh * ${ratio})`, md: `min(100%, (100dvh - 140px) * ${ratio})` },
+    position: 'relative', aspectRatio: String(ratio), mx: 'auto', overflow: 'hidden',
+    width: { xs: `min(100%, max(100px, min(50dvh, 100dvh - 376px)) * ${ratio})`, sm: `min(100%, 50dvh * ${ratio})`, md: `min(100%, (100dvh - 143px) * ${ratio})` },
     userSelect: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none', touchAction: 'none', cursor: moving ? 'grab' : 'auto',
   }),
   photo: { display: 'block', width: '100%', height: '100%', pointerEvents: 'none' },
@@ -62,5 +62,5 @@ export const styles = {
     width: 40, height: 40, color: on ? 'brand.ink' : 'brand.snow', bgcolor: on ? 'brand.lime' : 'transparent',
     '&:hover': { bgcolor: on ? 'brand.lime' : 'brand.carbon' }, '&.Mui-disabled': { color: 'brand.frost', opacity: 0.45 },
   }),
-  hint: { mt: { xs: 1.25, md: 0 }, gridArea: { md: 'hint' }, typography: 'body2', color: 'text.secondary' },
+  hint: { px: 1.75, py: 1.25, bgcolor: 'background.paper', borderTop: 1, borderColor: 'divider', typography: 'body2', color: 'text.secondary' },
 }

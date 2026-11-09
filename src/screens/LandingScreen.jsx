@@ -6,13 +6,15 @@ import { styles } from './LandingScreen.styles.js'
 export default function LandingScreen({ onNext }) {
   return (
     <Box sx={styles.root}>
-      <Box component="header" sx={styles.header}>
-        <Box sx={styles.logo}>
-          <CenterFocusStrongOutlined sx={styles.logoIcon} />
+      <Box component="header" sx={styles.bar}>
+        <Box sx={styles.header}>
+          <Box sx={styles.logo}>
+            <CenterFocusStrongOutlined sx={styles.logoIcon} />
+          </Box>
+          <Typography component="span" sx={styles.brand}>
+            Loopr Annotate
+          </Typography>
         </Box>
-        <Typography component="span" sx={styles.brand}>
-          Loopr Annotate
-        </Typography>
       </Box>
 
       <Box component="main" sx={styles.main}>
@@ -40,7 +42,7 @@ export default function LandingScreen({ onNext }) {
             Works in the browser. Photos stay on this device.
           </Typography>
           <Button variant="contained" size="large" fullWidth onClick={onNext} sx={styles.button}>
-            How it works
+            Start inspection
           </Button>
         </Box>
       </Box>
