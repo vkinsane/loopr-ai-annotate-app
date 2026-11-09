@@ -5,17 +5,34 @@ A mobile-first web app for photo inspection: take a photo, check its quality, an
 **Flow:** Landing → Before you start (camera permission) → Capture → Preview & quality → Annotate → Summary
 
 <details open>
-<summary><strong>Setup</strong></summary>
+<summary><strong>Installation</strong></summary>
 
-**Requirements:** Node.js 20.19+ or 22.12+, npm.
+**Requirements:** Node.js 20.19+ or 22.12+, npm, Git. No accounts or environment variables are needed.
 
 ```bash
+git clone https://github.com/vkinsane/loopr-ai-annotate-app.git
+cd loopr-ai-annotate-app
 npm install
+npm run dev       # open the URL it prints, usually http://localhost:5173
+```
+
+**To run the tests,** install the test browser once:
+
+```bash
+npx playwright install chromium
+npm run test:e2e  # Playwright; builds the app first
+```
+
+</details>
+
+<details>
+<summary><strong>Development</strong></summary>
+
+```bash
 npm run dev       # http://localhost:5173
 npm run build     # production build in dist/
 npm run preview   # serve the production build
 npm run lint      # oxlint
-npx playwright install chromium   # once
 npm run test:e2e  # Playwright; builds the app first
 ```
 
