@@ -4,7 +4,8 @@ A mobile-first web app for photo inspection: take a photo, check its quality, an
 
 **Flow:** Landing → Before you start (camera permission) → Capture → Preview & quality → Annotate → Summary
 
-## Setup
+<details open>
+<summary><strong>Setup</strong></summary>
 
 **Requirements:** Node.js 20.19+ or 22.12+, npm.
 
@@ -31,7 +32,10 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
 - `ngrok http 5173` also works, but its free plan has a monthly request limit. The dev server sends each source file as a separate request, so a few sessions use up the limit.
 - `vite.config.js` already allows `*.trycloudflare.com` and `*.ngrok-free.app` hosts.
 
-## Features
+</details>
+
+<details>
+<summary><strong>Features</strong></summary>
 
 - **Capture**
   - Live rear-camera preview at the highest resolution the device offers.
@@ -59,7 +63,10 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
   - **Download photo:** a full-resolution JPEG with the boxes and labels drawn on (canvas). Nothing is uploaded.
   - Back to Annotate keeps the boxes. "Take new photo" asks once more if the photo wasn't downloaded.
 
-## Implementation decisions
+</details>
+
+<details>
+<summary><strong>Implementation decisions</strong></summary>
 
 ### Stack
 - **React + Vite, JavaScript (no TypeScript).**
@@ -115,7 +122,10 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
 - No component file over 250 lines. Styles live in a `*.styles.js` file next to each component.
 - See [ARCHITECTURE.md](ARCHITECTURE.md) for the full structure and rules.
 
-## Supported screens
+</details>
+
+<details>
+<summary><strong>Supported screens</strong></summary>
 
 Measured in headless Chrome.
 
@@ -128,7 +138,10 @@ Measured in headless Chrome.
 | **Phones held sideways** | Everything is reachable and nothing overlaps, but screens scroll. Capture fits without scrolling. |
 | **Narrower than 320 px** | Not designed for. |
 
-## Known limitations
+</details>
+
+<details>
+<summary><strong>Known limitations</strong></summary>
 
 - **Thresholds are not calibrated.** The sharpness values in particular are starting points. They need measuring from sharp and deliberately blurred photos on the target devices.
 - **File size is a weak quality signal:** it depends on JPEG compression as much as on detail.
@@ -143,7 +156,10 @@ Measured in headless Chrome.
 - **Checks run in the browser only.** Browser checks can be bypassed, so a future backend must repeat them (OWASP). Today there is no server, so nothing leaves the device.
 - **Not deployed yet.** The brief requires a public HTTPS deployment.
 
-## Automated tests
+</details>
+
+<details>
+<summary><strong>Automated tests</strong></summary>
 
 Playwright 1.65, Chromium with a fake camera, against the production build. **174 tests: 172 pass, 2 are open findings** (below). `npm audit`: 0 vulnerabilities.
 
@@ -167,7 +183,10 @@ Playwright 1.65, Chromium with a fake camera, against the production build. **17
 
 **Not applicable:** login, sessions, CSRF, API errors, server-side validation and multi-user load, because the app has no backend.
 
-## Device testing
+</details>
+
+<details>
+<summary><strong>Device testing</strong></summary>
 
 | Device / browser | Result |
 |---|---|
@@ -175,6 +194,11 @@ Playwright 1.65, Chromium with a fake camera, against the production build. **17
 | Headless Chrome, 390 × 844 and 844 × 390, fake camera | Capture and error-screen layouts fit the screen, with no sideways scroll, in portrait, landscape and after rotating. |
 | Headless Chrome, 390 × 844, 820 × 1180, 1440 × 900, fake camera | Full flow by script: Before you start → capture → Preview → zoom (buttons + mouse drag) → draw 2 boxes → Summary → download (3840 × 2160 JPEG with labels) → back keeps boxes. |
 
-## Credits
+</details>
+
+<details>
+<summary><strong>Credits</strong></summary>
 
 - Landing demo photo: 'Damaged car door' by Garitzko, Wikimedia Commons (public domain). Resized to 800 × 600.
+
+</details>
