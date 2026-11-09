@@ -14,7 +14,7 @@ const CONNECTOR = 20 // px of dotted line between two step boxes
 // Animations run only when the user hasn't asked for reduced motion; the static styles are the final frame.
 const animate = (animation) => ({ '@media (prefers-reduced-motion: no-preference)': { animation } })
 
-// Box positions are % of the sample photo, matching the damage in it.
+// Box positions are % of the demo photo, matching the damage in it.
 const boxBase = { position: 'absolute', boxSizing: 'border-box' }
 const labelBase = { position: 'absolute', px: 0.625, ...BOX_LABEL_TEXT, whiteSpace: 'nowrap' }
 

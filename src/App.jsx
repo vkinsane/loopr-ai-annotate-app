@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useReducer, useState } from 'react'
 import ScreenLoader from './components/ScreenLoader/ScreenLoader.jsx'
 import { useScreenHistory } from './hooks'
 import CaptureScreen from './screens/CaptureScreen.jsx'
-import HowItWorksScreen from './screens/HowItWorksScreen.jsx'
+import BeforeYouStartScreen from './screens/BeforeYouStartScreen.jsx'
 import LandingScreen from './screens/LandingScreen.jsx'
 import PreviewScreen from './screens/PreviewScreen.jsx'
 import { annotationsReducer, initialAnnotations } from './utils'
@@ -48,12 +48,12 @@ function App() {
     go('annotate')
   }
 
-  if (screen === 'landing') return <LandingScreen onNext={() => go('how-it-works')} />
-  if (screen === 'how-it-works') {
-    return <HowItWorksScreen onBack={() => go('landing')} onStart={() => go('capture')} onPickPhoto={handleNewPhoto} />
+  if (screen === 'landing') return <LandingScreen onNext={() => go('before-you-start')} />
+  if (screen === 'before-you-start') {
+    return <BeforeYouStartScreen onBack={() => go('landing')} onStart={() => go('capture')} onPickPhoto={handleNewPhoto} />
   }
   if (screen === 'capture') {
-    return <CaptureScreen onBack={() => go('how-it-works')} onCapture={handleNewPhoto} onPickPhoto={handleNewPhoto} />
+    return <CaptureScreen onBack={() => go('before-you-start')} onCapture={handleNewPhoto} onPickPhoto={handleNewPhoto} />
   }
   if (screen === 'preview') return <PreviewScreen photo={photo} boxCount={annotations.items.length} onRetake={startOver} onAnnotate={handleMeasured} />
 

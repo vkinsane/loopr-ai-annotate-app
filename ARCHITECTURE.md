@@ -11,7 +11,7 @@ src/
 ├─ theme.js                    # MUI themes (light + dark camera), shared styles
 ├─ screens/
 │  ├─ LandingScreen.jsx
-│  ├─ HowItWorksScreen.jsx     # camera permission before Capture
+│  ├─ BeforeYouStartScreen.jsx     # camera permission before Capture
 │  ├─ CaptureScreen.jsx
 │  ├─ CameraErrorScreen.jsx
 │  ├─ PreviewScreen.jsx

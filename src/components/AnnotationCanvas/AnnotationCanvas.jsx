@@ -2,10 +2,10 @@ import { useRef, useState } from 'react'
 import { Add, PanToolOutlined, Remove } from '@mui/icons-material'
 import { Box, IconButton, Typography } from '@mui/material'
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch'
+import { CORNERS } from '../../theme.js'
 import { boxLabel, clamp, isTooSmall, labelGoesBelow, moveRect, rectFromPoints, resizeRect, ZOOM } from '../../utils'
 import { styles } from './AnnotationCanvas.styles.js'
 
-const CORNERS = ['top-left', 'top-right', 'bottom-left', 'bottom-right']
 const MIN_BOX_SCREEN_PX = 12
 const IDLE_HINT = 'Drag on the photo to add an annotation. Drag a box to move it, or a corner to resize it.'
 const DRAW_HINT = 'Lift your finger to add the box. Very small boxes are not added.'
@@ -123,7 +123,7 @@ export default function AnnotationCanvas({ photoUrl, size, items, selectedId, on
                     <Box component="span" sx={styles.label(selected, labelGoesBelow(item, size))}>
                       {boxLabel(item)}
                     </Box>
-                    {selected && CORNERS.map((corner) => <Box key={corner} data-corner={corner} sx={styles.handle(corner)} />)}
+                    {selected && CORNERS.map(([vertical, horizontal]) => <Box key={vertical + horizontal} data-corner={`${vertical}-${horizontal}`} sx={styles.handle(vertical, horizontal)} />)}
                   </Box>
                 )
               })}

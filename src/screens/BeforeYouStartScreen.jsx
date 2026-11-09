@@ -5,7 +5,7 @@ import ScreenLayout from '../components/ScreenLayout/ScreenLayout.jsx'
 import ScrollThumb from '../components/ScrollThumb/ScrollThumb.jsx'
 import { useCameraPermission } from '../hooks'
 import { VISUALLY_HIDDEN } from '../theme.js'
-import { styles } from './HowItWorksScreen.styles.js'
+import { styles } from './BeforeYouStartScreen.styles.js'
 
 const LATER_STEPS = [
   {
@@ -25,7 +25,7 @@ const TIPS = [
 ]
 
 /** Explains the flow and asks for the camera here, so the camera screen opens without a prompt. */
-export default function HowItWorksScreen({ onBack, onStart, onPickPhoto }) {
+export default function BeforeYouStartScreen({ onBack, onStart, onPickPhoto }) {
   const { state, request } = useCameraPermission()
   const allowed = state.status === 'allowed'
 

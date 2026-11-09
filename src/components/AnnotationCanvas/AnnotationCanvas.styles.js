@@ -38,18 +38,15 @@ export const styles = {
     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', pointerEvents: 'none',
   }),
   // A 44 px touch target, centred on the corner, around a small visible dot.
-  handle: (corner) => {
-    const [vertical, horizontal] = corner.split('-')
-    return {
-      position: 'absolute', width: HANDLE.hit, height: HANDLE.hit, [vertical]: 0, [horizontal]: 0,
-      transform: `translate(${horizontal === 'left' ? '-50%' : '50%'}, ${vertical === 'top' ? '-50%' : '50%'}) ${UNZOOM}`,
-      cursor: corner === 'top-left' || corner === 'bottom-right' ? 'nwse-resize' : 'nesw-resize',
-      '&::after': {
-        content: '""', position: 'absolute', inset: (HANDLE.hit - HANDLE.dot) / 2, borderRadius: '50%',
-        bgcolor: 'common.white', border: '2.5px solid', borderColor: 'primary.main', boxSizing: 'border-box',
-      },
-    }
-  },
+  handle: (vertical, horizontal) => ({
+    position: 'absolute', width: HANDLE.hit, height: HANDLE.hit, [vertical]: 0, [horizontal]: 0,
+    transform: `translate(${horizontal === 'left' ? '-50%' : '50%'}, ${vertical === 'top' ? '-50%' : '50%'}) ${UNZOOM}`,
+    cursor: (vertical === 'top') === (horizontal === 'left') ? 'nwse-resize' : 'nesw-resize',
+    '&::after': {
+      content: '""', position: 'absolute', inset: (HANDLE.hit - HANDLE.dot) / 2, borderRadius: '50%',
+      bgcolor: 'common.white', border: '2.5px solid', borderColor: 'primary.main', boxSizing: 'border-box',
+    },
+  }),
   sizeBadge: {
     position: 'absolute', right: 10, top: 10, px: 1, py: 0.5, borderRadius: '6px', pointerEvents: 'none',
     bgcolor: (theme) => alpha(theme.palette.brand.carbon, 0.8), color: 'brand.snow', typography: 'caption', fontWeight: 500,

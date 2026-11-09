@@ -21,6 +21,7 @@ export default function AnnotateScreen({ photo, quality, annotations, dispatch, 
   const checks = qualityChecks(photo.blob.size, quality)
   const issues = checks.filter((check) => check.grade !== 'good')
   const overall = gradePhoto({ bytes: photo.blob.size, ...quality }).grade
+  const select = (id) => dispatch({ type: 'select', id })
 
   // Delete removes the selected box and Escape deselects, except while typing a label.
   useEffect(() => {
@@ -60,14 +61,14 @@ export default function AnnotateScreen({ photo, quality, annotations, dispatch, 
           selectedId={selectedId}
           onAdd={(rect) => dispatch({ type: 'add', id: crypto.randomUUID(), rect })}
           onChange={(id, rect) => dispatch({ type: 'change', id, rect })}
-          onSelect={(id) => dispatch({ type: 'select', id })}
+          onSelect={select}
         />
 
         <Box sx={styles.sidebar}>
           <AnnotationList
             items={items}
             selectedId={selectedId}
-            onSelect={(id) => dispatch({ type: 'select', id })}
+            onSelect={select}
             onRename={(id, label) => dispatch({ type: 'rename', id, label })}
             onRemove={(id) => dispatch({ type: 'remove', id })}
           />

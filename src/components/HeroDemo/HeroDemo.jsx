@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material'
-import samplePart from '../../assets/sample-part.jpg'
+import demoPhoto from '../../assets/demo-photo.jpg'
 import { CORNERS } from '../../theme.js'
 import { styles } from './HeroDemo.styles.js'
 
@@ -14,7 +14,7 @@ export default function HeroDemo() {
       sx={styles.root}
     >
       <Box sx={styles.frame}>
-        <Box component="img" src={samplePart} alt="" sx={styles.photo} />
+        <Box component="img" src={demoPhoto} alt="" sx={styles.photo} />
         <Box sx={styles.guides}>
           {CORNERS.map(([vertical, horizontal]) => (
             <Box key={vertical + horizontal} component="span" sx={styles.corner(vertical, horizontal)} />
