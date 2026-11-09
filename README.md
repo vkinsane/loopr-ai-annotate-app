@@ -80,9 +80,7 @@ npm run dev       # open the URL it prints, usually http://localhost:5173
 </details>
 
 <details>
-<summary><strong>Architecture</strong></summary>
-
-### Folder structure (by file type)
+<summary><strong>Folder structure (by file type)</strong></summary>
 
 ```
 src/
@@ -134,7 +132,11 @@ src/
 e2e/*.spec.js                  # Playwright suite; see Testing
 ```
 
-### UI and theming
+</details>
+
+<details>
+<summary><strong>UI and theming</strong></summary>
+
 - **Material UI** (`@mui/material` + Emotion) for components; styled with the `sx` prop and theme values.
 - **Imports:** one line per package (`import { Box, Chip } from '@mui/material'`). The production build tree-shakes unused components and icons; bundle size was unchanged when we switched.
 - **Themes** in `theme.js`: light app theme plus a dark camera theme; `CssBaseline` provides the reset.
@@ -145,31 +147,6 @@ e2e/*.spec.js                  # Playwright suite; see Testing
   - Shared component styles are theme overrides (large buttons, focus ring, alert titles), not repeated per screen.
 - **Fonts:** Outfit (headings, buttons) and DM Sans (body), from Google Fonts in `index.html`. Fall back to `system-ui`.
 - **AnnotationCanvas is custom**: MUI has no drawing tools, and this logic is a core evaluation point.
-
-### Rules
-- `utils/` has no React. `geometry.js`, `annotations.js`, `quality.js` and `format.js` are pure; `image.js` and `exportPhoto.js` use canvas.
-- `hooks/` wrap browser APIs with React lifecycle and cleanup.
-- One folder per component: `StatusBadge/StatusBadge.jsx` + `StatusBadge.styles.js`.
-- `screens/` combine hooks, state and components.
-- Tests live in `e2e/`, one spec per area.
-- Files are created when we build them, never as empty stubs.
-- No component file over 250 lines; split out a component or pure util when it grows.
-- A private helper used in only one place is inlined. Exported `utils/` functions stay separate, so they can be tested.
-- One import line per module or folder: `import { useCamera, useTorch } from '../hooks'`.
-- Comments only where the code can't say it: browser quirks, uncalibrated values, data shapes.
-- Styles live in a `*.styles.js` file next to their component (`export const styles = { … }`); JSX uses `sx={styles.root}`, and plain `<img>` and `<video>` tags use `style={styles.photo}`. State-dependent styles are functions: `sx={styles.torch(on)}`.
-
-### Code principles
-- **Readable:** clear names, small single-job functions, early returns, named constants, comments explain *why*.
-- **Simple:** KISS, YAGNI; small duplication beats the wrong abstraction.
-- **Separated:** UI in components/screens, browser APIs in hooks, logic in `utils/`.
-- **SOLID, React-style:** one reason to change per file; small focused props; hooks hide browser APIs behind small interfaces.
-- **Reliable:** validate at boundaries (camera and browser APIs); never swallow errors; immutable state; test behaviour.
-- **Maintainable:** small commits, delete dead code, record decisions and trade-offs here.
-
-### Why by file type
-- Familiar; clear layers: `utils` → `hooks` → `components` → `screens`.
-- Trade-off: one feature spans folders; clear names keep it traceable.
 
 </details>
 
