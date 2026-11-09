@@ -1,25 +1,27 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Box, Button, Typography } from '@mui/material'
 import AnnotationCanvas from '../components/AnnotationCanvas/AnnotationCanvas.jsx'
 import AnnotationList from '../components/AnnotationList/AnnotationList.jsx'
+import ConfirmDialog from '../components/ConfirmDialog/ConfirmDialog.jsx'
 import QualityChecks from '../components/QualityChecks/QualityChecks.jsx'
+import ScreenLayout from '../components/ScreenLayout/ScreenLayout.jsx'
+import ScrollThumb from '../components/ScrollThumb/ScrollThumb.jsx'
 import StatusBadge from '../components/StatusBadge/StatusBadge.jsx'
-import { useConfirmTap } from '../hooks'
-import { gradePhoto, qualityChecks } from '../utils'
+import { gradePhoto, plural, qualityChecks } from '../utils'
 import { styles } from './AnnotateScreen.styles.js'
-
-const plural = (count, one, many = `${one}s`) => `${count} ${count === 1 ? one : many}`
 
 /**
  * `photo` is { blob, url }, `quality` the measured { width, height, brightness, sharpness }.
  * `annotations` and `dispatch` come from App's annotations reducer.
  */
-export default function AnnotateScreen({ photo, quality, annotations, dispatch, onNewPhoto, onDone }) {
+export default function AnnotateScreen({ photo, quality, annotations, dispatch, onBack, onNewPhoto, onDone }) {
   const { items, selectedId } = annotations
-  const { confirming, confirm } = useConfirmTap()
+  const [confirming, setConfirming] = useState(false)
+  const [confirmingNoBoxes, setConfirmingNoBoxes] = useState(false)
   const checks = qualityChecks(photo.blob.size, quality)
-  const issues = checks.filter((check) => check.grade !== 'good').length
-  const overall = gradePhoto({ bytes: photo.blob.size, ...quality }).summary.grade
+  const issues = checks.filter((check) => check.grade !== 'good')
+  const overall = gradePhoto({ bytes: photo.blob.size, ...quality }).grade
+  const select = (id) => dispatch({ type: 'select', id })
 
   // Delete removes the selected box and Escape deselects, except while typing a label.
   useEffect(() => {
@@ -32,50 +34,77 @@ export default function AnnotateScreen({ photo, quality, annotations, dispatch, 
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [selectedId, dispatch])
 
+  const actions = (
+    <>
+      {issues.length > 0 && (
+        <Box sx={styles.qualityPill}>
+          <StatusBadge
+            grade={overall}
+            label={`Quality: ${plural(issues.length, 'warning')}`}
+            pill
+            tip={issues.map((check) => check.tip).join('\n')}
+          />
+        </Box>
+      )}
+      <Button onClick={() => (items.length > 0 ? setConfirming(true) : onNewPhoto())} sx={styles.newPhoto}>New photo</Button>
+    </>
+  )
+
   return (
-    <Box component="main" sx={styles.root}>
-      <Box sx={styles.header}>
-        <Typography component="h1" sx={styles.title}>Annotate</Typography>
-        {issues > 0 && (
-          <Box sx={styles.qualityPill}>
-            <StatusBadge grade={overall} label={`Quality: ${plural(issues, 'warning')}`} pill />
-          </Box>
-        )}
-        <Button onClick={() => confirm(onNewPhoto, items.length > 0)} sx={styles.newPhoto(confirming)}>
-          {confirming ? `Discard ${plural(items.length, 'box', 'boxes')}?` : 'New photo'}
-        </Button>
-      </Box>
-
-      <AnnotationCanvas
-        photoUrl={photo.url}
-        size={quality}
-        items={items}
-        selectedId={selectedId}
-        onAdd={(rect) => dispatch({ type: 'add', id: crypto.randomUUID(), rect })}
-        onChange={(id, rect) => dispatch({ type: 'change', id, rect })}
-        onSelect={(id) => dispatch({ type: 'select', id })}
-      />
-
-      <Box sx={styles.sidebar}>
-        <AnnotationList
+    <ScreenLayout title="Annotate" onBack={onBack} backLabel="Back to Preview" actions={actions} headerSx={styles.headerWidth}>
+      <Box component="main" sx={styles.root}>
+        <ScrollThumb />
+        <AnnotationCanvas
+          photoUrl={photo.url}
+          size={quality}
           items={items}
           selectedId={selectedId}
-          onSelect={(id) => dispatch({ type: 'select', id })}
-          onRename={(id, label) => dispatch({ type: 'rename', id, label })}
-          onRemove={(id) => dispatch({ type: 'remove', id })}
+          onAdd={(rect) => dispatch({ type: 'add', id: crypto.randomUUID(), rect })}
+          onChange={(id, rect) => dispatch({ type: 'change', id, rect })}
+          onSelect={select}
         />
 
-        <Box component="section" aria-labelledby="quality-heading" sx={styles.quality}>
-          <Typography id="quality-heading" component="h2" sx={styles.qualityTitle}>Photo quality</Typography>
-          <QualityChecks checks={checks} compact />
+        <Box sx={styles.sidebar}>
+          <AnnotationList
+            items={items}
+            selectedId={selectedId}
+            onSelect={select}
+            onRename={(id, label) => dispatch({ type: 'rename', id, label })}
+            onRemove={(id) => dispatch({ type: 'remove', id })}
+          />
+
+          <Box component="section" aria-labelledby="quality-heading" sx={styles.quality}>
+            <Typography id="quality-heading" component="h2" sx={styles.qualityTitle}>Photo quality</Typography>
+            <QualityChecks checks={checks} compact />
+          </Box>
+
+          <Box sx={styles.doneBar}>
+            <Button variant="contained" size="large" fullWidth onClick={() => (items.length > 0 ? onDone() : setConfirmingNoBoxes(true))}>
+              {items.length > 0 ? `Done · ${plural(items.length, 'annotation')}` : 'Done'}
+            </Button>
+          </Box>
         </Box>
 
-        <Box sx={styles.doneBar}>
-          <Button variant="contained" size="large" fullWidth onClick={onDone}>
-            {items.length > 0 ? `Done · ${plural(items.length, 'annotation')}` : 'Done'}
-          </Button>
-        </Box>
+        <ConfirmDialog
+          open={confirming}
+          title="Discard this photo?"
+          message={`This photo and its ${plural(items.length, 'box', 'boxes')} will be lost.`}
+          confirmLabel="Discard"
+          onConfirm={onNewPhoto}
+          onCancel={() => setConfirming(false)}
+        />
+
+        <ConfirmDialog
+          open={confirmingNoBoxes}
+          title="No annotations added"
+          message="You have not added any annotations. Do you want to proceed?"
+          confirmLabel="Proceed"
+          confirmColor="primary"
+          cancelLabel="Add annotations"
+          onConfirm={onDone}
+          onCancel={() => setConfirmingNoBoxes(false)}
+        />
       </Box>
-    </Box>
+    </ScreenLayout>
   )
 }

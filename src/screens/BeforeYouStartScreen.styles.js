@@ -1,15 +1,15 @@
-import { CARD_RADIUS } from '../theme.js'
+import { CARD_RADIUS, SCREEN_BODY } from '../theme.js'
 
-// Phone and tablet: one column, Get started pinned to the bottom (tablet column 560 px).
-// Desktop: the three steps side by side, tips and Get started in one row at the bottom. Nothing is vertically centred: centring moves the page when a step grows.
+const MAX_WIDTH = { xs: 480, sm: 608, md: 1168 }
+
+// Phone and tablet: one column, Open camera pinned to the bottom (tablet column 560 px).
+// Desktop: the three steps side by side, tips and Open camera in one row at the bottom. Nothing is vertically centred: centring moves the page when a step grows.
 export const styles = {
   root: {
-    minHeight: '100dvh', maxWidth: { xs: 480, sm: 608, md: 1168 }, mx: 'auto', px: { xs: 2, sm: 3 }, py: { sm: 5 },
+    ...SCREEN_BODY, maxWidth: MAX_WIDTH, px: { xs: 2, sm: 3 }, pt: { xs: 1, sm: 3 }, pb: { md: 5 },
     display: 'flex', flexDirection: 'column',
   },
-  header: { display: 'flex', alignItems: 'center', gap: 0.5, ml: -1.5, py: 1, mb: { sm: 1.5, md: 2.5 } },
-  back: { width: 44, height: 44, color: 'text.primary' },
-  title: { typography: 'h1', fontSize: { md: 28 } },
+  headerWidth: { maxWidth: MAX_WIDTH, px: { xs: 2, sm: 3 } },
   steps: {
     listStyle: 'none', m: 0, mt: { xs: 1, sm: 0 }, p: 0, gap: { xs: 1.5, md: 2.5 },
     display: { xs: 'flex', md: 'grid' }, flexDirection: 'column', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
@@ -26,18 +26,18 @@ export const styles = {
   stepText: { typography: 'body2', color: 'text.secondary' },
   // Each state is one 52 px control plus one line, so the page doesn't move when the state changes.
   permission: { display: 'flex', flexDirection: 'column', gap: 1.5 },
-  noCamera: { typography: 'body2', color: 'text.secondary', textAlign: 'center' },
+  helperText: { typography: 'body2', color: 'text.secondary', textAlign: 'center' },
   allowed: {
     height: 52, borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1,
     bgcolor: 'success.tint', color: 'success.dark', typography: 'button', fontSize: 15,
   },
   errorSteps: { m: 0, pl: 2.25, display: 'flex', flexDirection: 'column', gap: 0.5 },
-  // Desktop: tips and Get started in one row at the bottom. Phone and tablet: the wrapper drops out of the layout
-  // (display: contents) and Get started is pinned to the bottom, so hiding steps for the blocked-camera help moves nothing.
-  bottom: { display: { xs: 'contents', md: 'flex' }, alignItems: 'center', gap: 3, mt: 'auto', pt: 2.5 },
+  // Desktop: tips and Open camera in one row at the bottom. Phone and tablet: the wrapper drops out of the layout
+  // (display: contents) and Open camera is pinned to the bottom, so hiding steps for the blocked-camera help moves nothing.
+  bottom: { display: { xs: 'contents', md: 'flex' }, alignItems: 'flex-end', gap: 3, mt: 'auto', pt: 2.5 },
   tips: (hideOnSmall) => ({
     display: { xs: hideOnSmall ? 'none' : 'flex', md: 'flex' }, flexGrow: { md: 1 }, mt: { xs: 1.5, md: 0 },
-    px: { xs: 2, md: 3 }, py: { xs: 1.75, md: 2.25 }, borderRadius: CARD_RADIUS, bgcolor: 'brand.tint',
+    px: { xs: 2, md: 3 }, py: { xs: 1.75, md: 0 }, height: { md: 52 }, borderRadius: CARD_RADIUS, bgcolor: 'brand.tint',
     flexDirection: { xs: 'column', md: 'row' }, alignItems: { md: 'center' }, gap: { xs: 1.5, md: 4 },
   }),
   tipsTitle: { typography: 'overline', textTransform: 'uppercase', color: 'primary.dark' },
@@ -48,8 +48,11 @@ export const styles = {
   },
   tipIcon: { fontSize: 22, color: 'primary.dark' },
   footer: {
-    mt: { xs: 'auto', md: 0 }, width: { md: 300 }, flexShrink: 0, pt: { xs: 2, md: 0 }, pb: { xs: 4, sm: 0 },
+    mt: { xs: 'auto', md: 0 }, width: { md: 300 }, flexShrink: 0, pt: { xs: 2, md: 0 }, pb: { xs: 4, md: 0 },
     display: 'flex', flexDirection: 'column', gap: 1,
+    // Phone and tablet: stays pinned to the bottom while the steps scroll on short screens.
+    position: { xs: 'sticky', md: 'static' }, bottom: 0, zIndex: 1, bgcolor: { xs: 'background.default', md: 'transparent' },
+    mx: { xs: -2, sm: -3, md: 0 }, px: { xs: 2, sm: 3, md: 0 },
   },
   footerHint: { typography: 'caption', color: 'text.secondary', textAlign: 'center' },
 }

@@ -7,47 +7,46 @@ Flow: **Landing → How it works → Capture → Preview & quality → Annotate 
 ```
 src/
 ├─ main.jsx                    # ThemeProvider + CssBaseline
-├─ App.jsx                     # stage, photo, quality, annotations reducer; picks the screen
+├─ App.jsx                     # screen history, photo, quality, annotations reducer; picks the screen
 ├─ theme.js                    # MUI themes (light + dark camera), shared styles
 ├─ screens/
 │  ├─ LandingScreen.jsx
-│  ├─ HowItWorksScreen.jsx     # camera permission before Capture
+│  ├─ BeforeYouStartScreen.jsx     # camera permission before Capture
 │  ├─ CaptureScreen.jsx
 │  ├─ CameraErrorScreen.jsx
 │  ├─ PreviewScreen.jsx
 │  ├─ AnnotateScreen.jsx
 │  ├─ SummaryScreen.jsx        # read-only result + download
-│  └─ __tests__/
 ├─ components/
 │  ├─ StatusBadge/             # ✓ / ! / ✕ — used on 3 screens
 │  ├─ LiveQualityChips/        # resolution, brightness, sharpness chips
 │  ├─ AnnotationCanvas/        # photo + boxes + pointer gestures
 │  ├─ AnnotationList/
 │  ├─ QualityChecks/           # check rows: Preview (full), Annotate (compact)
-│  ├─ ZoomViewer/              # full-screen pinch / scroll / drag zoom
+│  ├─ ZoomViewer/              # full-screen zoom (react-zoom-pan-pinch)
+│  ├─ BackButton/              # back arrow used on five screens
 │  ├─ PhotoWithBoxes/          # read-only photo + boxes (Summary)
 │  ├─ ChoosePhotoButton/       # file picker fallback when there's no camera
 │  ├─ HeroDemo/                # landing animation
-│  └─ __tests__/
+│  ├─ ConfirmDialog/           # asks before work is lost
 ├─ hooks/
 │  ├─ useCamera.js             # stream + capturePhoto
 │  ├─ useTorch.js
 │  ├─ useLiveQuality.js
 │  ├─ usePhotoQuality.js       # brightness + sharpness of the captured photo
 │  ├─ useCameraPermission.js   # ask once on How it works
-│  ├─ useConfirmTap.js         # second tap confirms a discard
+│  ├─ useScreenHistory.js      # current screen, in step with browser Back / Forward
 │  ├─ index.js                # re-exports, for one-line imports
-│  └─ __tests__/
 └─ utils/
    ├─ cameraErrors.js          # pure
    ├─ quality.js               # pure: thresholds, measures, grades, banner text
    ├─ image.js                 # canvas: blob/video → small grey pixel array
+   ├─ format.js                # toPercent, capitalize
    ├─ geometry.js              # pure
    ├─ annotations.js           # pure reducer
    ├─ exportPhoto.js           # canvas: photo + boxes → JPEG blob
    ├─ index.js                 # re-exports, for one-line imports
-   └─ __tests__/
-e2e/flow.spec.js               # one Playwright test, fake camera
+e2e/*.spec.js                  # Playwright suite (fake camera); see README
 ```
 
 ## UI and theming
@@ -70,7 +69,7 @@ e2e/flow.spec.js               # one Playwright test, fake camera
 - `components/` only for UI used in 2+ places or complex enough to test alone.
 - One folder per component: `StatusBadge/StatusBadge.jsx` + `StatusBadge.styles.js`.
 - `screens/` combine hooks, state and components.
-- Tests in a `__tests__/` folder next to the code they test.
+- Tests live in `e2e/`, one spec per area.
 - Files are created when we build them, never as empty stubs.
 - No component file over 250 lines; split out a component or pure util when it grows.
 - A private helper used in only one place is inlined. Exported `utils/` functions stay separate (pure, testable).

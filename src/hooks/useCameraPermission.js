@@ -13,16 +13,14 @@ export function useCameraPermission() {
   // Skip the prompt when access was granted on an earlier visit. Firefox and older Safari reject the 'camera' query.
   useEffect(() => {
     if (!canUseCamera() || !navigator.permissions) return
-    let active = true
+    const lookup = new AbortController()
     navigator.permissions.query({ name: 'camera' }).then(
       (permission) => {
-        if (active && permission.state === 'granted') setState({ status: 'allowed' })
+        if (!lookup.signal.aborted && permission.state === 'granted') setState({ status: 'allowed' })
       },
       (error) => console.warn('Camera permission state is not available', error),
     )
-    return () => {
-      active = false
-    }
+    return () => lookup.abort()
   }, [])
 
   async function request() {

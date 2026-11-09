@@ -1,33 +1,35 @@
 import { CenterFocusStrongOutlined, WbSunnyOutlined } from '@mui/icons-material'
 import { Box, Chip } from '@mui/material'
-import { BRIGHTNESS, gradeBrightness, gradeResolution, gradeSharpness, megapixels } from '../../utils'
-import { styles } from './LiveQualityChips.styles.js'
+import { BRIGHTNESS, brightnessPercent, gradeBrightness, gradeResolution, gradeSharpness, megapixels, SHARPNESS_WORDS } from '../../utils'
 import StatusBadge from '../StatusBadge/StatusBadge.jsx'
+import { styles } from './LiveQualityChips.styles.js'
 
 const BRIGHTNESS_LABELS = {
   good: { dark: 'Good', bright: 'Good' },
   warn: { dark: 'Dark', bright: 'Bright' },
   poor: { dark: 'Too dark', bright: 'Too bright' },
 }
-const SHARPNESS_LABELS = { good: 'Good', warn: 'A bit blurry', poor: 'Blurry' }
 
 /** `resolution` is { width, height } or null; `quality` is { brightness, sharpness } or null. */
 export default function LiveQualityChips({ resolution, quality }) {
+  const brightness = quality && gradeBrightness(quality.brightness)
+  const sharpness = quality && gradeSharpness(quality.sharpness)
   return (
     <Box role="group" aria-label="Live quality" sx={styles.row}>
-      {resolution && <ResolutionChip {...resolution} />}
+      {resolution && (
+        <MetricChip title="Live preview resolution" icon={<Box component="span" sx={styles.dot(gradeResolution(resolution.width, resolution.height))} />}>
+          <Box component="span" sx={styles.dimensions}>{resolution.width} × {resolution.height} ·{' '}</Box>
+          {megapixels(resolution.width, resolution.height).toFixed(1)} MP
+        </MetricChip>
+      )}
       {quality && (
         <>
           <MetricChip icon={<WbSunnyOutlined />} name="Brightness">
-            {quality.brightness}{' '}
-            <StatusBadge
-              grade={gradeBrightness(quality.brightness)}
-              label={BRIGHTNESS_LABELS[gradeBrightness(quality.brightness)][quality.brightness < BRIGHTNESS.dim ? 'dark' : 'bright']}
-            />
+            {brightnessPercent(quality.brightness)}%{' '}
+            <StatusBadge grade={brightness} label={BRIGHTNESS_LABELS[brightness][quality.brightness < BRIGHTNESS.dim ? 'dark' : 'bright']} />
           </MetricChip>
           <MetricChip icon={<CenterFocusStrongOutlined />} name="Sharpness">
-            {quality.sharpness}{' '}
-            <StatusBadge grade={gradeSharpness(quality.sharpness)} label={SHARPNESS_LABELS[gradeSharpness(quality.sharpness)]} />
+            {SHARPNESS_WORDS[sharpness]} <StatusBadge grade={sharpness} label="" />
           </MetricChip>
         </>
       )}
@@ -35,31 +37,16 @@ export default function LiveQualityChips({ resolution, quality }) {
   )
 }
 
-function MetricChip({ icon, name, children }) {
+function MetricChip({ icon, name, title, children }) {
   return (
     <Chip
+      title={title}
       sx={styles.chip}
       icon={<Box component="span" aria-hidden sx={styles.icon}>{icon}</Box>}
       label={
         <>
-          <Box component="span" sx={styles.name}>{name}</Box>
+          {name && <Box component="span" sx={styles.name}>{name}</Box>}
           {children}
-        </>
-      }
-    />
-  )
-}
-
-function ResolutionChip({ width, height }) {
-  return (
-    <Chip
-      title="Live preview resolution"
-      sx={styles.chip}
-      icon={<Box component="span" sx={styles.dot(gradeResolution(width, height))} />}
-      label={
-        <>
-          <Box component="span" sx={styles.dimensions}>{width} × {height} ·{' '}</Box>
-          {megapixels(width, height).toFixed(1)} MP
         </>
       }
     />

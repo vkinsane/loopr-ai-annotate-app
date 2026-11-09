@@ -2,6 +2,7 @@ import { CARD_RADIUS } from '../theme.js'
 
 export const styles = {
   root: { height: '100dvh', display: 'flex', flexDirection: 'column', p: 3, bgcolor: 'background.default', color: 'text.primary' },
+  back: { alignSelf: 'flex-start', mt: -1.5, ml: -1.5 },
   content: {
     flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
     gap: 2, maxWidth: 420, mx: 'auto', textAlign: 'center',

@@ -1,8 +1,8 @@
 import { Box, Typography } from '@mui/material'
-import samplePart from '../../assets/sample-part.jpg'
+import demoPhoto from '../../assets/demo-photo.jpg'
+import { CORNERS } from '../../theme.js'
 import { styles } from './HeroDemo.styles.js'
 
-const CORNERS = [['top', 'left'], ['top', 'right'], ['bottom', 'left'], ['bottom', 'right']]
 const STEPS = ['Capture', 'Check', 'Annotate']
 
 /** A 6-second CSS loop of the app's flow. With reduced motion it shows the last frame only. */
@@ -14,7 +14,7 @@ export default function HeroDemo() {
       sx={styles.root}
     >
       <Box sx={styles.frame}>
-        <Box component="img" src={samplePart} alt="" sx={styles.photo} />
+        <Box component="img" src={demoPhoto} alt="" sx={styles.photo} />
         <Box sx={styles.guides}>
           {CORNERS.map(([vertical, horizontal]) => (
             <Box key={vertical + horizontal} component="span" sx={styles.corner(vertical, horizontal)} />
@@ -23,12 +23,12 @@ export default function HeroDemo() {
         <Box sx={styles.flash} />
         <Box sx={styles.boxSelected}>
           <Box component="span" sx={styles.labelSelected}>
-            Dent
+            Annotation 1
           </Box>
         </Box>
         <Box sx={styles.boxOther}>
           <Box component="span" sx={styles.labelOther}>
-            Rust
+            Annotation 2
           </Box>
         </Box>
         <Typography component="span" sx={styles.pill}>

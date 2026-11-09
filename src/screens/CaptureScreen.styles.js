@@ -1,8 +1,7 @@
-import { CARD_RADIUS } from '../theme.js'
+import { CARD_RADIUS, cornerLines } from '../theme.js'
 
 const LANDSCAPE = '@media (orientation: landscape)'
 const GUIDE = { size: 32, inset: 24, line: '3px solid' }
-const capitalize = (word) => word[0].toUpperCase() + word.slice(1)
 
 export const styles = {
   root: {
@@ -11,6 +10,9 @@ export const styles = {
     [LANDSCAPE]: { flexDirection: 'row' },
   },
   main: { flex: 1, minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column' },
+  topBar: { display: 'flex', alignItems: 'flex-start' },
+  // Above the "Starting camera" overlay, so the user can leave if the camera never opens.
+  back: { position: 'relative', zIndex: 1, mt: 1.25, ml: 1 },
   // Size container: the frame is the largest box with the camera's aspect ratio, so what you see is what gets captured.
   viewport: { flex: 1, minHeight: 0, mx: 2, containerType: 'size', display: 'grid', placeItems: 'center' },
   // Hidden until live: the real aspect ratio is only known then, and a visible resize would shift the layout.
@@ -21,8 +23,7 @@ export const styles = {
   video: { display: 'block', width: '100%', height: '100%' },
   guide: (vertical, horizontal) => ({
     position: 'absolute', [vertical]: GUIDE.inset, [horizontal]: GUIDE.inset, width: GUIDE.size, height: GUIDE.size,
-    [`border${capitalize(vertical)}`]: GUIDE.line, [`border${capitalize(horizontal)}`]: GUIDE.line,
-    [`border${capitalize(vertical)}${capitalize(horizontal)}Radius`]: 6, color: 'common.white',
+    ...cornerLines(vertical, horizontal, GUIDE.line, 6), color: 'common.white',
   }),
   saving: {
     position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',

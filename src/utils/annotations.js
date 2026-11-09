@@ -1,23 +1,25 @@
 // An item is { id, label, x, y, width, height } in photo pixels.
 export const initialAnnotations = { items: [], selectedId: null, nextNumber: 1 }
 
+const LABEL_BELOW_FROM_TOP = 0.08
+
+export const boxLabel = (item) => item.label || 'Untitled'
+/** A box at the very top has no room for its label above it. */
+export const labelGoesBelow = (item, size) => item.y / size.height < LABEL_BELOW_FROM_TOP
+
+const updateItem = (state, id, changes) => ({ ...state, items: state.items.map((item) => (item.id === id ? { ...item, ...changes } : item)) })
+
 /** Pure: ids come in with the action, so StrictMode's double call gives the same result. */
 export function annotationsReducer(state, action) {
   switch (action.type) {
     case 'add': {
-      const { x, y, width, height } = action.rect
-      const item = { id: action.id, label: `Annotation ${state.nextNumber}`, x, y, width, height }
+      const item = { id: action.id, label: `Annotation ${state.nextNumber}`, ...action.rect }
       return { items: [...state.items, item], selectedId: action.id, nextNumber: state.nextNumber + 1 }
     }
-    case 'change': {
-      const { x, y, width, height } = action.rect
-      const items = state.items.map((item) => (item.id === action.id ? { ...item, x, y, width, height } : item))
-      return { ...state, items }
-    }
-    case 'rename': {
-      const items = state.items.map((item) => (item.id === action.id ? { ...item, label: action.label } : item))
-      return { ...state, items }
-    }
+    case 'change':
+      return updateItem(state, action.id, action.rect)
+    case 'rename':
+      return updateItem(state, action.id, { label: action.label })
     case 'remove':
       return {
         ...state,

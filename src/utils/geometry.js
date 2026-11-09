@@ -1,5 +1,7 @@
 // A rect is { x, y, width, height } in photo pixels; a point is { x, y }; a corner is 'top-left' etc.
 
+export const ZOOM = { max: 8, step: 0.4, ms: 150 }
+
 export function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max)
 }
@@ -11,12 +13,7 @@ export function rectFromPoints(a, b) {
 
 /** Moves without leaving the photo: at an edge the box stops instead of shrinking. */
 export function moveRect(rect, dx, dy, size) {
-  return {
-    x: clamp(rect.x + dx, 0, size.width - rect.width),
-    y: clamp(rect.y + dy, 0, size.height - rect.height),
-    width: rect.width,
-    height: rect.height,
-  }
+  return { ...rect, x: clamp(rect.x + dx, 0, size.width - rect.width), y: clamp(rect.y + dy, 0, size.height - rect.height) }
 }
 
 /** The opposite corner stays fixed; dragging past it flips the box. */

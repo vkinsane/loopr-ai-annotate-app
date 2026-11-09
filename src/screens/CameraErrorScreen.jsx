@@ -1,5 +1,6 @@
 import { LockOutlined, NoPhotographyOutlined, PhotoCameraOutlined, ReportProblemOutlined, VideocamOff } from '@mui/icons-material'
 import { Box, Button, Typography } from '@mui/material'
+import BackButton from '../components/BackButton/BackButton.jsx'
 import ChoosePhotoButton from '../components/ChoosePhotoButton/ChoosePhotoButton.jsx'
 import { styles } from './CameraErrorScreen.styles.js'
 
@@ -12,11 +13,12 @@ const ICONS = {
 }
 
 /** When the camera can't be retried, choosing a photo becomes the main action. */
-export default function CameraErrorScreen({ error, onRetry, onPickPhoto }) {
+export default function CameraErrorScreen({ error, onBack, onRetry, onPickPhoto }) {
   const { Icon, color } = ICONS[error.kind]
 
   return (
     <Box sx={styles.root}>
+      <BackButton onClick={onBack} sx={styles.back} />
       <Box role="alert" sx={styles.content}>
         <Box sx={styles.iconCircle}>
           <Icon sx={styles.icon(color)} />

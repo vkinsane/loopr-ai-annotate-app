@@ -22,7 +22,7 @@ const NOT_FOUND_ERROR = {
   kind: 'not-found',
   title: 'No camera found',
   message:
-    "This device doesn't have a camera the browser can use. Connect a camera, or open this page on a phone or tablet.",
+    "This device doesn't have a camera the browser can use. Connect a camera, or open this page on a device that has one.",
   canRetry: true,
 }
 

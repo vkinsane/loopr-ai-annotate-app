@@ -1,4 +1,4 @@
-import { createTheme } from '@mui/material'
+import { alpha, createTheme } from '@mui/material'
 
 // Brand palette follows loopr.ai's public site (indigo, carbon, lime). Every text pair passes WCAG AA.
 const BRAND = {
@@ -7,6 +7,7 @@ const BRAND = {
   carbon: '#05091c', carbonRaised: '#12173c', carbonBorder: '#252c4c', frost: '#c7d2ff',
   lime: '#cefe6f', limeDark: '#a8d94a', white: '#ffffff', snow: '#f8fafc', scrim: 'rgba(5, 9, 28, 0.55)',
 }
+const SCROLLBAR_PX = 8
 const HEADING_FONT = "'Outfit', system-ui, sans-serif"
 
 // Shared by both themes. `tint` is a pale background for status pills; `light` is for status text on dark.
@@ -49,7 +50,20 @@ const shared = {
     MuiAlert: { styleOverrides: { root: { borderRadius: 16 } } },
     MuiAlertTitle: { styleOverrides: { root: heading(16) } },
     MuiCssBaseline: {
-      styleOverrides: { '@media (prefers-reduced-motion: reduce)': { '*, *::before, *::after': { transitionDuration: '0.01ms !important' } } },
+      styleOverrides: (theme) => ({
+        '@media (prefers-reduced-motion: reduce)': { '*, *::before, *::after': { transitionDuration: '0.01ms !important' } },
+        '@media (prefers-reduced-motion: no-preference)': {
+          '*': { scrollBehavior: 'smooth' },
+          // A new screen fades in. Only opacity changes, so nothing shifts.
+          '#root > *': { animation: 'screen-in 180ms ease-out' },
+        },
+        '@keyframes screen-in': { from: { opacity: 0 } },
+        // Shown only when an area's content overflows, and then always, even in browsers that hide scrollbars until you scroll.
+        '*::-webkit-scrollbar': { width: SCROLLBAR_PX, height: SCROLLBAR_PX },
+        '*::-webkit-scrollbar-track': { background: theme.palette.brand.tint },
+        '*::-webkit-scrollbar-thumb': { background: theme.palette.primary.light, borderRadius: 4 },
+        '@supports not selector(::-webkit-scrollbar)': { '*': { scrollbarWidth: 'thin', scrollbarColor: `${theme.palette.primary.light} ${theme.palette.brand.tint}` } },
+      }),
     },
   },
 }
@@ -64,7 +78,7 @@ export const theme = createTheme({
     divider: BRAND.border,
     // Lighter than MUI's grey so a disabled button reads as "not yet", not as broken. Text still passes AA.
     action: { disabledBackground: '#e9edf5', disabled: '#6b7b92' },
-    brand: { ...BRAND, photoBackdrop: BRAND.carbonRaised },
+    brand: BRAND,
   },
 })
 
@@ -82,15 +96,60 @@ export const cameraTheme = createTheme({
   },
 })
 
+/** The full-width bar at the top of each screen. */
+export const HEADER_BAR = { flexShrink: 0, bgcolor: 'background.paper', borderBottom: 1, borderColor: 'divider' }
+
+/** The title strip on top of a list, like a table header. The list below it squares its top corners with TABLE_BODY_RADIUS. */
+export const TABLE_HEADER = {
+  display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: 40, px: 1.75, typography: 'h2', fontSize: 14,
+  bgcolor: 'brand.tint', border: 1, borderBottom: 0, borderColor: 'divider', borderRadius: '6px 6px 0 0',
+}
+export const TABLE_BODY_RADIUS = '0 0 6px 6px'
+
 /** Photo frames, panels, alerts and empty states. Buttons and inputs use theme.shape.borderRadius (6px). */
 export const CARD_RADIUS = '16px'
 
-// Strings, not numbers: in MUI's sx, width/height values from 0 to 1 mean a percentage (1 = 100%).
-export const VISUALLY_HIDDEN = {
-  position: 'absolute',
-  width: '1px',
-  height: '1px',
-  overflow: 'hidden',
-  clip: 'rect(0 0 0 0)',
-  whiteSpace: 'nowrap',
+/**
+ * For scrolling lists. A soft shadow shows at any edge with more content, so it also works where scrollbars stay hidden (iOS).
+ * The two "local" layers scroll with the content and cover the shadows once an end is reached.
+ */
+export const SCROLL_SHADOWS = (theme) => {
+  const paper = theme.palette.background.paper
+  const shade = alpha(theme.palette.brand.ink, 0.18)
+  return {
+    background: `linear-gradient(${paper} 30%, transparent) top / 100% 28px local no-repeat,
+      linear-gradient(transparent, ${paper} 70%) bottom / 100% 28px local no-repeat,
+      linear-gradient(${shade}, transparent) top left / calc(100% - ${SCROLLBAR_PX}px) 10px scroll no-repeat,
+      linear-gradient(transparent, ${shade}) bottom left / calc(100% - ${SCROLLBAR_PX}px) 10px scroll no-repeat,
+      ${paper}`,
+  }
 }
+
+// Strings, not numbers: in MUI's sx, width/height values from 0 to 1 mean a percentage (1 = 100%).
+export const VISUALLY_HIDDEN = { position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap' }
+
+/** The part of a screen below the header bar. It does its own scrolling; position: relative is for ScrollThumb. */
+export const SCREEN_BODY = { position: 'relative', flex: 1, minHeight: 0, width: '100%', overflowY: 'auto', mx: 'auto' }
+
+/** Preview and Summary. Desktop: photo on the left, details in a 380 px column on the right. */
+export const PHOTO_PAGE = {
+  ...SCREEN_BODY, maxWidth: { xs: 600, md: 1200 }, display: 'grid',
+  gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 1fr) 380px' },
+}
+
+/** The widest a photo of this shape can be: the full column, unless `heights` (a CSS height per breakpoint) stops it first. */
+export const fitPhotoWidth = (heights, ratio) => Object.fromEntries(Object.entries(heights).map(([size, height]) => [size, `min(100%, ${height} * ${ratio})`]))
+
+export const BOX_LABEL_TEXT = { fontSize: 11, fontWeight: 600, lineHeight: '16px' }
+
+/** A navy line just outside and inside a lime box, so it shows on any photo. */
+export const INK_OUTLINE = (theme, width = '1px') => `0 0 0 ${width} ${theme.palette.brand.ink}, inset 0 0 0 ${width} ${theme.palette.brand.ink}`
+
+export const CORNERS = [['top', 'left'], ['top', 'right'], ['bottom', 'left'], ['bottom', 'right']]
+const capitalize = (word) => word[0].toUpperCase() + word.slice(1)
+
+/** The two border lines and the rounding of one viewfinder corner. */
+export const cornerLines = (vertical, horizontal, line, radius) => ({
+  [`border${capitalize(vertical)}`]: line, [`border${capitalize(horizontal)}`]: line,
+  [`border${capitalize(vertical)}${capitalize(horizontal)}Radius`]: radius,
+})
