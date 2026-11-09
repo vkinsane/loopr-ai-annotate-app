@@ -163,19 +163,19 @@ Measured in headless Chrome.
 
 Playwright 1.65, Chromium with a fake camera, against the production build. **174 tests: 172 pass, 2 are open findings** (below). `npm audit`: 0 vulnerabilities.
 
-| Area | File | Tests | What is checked |
-|---|---|---|---|
-| Rules | `logic.spec.js` | 50 | Box geometry, reducer, every quality grade boundary, text and file validation, camera error mapping. No browser. |
-| Core flows | `flows.spec.js` | 11 | Camera and chosen-photo flows to download (file name, full pixel size, box and label drawn); Back/Forward; reload; every "lose work" dialog; Done with no boxes. |
-| Annotation | `annotation.spec.js` | 25 | Photo-pixel accuracy in 4 drag directions; clamping; minimum size; move; resize from 4 corners; window resize and rotation; zoom and pan make no box; drawing while zoomed; keyboard delete; touch draw and two-finger gesture. |
-| Quality | `quality.spec.js` | 10 | Generated good, dark, bright, blurry and low-resolution photos; advice; main button; damaged photo; portrait and EXIF rotation; PNG and WebP. |
-| Input | `validation.spec.js` | 14 | Annotation and photo names: characters, paste, limits, other languages, duplicates, trimming. Non-photo, empty and over-30 MB files. |
-| Camera | `camera.spec.js` | 21 | Granted, denied, slow answer, earlier grant, no camera, busy, insecure page, stopped mid-use, retry, page hidden, leaving the screen, torch on/off/failed/missing, ImageCapture fallback, failed capture, two tabs. |
-| Failure handling | `errors.spec.js` | 5 | Slow and failed screen downloads, offline after load, failed download with retry, no console errors. |
-| Screens | `responsive.spec.js` | 16 | 320 × 568, 390 × 844, 820 × 1180, 1440 × 900, 844 × 390 and 200% zoom: no page scroll, every button reachable. Scroll bars only on overflow, including browsers that hide them. Touch targets. |
-| Accessibility | `accessibility.spec.js` | 13 | axe WCAG 2.1 AA on all 6 screens and a dialog; keyboard start; dialog focus trap and Escape; rename and delete by keyboard; tooltip by keyboard; reduced motion. |
-| Privacy | `security.spec.js` | 4 | Markup in names never runs; only GET requests, so the photo is not sent; no storage or cookies; names not logged. |
-| Performance | `performance.spec.js` | 5 | First-load and lazy-chunk size budgets, layout shift under 0.01, 40 boxes, a 27 MP photo at full size. |
+| Area | What is checked |
+|---|---|
+| Rules | <ul><li>Box geometry</li><li>Box reducer</li><li>Every quality grade boundary</li><li>Text and file validation</li><li>Camera error mapping</li><li>Runs without a browser</li></ul> |
+| Core flows | <ul><li>Camera and chosen-photo flows to download: file name, full pixel size, box and label drawn</li><li>Back and Forward</li><li>Reload</li><li>Every "lose work" dialog</li><li>Done with no boxes</li></ul> |
+| Annotation | <ul><li>Photo-pixel accuracy in 4 drag directions</li><li>Clamping</li><li>Minimum size</li><li>Move</li><li>Resize from 4 corners</li><li>Window resize and rotation</li><li>Zoom and pan make no box</li><li>Drawing while zoomed</li><li>Keyboard delete</li><li>Touch draw and two-finger gesture</li></ul> |
+| Quality | <ul><li>Generated good, dark, bright, blurry and low-resolution photos</li><li>Advice</li><li>Main button</li><li>Damaged photo</li><li>Portrait and EXIF rotation</li><li>PNG and WebP</li></ul> |
+| Input | <ul><li>Annotation and photo names: characters, paste, limits, other languages, duplicates, trimming</li><li>Non-photo, empty and over-30 MB files</li></ul> |
+| Camera | <ul><li>Granted, denied, slow answer, earlier grant</li><li>No camera, busy, insecure page, stopped mid-use</li><li>Retry</li><li>Page hidden, leaving the screen</li><li>Torch on, off, failed and missing</li><li>ImageCapture fallback</li><li>Failed capture</li><li>Two tabs</li></ul> |
+| Failure handling | <ul><li>Slow and failed screen downloads</li><li>Offline after load</li><li>Failed download with retry</li><li>No console errors</li></ul> |
+| Screens | <ul><li>320 × 568, 390 × 844, 820 × 1180, 1440 × 900, 844 × 390 and 200% zoom: no page scroll, every button reachable</li><li>Scroll bars only on overflow, including browsers that hide them</li><li>Touch targets</li></ul> |
+| Accessibility | <ul><li>axe WCAG 2.1 AA on all 6 screens and a dialog</li><li>Keyboard start</li><li>Dialog focus trap and Escape</li><li>Rename and delete by keyboard</li><li>Tooltip by keyboard</li><li>Reduced motion</li></ul> |
+| Privacy | <ul><li>Markup in names never runs</li><li>Only GET requests, so the photo is not sent</li><li>No storage or cookies</li><li>Names not logged</li></ul> |
+| Performance | <ul><li>First-load and lazy-chunk size budgets</li><li>Layout shift under 0.01</li><li>40 boxes</li><li>A 27 MP photo at full size</li></ul> |
 
 **Open findings** (written as expected failures, so each one reports when it is fixed):
 - A failed download of a lazy screen, for example on a bad network, leaves a blank page. There is no error boundary.
