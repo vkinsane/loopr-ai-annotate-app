@@ -6,9 +6,8 @@ const CONTENT_WIDTH = { xs: 480, sm: 608, md: 1168 } // 24px gutters inside → 
 
 export const styles = {
   root: (theme) => ({
-    minHeight: '100dvh', display: 'flex', flexDirection: 'column',
-    // Phone: one window tall. If the text doesn't fit, it scrolls under the pinned button.
-    height: { xs: '100dvh', sm: 'auto' }, overflowY: { xs: 'auto', sm: 'visible' },
+    // One window tall. If the content doesn't fit, it scrolls inside, and on phones under the pinned button.
+    position: 'relative', height: '100dvh', overflowY: 'auto', display: 'flex', flexDirection: 'column',
     background: `linear-gradient(180deg, ${theme.palette.brand.frost} 0px, ${theme.palette.background.default} ${HERO_FADE_PX.xs}px)`,
     [theme.breakpoints.up('md')]: {
       background: `linear-gradient(180deg, ${theme.palette.brand.frost} 0px, ${theme.palette.background.default} ${HERO_FADE_PX.md}px)`,

@@ -4,7 +4,7 @@ import { CARD_RADIUS } from '../theme.js'
 // Desktop: the three steps side by side, tips and Open camera in one row at the bottom. Nothing is vertically centred: centring moves the page when a step grows.
 export const styles = {
   root: {
-    flex: 1, minHeight: 0, width: '100%', overflowY: 'auto', maxWidth: { xs: 480, sm: 608, md: 1168 }, mx: 'auto', px: { xs: 2, sm: 3 }, pt: { xs: 1, sm: 3 }, pb: { md: 5 },
+    position: 'relative', flex: 1, minHeight: 0, width: '100%', overflowY: 'auto', maxWidth: { xs: 480, sm: 608, md: 1168 }, mx: 'auto', px: { xs: 2, sm: 3 }, pt: { xs: 1, sm: 3 }, pb: { md: 5 },
     display: 'flex', flexDirection: 'column',
   },
   headerWidth: { maxWidth: { xs: 480, sm: 608, md: 1168 }, px: { xs: 2, sm: 3 } },

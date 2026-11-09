@@ -4,6 +4,7 @@ import { Alert, AlertTitle, Box, Button, CircularProgress } from '@mui/material'
 import ConfirmDialog from '../components/ConfirmDialog/ConfirmDialog.jsx'
 import QualityChecks from '../components/QualityChecks/QualityChecks.jsx'
 import ScreenLayout from '../components/ScreenLayout/ScreenLayout.jsx'
+import ScrollThumb from '../components/ScrollThumb/ScrollThumb.jsx'
 import { usePhotoQuality } from '../hooks'
 import { gradePhoto, qualityChecks } from '../utils'
 import { styles } from './PreviewScreen.styles.js'
@@ -50,6 +51,7 @@ export default function PreviewScreen({ photo, boxCount, onRetake, onAnnotate })
   return (
     <ScreenLayout title={TITLE} headerSx={styles.headerWidth}>
       <Box component="main" sx={styles.root}>
+        <ScrollThumb />
         <Box sx={styles.photoFrame(measured && measured.width / measured.height)}>
           <Box component="img" src={photo.url} alt="Captured photo" sx={styles.photo} />
           {measured && (

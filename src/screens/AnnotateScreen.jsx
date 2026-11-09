@@ -5,6 +5,7 @@ import AnnotationList from '../components/AnnotationList/AnnotationList.jsx'
 import ConfirmDialog from '../components/ConfirmDialog/ConfirmDialog.jsx'
 import QualityChecks from '../components/QualityChecks/QualityChecks.jsx'
 import ScreenLayout from '../components/ScreenLayout/ScreenLayout.jsx'
+import ScrollThumb from '../components/ScrollThumb/ScrollThumb.jsx'
 import StatusBadge from '../components/StatusBadge/StatusBadge.jsx'
 import { gradePhoto, qualityChecks } from '../utils'
 import { styles } from './AnnotateScreen.styles.js'
@@ -52,6 +53,7 @@ export default function AnnotateScreen({ photo, quality, annotations, dispatch, 
   return (
     <ScreenLayout title="Annotate" onBack={onBack} backLabel="Back to Preview" actions={actions} headerSx={styles.headerWidth}>
       <Box component="main" sx={styles.root}>
+        <ScrollThumb />
         <AnnotationCanvas
           photoUrl={photo.url}
           size={quality}

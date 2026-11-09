@@ -5,7 +5,7 @@ import { TABLE_HEADER } from '../theme.js'
 // Desktop: photo on the left; list, quality and Done in a 370 px sidebar whose bottom lines up with the photo's.
 export const styles = {
   root: {
-    flex: 1, minHeight: 0, width: '100%', overflowY: 'auto', maxWidth: 1200, mx: 'auto', p: 2, pb: { xs: 0, md: 2 }, display: 'grid', gap: 2,
+    position: 'relative', flex: 1, minHeight: 0, width: '100%', overflowY: 'auto', maxWidth: 1200, mx: 'auto', p: 2, pb: { xs: 0, md: 2 }, display: 'grid', gap: 2,
     gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 1fr) 370px' },
     // max-content: the photo card clips its overflow, so an `auto` row could collapse and let the sidebar overlap it.
     // The minimums stop the sidebar being squeezed on very short screens: the screen scrolls instead of overlapping.

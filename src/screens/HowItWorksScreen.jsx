@@ -1,6 +1,7 @@
 import { Check, CheckCircleOutlined, CropFree, PanToolOutlined, PhotoCameraOutlined, WbSunnyOutlined } from '@mui/icons-material'
 import { Alert, AlertTitle, Box, Button, CircularProgress, Paper, Typography } from '@mui/material'
 import ScreenLayout from '../components/ScreenLayout/ScreenLayout.jsx'
+import ScrollThumb from '../components/ScrollThumb/ScrollThumb.jsx'
 import ChoosePhotoButton from '../components/ChoosePhotoButton/ChoosePhotoButton.jsx'
 import { useCameraPermission } from '../hooks'
 import { VISUALLY_HIDDEN } from '../theme.js'
@@ -37,6 +38,7 @@ export default function HowItWorksScreen({ onBack, onStart, onPickPhoto }) {
   return (
     <ScreenLayout title="Before you start" onBack={onBack} backLabel="Back" headerSx={styles.headerWidth}>
       <Box sx={styles.root}>
+        <ScrollThumb />
         <Box component="ol" sx={styles.steps}>
           <Paper component="li" variant="outlined" sx={styles.step}>
             <Box sx={styles.stepHeading}>

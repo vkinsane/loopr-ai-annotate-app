@@ -8,7 +8,7 @@ export const styles = {
   // One window tall. Phone and tablet: one column, and on short screens the details scroll with the buttons pinned.
   // Desktop: photo on the left, result and buttons on the right.
   root: {
-    flex: 1, minHeight: 0, width: '100%', overflowY: 'auto', maxWidth: { xs: 600, md: 1200 }, mx: 'auto', p: 2, pb: { xs: 0, md: 2 }, display: 'grid', gap: { xs: 1.5, md: 2 },
+    position: 'relative', flex: 1, minHeight: 0, width: '100%', overflowY: 'auto', maxWidth: { xs: 600, md: 1200 }, mx: 'auto', p: 2, pb: { xs: 0, md: 2 }, display: 'grid', gap: { xs: 1.5, md: 2 },
     gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 1fr) 380px' },
     // max-content: the photo clips its overflow, so an `auto` row could collapse to nothing when space is short.
     gridTemplateRows: { xs: 'max-content 1fr', md: '1fr' },

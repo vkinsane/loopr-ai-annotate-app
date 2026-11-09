@@ -4,7 +4,7 @@ import { CARD_RADIUS } from '../theme.js'
 // Phone and tablet: one column. Desktop: photo on the left, details and actions on the right.
 export const styles = {
   root: {
-    flex: 1, minHeight: 0, width: '100%', overflowY: 'auto', maxWidth: { xs: 600, md: 1200 }, mx: 'auto', p: 2, pb: { xs: 3, md: 2 },
+    position: 'relative', flex: 1, minHeight: 0, width: '100%', overflowY: 'auto', maxWidth: { xs: 600, md: 1200 }, mx: 'auto', p: 2, pb: { xs: 3, md: 2 },
     display: 'grid', gap: 2,
     gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 1fr) 380px' },
     gridTemplateRows: { xs: 'max-content minmax(395px, 1fr)', md: 'minmax(0, 1fr)' },

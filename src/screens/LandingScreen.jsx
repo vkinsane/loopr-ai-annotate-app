@@ -1,11 +1,13 @@
 import { CenterFocusStrongOutlined, LockOutlined } from '@mui/icons-material'
 import { Box, Button, Typography } from '@mui/material'
 import HeroDemo from '../components/HeroDemo/HeroDemo.jsx'
+import ScrollThumb from '../components/ScrollThumb/ScrollThumb.jsx'
 import { styles } from './LandingScreen.styles.js'
 
 export default function LandingScreen({ onNext }) {
   return (
     <Box sx={styles.root}>
+      <ScrollThumb />
       <Box component="header" sx={styles.bar}>
         <Box sx={styles.header}>
           <Box sx={styles.logo}>

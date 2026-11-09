@@ -3,6 +3,7 @@ import { AddBoxOutlined, DeleteOutlined, EditOutlined } from '@mui/icons-materia
 import { Box, IconButton, InputBase, Tooltip, Typography } from '@mui/material'
 import { VISUALLY_HIDDEN } from '../../theme.js'
 import { finishText, TEXT_RULES, validateText } from '../../utils'
+import ScrollThumb from '../ScrollThumb/ScrollThumb.jsx'
 import { styles } from './AnnotationList.styles.js'
 
 const RULE = TEXT_RULES.annotationName
@@ -53,6 +54,7 @@ export default function AnnotationList({ items, selectedId, readOnly = false, on
         </Box>
       ) : (
         <Box component="ul" ref={listRef} sx={styles.list(readOnly)}>
+          <ScrollThumb component="li" />
           {items.map((item, index) => {
             if (readOnly) {
               return (

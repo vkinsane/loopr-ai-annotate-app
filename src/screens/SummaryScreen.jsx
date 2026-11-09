@@ -3,6 +3,7 @@ import { EditOutlined, FileDownloadOutlined } from '@mui/icons-material'
 import { Box, Button, IconButton, InputAdornment, Paper, TextField, Typography, useTheme } from '@mui/material'
 import AnnotationList from '../components/AnnotationList/AnnotationList.jsx'
 import ScreenLayout from '../components/ScreenLayout/ScreenLayout.jsx'
+import ScrollThumb from '../components/ScrollThumb/ScrollThumb.jsx'
 import ConfirmDialog from '../components/ConfirmDialog/ConfirmDialog.jsx'
 import PhotoWithBoxes from '../components/PhotoWithBoxes/PhotoWithBoxes.jsx'
 import StatusBadge from '../components/StatusBadge/StatusBadge.jsx'
@@ -41,6 +42,7 @@ export default function SummaryScreen({ photo, quality, items, photoName, onPhot
   return (
     <ScreenLayout title="Inspection summary" onBack={onBack} backLabel="Back to Annotate" headerSx={styles.headerWidth}>
       <Box component="main" sx={styles.root}>
+        <ScrollThumb />
         <PhotoWithBoxes photoUrl={photo.url} size={quality} items={items} />
 
         <Box sx={styles.side}>
