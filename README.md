@@ -7,25 +7,13 @@ A mobile-first web app for photo inspection: take a photo, check its quality, an
 <details open>
 <summary><strong>Installation</strong></summary>
 
-**Requirements:** Node.js 20.19+ or 22.12+, npm, Git. No accounts or environment variables are needed.
+**Requirements:** Node.js 20.19+ or 22.12+, npm, Git.
 
 ```bash
 git clone https://github.com/vkinsane/loopr-ai-annotate-app.git
 cd loopr-ai-annotate-app
 npm install
 npm run dev       # open the URL it prints, usually http://localhost:5173
-```
-
-</details>
-
-<details>
-<summary><strong>Development</strong></summary>
-
-```bash
-npm run dev       # http://localhost:5173
-npm run build     # production build in dist/
-npm run preview   # serve the production build
-npm run lint      # oxlint
 ```
 
 </details>
@@ -50,8 +38,6 @@ npm run lint      # oxlint
   - Label, select and delete boxes from the list. Delete / Escape keys work on desktop.
   - Zoom while annotating: pinch, scroll or + and −. The hand button moves the photo. Boxes, labels and handles keep their size on screen.
   - Works with mouse, touch and pen. Boxes stay on the same pixels at any screen size or rotation.
-  - Photo quality is shown beside the photo on tablet and desktop.
-  - **Name checks** (`utils/validation.js`): up to 40 characters; only letters (any language), numbers, spaces and `- _ . , ( )`. Typed and pasted text is cleaned at once, with a short note saying why. Extra spaces are removed, an empty name goes back to the old one, and a repeated name gets a warning.
 - **Choose a photo** (no camera): only JPEG, PNG, WebP or HEIC, checked from the file's first bytes, not its name; not empty; up to 30 MB.
 
 </details>
@@ -63,8 +49,7 @@ npm run lint      # oxlint
 - **React + Vite, JavaScript (no TypeScript).**
   - The brief asks for TypeScript; I removed it to cut type noise.
   - Trade-off: no compile-time checks. Data shapes are described in short doc comments, and oxlint catches common mistakes.
-- **MUI + Emotion** for components and theming. Emotion is MUI's required styling engine.
-- **Look:** colours and type follow loopr.ai's public site (indigo, carbon, lime; Outfit + DM Sans), so the tool reads as part of that product family. Tokens live in `src/theme.js`.
+- **MUI + Emotion** for components and theming.
 - **Few dependencies:** react, react-dom, MUI, MUI icons, Emotion, and `react-zoom-pan-pinch` for zoom and pan on Preview and Annotate. No router, no state library, no canvas or annotation library.
 - **State:** `App` holds the photo, its measured quality, its name and the annotations (`useReducer` with a pure reducer), so moving between screens keeps them. `useScreenHistory` keeps the current screen in step with the browser's Back and Forward buttons, without a router. Other state stays in each screen.
 
@@ -74,13 +59,7 @@ npm run lint      # oxlint
   - 4:3 matches most phone sensors, so the browser doesn't crop to 16:9.
 - **The preview frame matches the camera's aspect ratio** (CSS container units), so what you see is what gets captured. The cost is dark bars on some screens.
 - **Capture:** `ImageCapture.takePhoto()` where available (Chromium, Android) for full sensor resolution. Otherwise, including on iPhone, a full-size video frame is saved as JPEG (quality 0.92).
-- **Torch:**
-  - Detected with `track.getCapabilities().torch`.
-  - Switched with `applyConstraints`, passing the current constraints back so the resolution isn't reset.
-  - The on/off state is read from `getSettings()` on every render, never stored, so the button shows the real hardware state.
-- **Errors:** browser error names are mapped to operator-friendly messages (`utils/cameraErrors.js`).
-- **Cleanup:**
-  - Tracks are stopped on unmount and when the page is hidden.
+- **Torch:** the on/off state is read from `getSettings()` on every render, never stored, so the button shows the real hardware state.
 
 ### Quality
 - **Brightness** is how light or dark the photo is overall. The app makes a greyscale copy, where every pixel is a number from 0 (black) to 255 (white), and takes the average. A low average means the photo is too dark; a very high one means it is overexposed.
@@ -99,8 +78,6 @@ npm run lint      # oxlint
 - **HTML elements, not SVG or canvas:** real text labels, fixed 44 px corner touch targets, and hit-testing from the DOM.
 
 ### Code conventions
-- Folders by file type: `screens/`, `components/`, `hooks/` (browser APIs and lifecycle), `utils/` (pure logic).
-- No component file over 250 lines. Styles live in a `*.styles.js` file next to each component.
 - See [ARCHITECTURE.md](ARCHITECTURE.md) for the full structure and rules.
 
 </details>
