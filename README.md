@@ -77,8 +77,100 @@ npm run dev       # open the URL it prints, usually http://localhost:5173
 - **Boxes are stored in photo pixels and drawn as percentages of the frame.** A box at `left: 25%` stays on the same pixels at any size or rotation, without resize listeners.
 - **HTML elements, not SVG or canvas:** real text labels, fixed 44 px corner touch targets, and hit-testing from the DOM.
 
-### Code conventions
-- See [ARCHITECTURE.md](ARCHITECTURE.md) for the full structure and rules.
+</details>
+
+<details>
+<summary><strong>Architecture</strong></summary>
+
+### Folder structure (by file type)
+
+```
+src/
+├─ main.jsx                    # ThemeProvider + CssBaseline
+├─ App.jsx                     # screen history, photo, quality, annotations reducer; picks the screen
+├─ theme.js                    # MUI themes (light + dark camera), shared styles
+├─ assets/                     # Landing demo photo
+├─ screens/
+│  ├─ LandingScreen.jsx
+│  ├─ BeforeYouStartScreen.jsx     # camera permission before Capture
+│  ├─ CaptureScreen.jsx
+│  ├─ CameraErrorScreen.jsx
+│  ├─ PreviewScreen.jsx
+│  ├─ AnnotateScreen.jsx
+│  ├─ SummaryScreen.jsx        # read-only result + download
+├─ components/
+│  ├─ StatusBadge/             # ✓ / ! / ✕ — used on 3 screens
+│  ├─ LiveQualityChips/        # resolution, brightness, sharpness chips
+│  ├─ AnnotationCanvas/        # photo + boxes + pointer gestures
+│  ├─ AnnotationList/
+│  ├─ QualityChecks/           # check rows: Preview (full), Annotate (compact)
+│  ├─ ZoomViewer/              # full-screen zoom (react-zoom-pan-pinch)
+│  ├─ BackButton/              # back arrow used on five screens
+│  ├─ PhotoWithBoxes/          # read-only photo + boxes (Summary)
+│  ├─ ChoosePhotoButton/       # file picker fallback when there's no camera
+│  ├─ HeroDemo/                # landing animation
+│  ├─ ConfirmDialog/           # asks before work is lost
+│  ├─ ScreenLayout/            # screen header and content area
+│  ├─ ScreenLoader/            # shown while a screen downloads
+│  ├─ ScrollThumb/             # scroll bar for browsers that hide theirs
+├─ hooks/
+│  ├─ useCamera.js             # stream + capturePhoto
+│  ├─ useTorch.js
+│  ├─ useLiveQuality.js
+│  ├─ usePhotoQuality.js       # brightness + sharpness of the captured photo
+│  ├─ useCameraPermission.js   # ask once on Before you start
+│  ├─ useScreenHistory.js      # current screen, in step with browser Back / Forward
+│  ├─ index.js                # re-exports, for one-line imports
+└─ utils/
+   ├─ cameraErrors.js          # pure
+   ├─ quality.js               # pure: thresholds, measures, grades, banner text
+   ├─ image.js                 # canvas: blob/video → small grey pixel array
+   ├─ format.js                # toPercent, capitalize
+   ├─ geometry.js              # pure
+   ├─ annotations.js           # pure reducer
+   ├─ exportPhoto.js           # canvas: photo + boxes → JPEG blob
+   ├─ validation.js            # pure: text and picked-file checks
+   ├─ index.js                 # re-exports, for one-line imports
+e2e/*.spec.js                  # Playwright suite (fake camera); see Testing
+```
+
+### UI and theming
+- **Material UI** (`@mui/material` + Emotion) for components; styled with the `sx` prop and theme values.
+- **Imports:** one line per package (`import { Box, Chip } from '@mui/material'`). The production build tree-shakes unused components and icons; bundle size was unchanged when we switched.
+- **Themes** in `theme.js`: light app theme plus a dark camera theme; `CssBaseline` provides the reset.
+- **Design tokens live only in `theme.js`.** Style files use theme paths (`'primary.main'`, `'brand.lime'`, `typography: 'h1'`), never hex values.
+  - Palette follows loopr.ai's public site: indigo `#3c4fc9` (actions), carbon `#05091c` (camera), lime `#cefe6f` (accent, other boxes). No Loopr logo or artwork.
+  - Type scale: h1 22 · h2 17 · subtitle1 16 · body1 15 · body2 14 · caption 13 · overline 12 (uppercase labels).
+  - Radius: 6px controls (`shape.borderRadius`), 16px cards (`CARD_RADIUS`). Spacing: MUI's 8px unit, 0.5 steps for 4px.
+  - Shared component styles are theme overrides (large buttons, focus ring, alert titles), not repeated per screen.
+- **Fonts:** Outfit (headings, buttons) and DM Sans (body), from Google Fonts in `index.html`. Fall back to `system-ui`.
+- **AnnotationCanvas is custom**: MUI has no drawing tools, and this logic is a core evaluation point.
+
+### Rules
+- `utils/` has no React. Everything except `image.js` is pure.
+- `hooks/` wrap browser APIs with React lifecycle and cleanup.
+- `components/` only for UI used in 2+ places or complex enough to test alone.
+- One folder per component: `StatusBadge/StatusBadge.jsx` + `StatusBadge.styles.js`.
+- `screens/` combine hooks, state and components.
+- Tests live in `e2e/`, one spec per area.
+- Files are created when we build them, never as empty stubs.
+- No component file over 250 lines; split out a component or pure util when it grows.
+- A private helper used in only one place is inlined. Exported `utils/` functions stay separate (pure, testable).
+- One import line per module or folder: `import { useCamera, useTorch } from '../hooks'`.
+- Comments only where the code can't say it: browser quirks, uncalibrated values, data shapes.
+- Styles live in a `*.styles.js` file next to their component (`export const styles = { … }`); JSX uses `sx={styles.root}`. State-dependent styles are functions: `sx={styles.torch(on)}`.
+
+### Code principles
+- **Readable:** clear names, small single-job functions, early returns, named constants, comments explain *why*.
+- **Simple:** KISS, YAGNI; small duplication beats the wrong abstraction.
+- **Separated:** UI in components/screens, browser APIs in hooks, logic in pure `utils/`.
+- **SOLID, React-style:** one reason to change per file; small focused props; hooks hide browser APIs behind small interfaces.
+- **Reliable:** validate at boundaries (camera and browser APIs); never swallow errors; immutable state; test behaviour.
+- **Maintainable:** small commits, delete dead code, record decisions and trade-offs here.
+
+### Why by file type
+- Familiar; clear layers: `utils` → `hooks` → `components` → `screens`.
+- Trade-off: one feature spans folders; clear names keep it traceable.
 
 </details>
 
@@ -92,20 +184,18 @@ npx playwright install chromium
 npm run test:e2e  # Playwright; builds the app first
 ```
 
-Playwright 1.65, Chromium with a fake camera, against the production build. **174 tests: 172 pass, 2 are open findings**. `npm audit`: 0 vulnerabilities.
+Run in Chromium with a simulated camera, on the production build. **174 tests: 172 pass, 2 are open findings**. No known security problems in the dependencies.
 
 | Area | What is checked |
 |---|---|
-| Rules | <ul><li>Box geometry</li><li>Box reducer</li><li>Every quality grade boundary</li><li>Text and file validation</li><li>Camera error mapping</li><li>Runs without a browser</li></ul> |
+| Rules | <ul><li>Box position and size calculations</li><li>Adding, changing and deleting boxes</li><li>Every quality grade boundary</li><li>Text and file validation</li><li>The right message for each camera error</li><li>Runs without a browser</li></ul> |
 | Core flows | <ul><li>Camera and chosen-photo flows to download: file name, full pixel size, box and label drawn</li><li>Back and Forward</li><li>Reload</li><li>Every "lose work" dialog</li><li>Done with no boxes</li></ul> |
-| Annotation | <ul><li>Photo-pixel accuracy in 4 drag directions</li><li>Clamping</li><li>Minimum size</li><li>Move</li><li>Resize from 4 corners</li><li>Window resize and rotation</li><li>Zoom and pan make no box</li><li>Drawing while zoomed</li><li>Keyboard delete</li><li>Touch draw and two-finger gesture</li></ul> |
-| Quality | <ul><li>Generated good, dark, bright, blurry and low-resolution photos</li><li>Advice</li><li>Main button</li><li>Damaged photo</li><li>Portrait and EXIF rotation</li><li>PNG and WebP</li></ul> |
+| Annotation | <ul><li>Boxes land on the right part of the photo, whichever way they are drawn</li><li>Boxes stay inside the photo</li><li>Minimum size</li><li>Move</li><li>Resize from 4 corners</li><li>Window resize and rotation</li><li>Zoom and pan make no box</li><li>Drawing while zoomed</li><li>Keyboard delete</li><li>Touch draw and two-finger gesture</li></ul> |
+| Quality | <ul><li>Good, dark, bright, blurry and low-resolution photos</li><li>Advice</li><li>Main button</li><li>Damaged photo</li><li>Portrait and rotated photos</li><li>PNG and WebP</li></ul> |
 | Input | <ul><li>Annotation and photo names: characters, paste, limits, other languages, duplicates, trimming</li><li>Non-photo, empty and over-30 MB files</li></ul> |
-| Camera | <ul><li>Granted, denied, slow answer, earlier grant</li><li>No camera, busy, insecure page, stopped mid-use</li><li>Retry</li><li>Page hidden, leaving the screen</li><li>Torch on, off, failed and missing</li><li>ImageCapture fallback</li><li>Failed capture</li><li>Two tabs</li></ul> |
+| Camera | <ul><li>Granted, denied, slow answer, earlier grant</li><li>No camera, busy, insecure page, stopped mid-use</li><li>Retry</li><li>Page hidden, leaving the screen</li><li>Torch on, off, failed and missing</li><li>Capture still works where full-resolution photos are not available</li><li>Failed capture</li><li>Two tabs</li></ul> |
 | Failure handling | <ul><li>Slow and failed screen downloads</li><li>Offline after load</li><li>Failed download with retry</li><li>No console errors</li></ul> |
 | Screens | <ul><li>320 × 568, 390 × 844, 820 × 1180, 1440 × 900, 844 × 390 and 200% zoom: no page scroll, every button reachable</li><li>Scroll bars only on overflow, including browsers that hide them</li><li>Touch targets</li></ul> |
-| Accessibility | <ul><li>axe WCAG 2.1 AA on all 6 screens and a dialog</li><li>Keyboard start</li><li>Dialog focus trap and Escape</li><li>Rename and delete by keyboard</li><li>Tooltip by keyboard</li><li>Reduced motion</li></ul> |
-| Privacy | <ul><li>Markup in names never runs</li><li>Only GET requests, so the photo is not sent</li><li>No storage or cookies</li><li>Names not logged</li></ul> |
-| Performance | <ul><li>First-load and lazy-chunk size budgets</li><li>Layout shift under 0.01</li><li>40 boxes</li><li>A 27 MP photo at full size</li></ul> |
+| Accessibility | <ul><li>Automatic accessibility checks on all 6 screens and a dialog</li><li>Starting the flow with the keyboard</li><li>The keyboard stays inside an open dialog, and Escape closes it</li><li>Rename and delete by keyboard</li><li>Tooltip by keyboard</li><li>Reduced motion</li></ul> |
 
 </details>
