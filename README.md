@@ -1,13 +1,13 @@
 # <img src="docs/logo.svg" alt="" width="32" height="32" align="absmiddle"> Loopr Annotate
 
-A mobile-first web app for photo inspection: take a photo, check its quality, and annotate it with labelled boxes.
+Loopr Annotate is a mobile-first web application for visual inspection. It captures high-resolution photos, evaluates their quality in real time, and supports precise annotation with labelled boxes.
 
 **Flow:** Landing → Before you start (camera permission) → Capture → Preview & quality → Annotate → Summary
 
 <details open>
 <summary><strong>Installation</strong></summary>
 
-**Requirements:** Node.js 20.19+ or 22.12+, npm, Git.
+**Requirements:** Node.js 22.12+, npm, Git.
 
 ```bash
 git clone https://github.com/vkinsane/loopr-ai-annotate-app.git
@@ -49,8 +49,6 @@ npm run dev       # open the URL it prints, usually http://localhost:5173
 - **React + Vite, JavaScript (no TypeScript).**
   - The brief asks for TypeScript; I removed it to cut type noise.
   - Trade-off: no compile-time checks. Data shapes are described in short doc comments, and oxlint catches common mistakes.
-- **MUI + Emotion** for components and theming.
-- **Few dependencies:** react, react-dom, MUI, MUI icons, Emotion, and `react-zoom-pan-pinch` for zoom and pan on Preview and Annotate. No router, no state library, no canvas or annotation library.
 - **State:** `App` holds the photo, its measured quality, its name and the annotations (`useReducer` with a pure reducer), so moving between screens keeps them. `useScreenHistory` keeps the current screen in step with the browser's Back and Forward buttons, without a router. Other state stays in each screen.
 
 ### Camera
@@ -147,6 +145,31 @@ e2e/*.spec.js                  # Playwright suite; see Testing
   - Shared component styles are theme overrides (large buttons, focus ring, alert titles), not repeated per screen.
 - **Fonts:** Outfit (headings, buttons) and DM Sans (body), from Google Fonts in `index.html`. Fall back to `system-ui`.
 - **AnnotationCanvas is custom**: MUI has no drawing tools, and this logic is a core evaluation point.
+
+</details>
+
+<details>
+<summary><strong>External libraries used</strong></summary>
+
+**In the app**
+
+| Library | Used for |
+|---|---|
+| `react`, `react-dom` | User interface |
+| `@mui/material`, `@mui/icons-material` | Components, theming and icons |
+| `@emotion/react`, `@emotion/styled` | Styling engine for MUI |
+| `react-zoom-pan-pinch` | Zoom and pan on Preview and Annotate |
+
+**For development and testing**
+
+| Library | Used for |
+|---|---|
+| `vite`, `@vitejs/plugin-react` | Dev server and production build |
+| `oxlint` | Linting |
+| `@playwright/test` | Automated browser tests |
+| `@axe-core/playwright` | Automatic accessibility checks |
+
+No router, state library, or canvas or annotation library.
 
 </details>
 
