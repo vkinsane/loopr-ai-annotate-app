@@ -23,12 +23,12 @@ export default function HeroDemo() {
         <Box sx={styles.flash} />
         <Box sx={styles.boxSelected}>
           <Box component="span" sx={styles.labelSelected}>
-            Dent
+            Annotation 1
           </Box>
         </Box>
         <Box sx={styles.boxOther}>
           <Box component="span" sx={styles.labelOther}>
-            Rust
+            Annotation 2
           </Box>
         </Box>
         <Typography component="span" sx={styles.pill}>

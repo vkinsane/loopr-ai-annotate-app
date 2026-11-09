@@ -21,14 +21,14 @@ export default function LandingScreen({ onNext }) {
         <Box sx={styles.copy}>
           <Typography sx={styles.overline}>Photo inspection</Typography>
           <Typography component="h1" sx={styles.headline}>
-            Inspect every part.
+            Check every photo.
             <br />
             <Box component="span" sx={styles.highlight}>
               Annotate every detail.
             </Box>
           </Typography>
           <Typography sx={styles.intro}>
-            Take a photo of the part, check that it is clear, and annotate what you find. All on your phone.
+            Take a photo, check that it is clear, and annotate what you find.
           </Typography>
         </Box>
 

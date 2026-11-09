@@ -21,7 +21,7 @@ const animate = (animation) => ({ '@media (prefers-reduced-motion: no-preference
 
 // Box positions are % of the sample photo, matching the damage in it.
 const boxBase = { position: 'absolute', boxSizing: 'border-box' }
-const labelBase = { position: 'absolute', px: 0.625, fontSize: 11, fontWeight: 600, lineHeight: '16px' }
+const labelBase = { position: 'absolute', px: 0.625, fontSize: 11, fontWeight: 600, lineHeight: '16px', whiteSpace: 'nowrap' }
 
 export const styles = {
   root: { display: 'flex', flexDirection: 'column', gap: 1.25, mt: 0.5 },

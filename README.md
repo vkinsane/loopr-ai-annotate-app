@@ -1,6 +1,6 @@
 # Loopr Annotate
 
-A mobile-first web app for photo inspection: photograph a part, check the photo's quality, and annotate it with labelled boxes.
+A mobile-first web app for photo inspection: take a photo, check its quality, and annotate it with labelled boxes.
 
 **Flow:** Landing → Before you start (camera permission) → Capture → Preview & quality → Annotate → Summary
 

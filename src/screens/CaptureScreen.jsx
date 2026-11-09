@@ -100,7 +100,7 @@ export default function CaptureScreen({ onBack, onCapture, onPickPhoto }) {
           <Box role="status" sx={styles.overlay}>
             <CircularProgress size={56} />
             <Typography component="h1" sx={styles.title}>Starting camera…</Typography>
-            <Typography sx={styles.overlayText}>Opening the rear camera. Photos stay on this device.</Typography>
+            <Typography sx={styles.overlayText}>Opening the camera. Photos stay on this device.</Typography>
           </Box>
         )}
       </Box>

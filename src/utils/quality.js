@@ -69,7 +69,7 @@ export function gradeSharpness(value) {
   return value < SHARPNESS.softBelow ? 'warn' : 'good'
 }
 
-const DEFAULT_HINT = 'Fill the frame with the part and hold steady'
+const DEFAULT_HINT = 'Fill the frame and hold steady'
 
 /** Worst problem first. `torch` is { supported, on, failed }. Returns { text, warn }. */
 export function getCaptureHint(quality, torch) {
@@ -85,16 +85,16 @@ export function getCaptureHint(quality, torch) {
     return { text: torch.on ? 'Too dark, so move to a brighter place.' : 'Too dark, so turn on the torch.', warn: true }
   }
 
-  if (gradeSharpness(quality.sharpness) !== 'good') return { text: 'Slightly blurry, so hold the phone steady.', warn: true }
+  if (gradeSharpness(quality.sharpness) !== 'good') return { text: 'Slightly blurry, so hold the camera steady.', warn: true }
   return { text: DEFAULT_HINT, warn: false }
 }
 
 const ISSUES = {
-  resolution: { problem: 'low resolution', advice: 'move closer to the part', tip: 'This photo has low resolution, so move closer to the part.' },
-  fileSize: { problem: 'low on detail', advice: 'move closer to the part', tip: 'This file is small, so fine details may be missing.' },
-  dark: { problem: 'too dark', advice: 'turn on the torch or add more light', tip: 'This photo is too dark, so turn on the torch or add more light.' },
-  bright: { problem: 'too bright', advice: 'turn off the torch or move away from strong light', tip: 'This photo is too bright, so turn off the torch or move away from strong light.' },
-  blurry: { problem: 'blurry', advice: 'hold the phone steady', tip: 'This photo is blurry, so hold the phone steady.' },
+  resolution: { problem: 'low resolution', advice: 'move closer', tip: 'This photo has low resolution, so move closer.' },
+  fileSize: { problem: 'low on detail', advice: 'move closer', tip: 'This file is small, so fine details may be missing.' },
+  dark: { problem: 'too dark', advice: 'add more light', tip: 'This photo is too dark, so add more light.' },
+  bright: { problem: 'too bright', advice: 'move away from strong light', tip: 'This photo is too bright, so move away from strong light.' },
+  blurry: { problem: 'blurry', advice: 'hold the camera steady', tip: 'This photo is blurry, so hold the camera steady.' },
 }
 
 const joinList = (items) => (items.length > 1 ? `${items.slice(0, -1).join(', ')} and ${items.at(-1)}` : items[0])
