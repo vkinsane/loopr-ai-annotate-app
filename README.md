@@ -16,13 +16,6 @@ npm install
 npm run dev       # open the URL it prints, usually http://localhost:5173
 ```
 
-**To run the tests,** install the test browser once:
-
-```bash
-npx playwright install chromium
-npm run test:e2e  # Playwright; builds the app first
-```
-
 </details>
 
 <details>
@@ -37,17 +30,6 @@ npm run test:e2e  # Playwright; builds the app first
 ```
 
 **Camera access needs a secure page:** `https://` or `localhost`. A phone on the same Wi-Fi opening `http://<laptop-ip>:5173` will load the app, but the camera stays blocked.
-
-**Testing on a phone:** expose the dev server over HTTPS with a tunnel:
-
-```bash
-npm run dev
-brew install cloudflared                          # once; no account needed
-cloudflared tunnel --url http://localhost:5173    # open the printed https://….trycloudflare.com link on the phone
-```
-
-- `ngrok http 5173` also works, but its free plan has a monthly request limit. The dev server sends each source file as a separate request, so a few sessions use up the limit.
-- `vite.config.js` already allows `*.trycloudflare.com` and `*.ngrok-free.app` hosts.
 
 </details>
 
@@ -74,11 +56,6 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
   - Photo quality is shown beside the photo on tablet and desktop.
   - **Name checks** (`utils/validation.js`): up to 40 characters; only letters (any language), numbers, spaces and `- _ . , ( )`. Typed and pasted text is cleaned at once, with a short note saying why. Extra spaces are removed, an empty name goes back to the old one, and a repeated name gets a warning.
 - **Choose a photo** (no camera): only JPEG, PNG, WebP or HEIC, checked from the file's first bytes, not its name; not empty; up to 30 MB.
-- **No page scroll on Annotate and Summary:** the photo shrinks to fit and the annotation list scrolls inside its card.
-- **Summary**
-  - The photo with all boxes, the annotation count, the quality grade, and each box's size.
-  - **Download photo:** a full-resolution JPEG with the boxes and labels drawn on (canvas). Nothing is uploaded.
-  - Back to Annotate keeps the boxes. "Take new photo" asks once more if the photo wasn't downloaded.
 
 </details>
 
@@ -150,9 +127,16 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
 </details>
 
 <details>
-<summary><strong>Automated tests</strong></summary>
+<summary><strong>Testing</strong></summary>
 
-Playwright 1.65, Chromium with a fake camera, against the production build. **174 tests: 172 pass, 2 are open findings** (below). `npm audit`: 0 vulnerabilities.
+**To run the tests,** install the test browser once:
+
+```bash
+npx playwright install chromium
+npm run test:e2e  # Playwright; builds the app first
+```
+
+Playwright 1.65, Chromium with a fake camera, against the production build. **174 tests: 172 pass, 2 are open findings**. `npm audit`: 0 vulnerabilities.
 
 | Area | What is checked |
 |---|---|
@@ -167,11 +151,5 @@ Playwright 1.65, Chromium with a fake camera, against the production build. **17
 | Accessibility | <ul><li>axe WCAG 2.1 AA on all 6 screens and a dialog</li><li>Keyboard start</li><li>Dialog focus trap and Escape</li><li>Rename and delete by keyboard</li><li>Tooltip by keyboard</li><li>Reduced motion</li></ul> |
 | Privacy | <ul><li>Markup in names never runs</li><li>Only GET requests, so the photo is not sent</li><li>No storage or cookies</li><li>Names not logged</li></ul> |
 | Performance | <ul><li>First-load and lazy-chunk size budgets</li><li>Layout shift under 0.01</li><li>40 boxes</li><li>A 27 MP photo at full size</li></ul> |
-
-**Open findings** (written as expected failures, so each one reports when it is fixed):
-- A failed download of a lazy screen, for example on a bad network, leaves a blank page. There is no error boundary.
-- Under 44 px on a phone: "Choose a photo instead" link (20 px high), New photo (32), zoom tools (40).
-
-**Not applicable:** login, sessions, CSRF, API errors, server-side validation and multi-user load, because the app has no backend.
 
 </details>
