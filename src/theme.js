@@ -131,6 +131,17 @@ export const VISUALLY_HIDDEN = { position: 'absolute', width: '1px', height: '1p
 /** The part of a screen below the header bar. It does its own scrolling; position: relative is for ScrollThumb. */
 export const SCREEN_BODY = { position: 'relative', flex: 1, minHeight: 0, width: '100%', overflowY: 'auto', mx: 'auto' }
 
+/** Preview and Summary. Desktop: photo on the left, details in a 380 px column on the right. */
+export const PHOTO_PAGE = {
+  ...SCREEN_BODY, maxWidth: { xs: 600, md: 1200 }, display: 'grid',
+  gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 1fr) 380px' },
+}
+
+/** The widest a photo of this shape can be: the full column, unless `heights` (a CSS height per breakpoint) stops it first. */
+export const fitPhotoWidth = (heights, ratio) => Object.fromEntries(Object.entries(heights).map(([size, height]) => [size, `min(100%, ${height} * ${ratio})`]))
+
+export const BOX_LABEL_TEXT = { fontSize: 11, fontWeight: 600, lineHeight: '16px' }
+
 /** A navy line just outside and inside a lime box, so it shows on any photo. */
 export const INK_OUTLINE = (theme, width = '1px') => `0 0 0 ${width} ${theme.palette.brand.ink}, inset 0 0 0 ${width} ${theme.palette.brand.ink}`
 

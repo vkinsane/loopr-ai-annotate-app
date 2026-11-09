@@ -24,17 +24,19 @@ export default function AnnotationList({ items, selectedId, readOnly = false, on
     listRef.current?.querySelector(`[data-id="${selectedId}"]`)?.scrollIntoView({ block: 'nearest' })
   }, [selectedId])
 
+  const showNote = (item, message) => setNote(message && { id: item.id, ...message })
+
   function handleChange(item, raw) {
     const { value, message } = validateText(raw, RULE)
     onRename(item.id, value)
-    setNote(message && { id: item.id, ...message })
+    showNote(item, message)
   }
 
   function handleBlur(item) {
     const others = items.filter((other) => other.id !== item.id).map((other) => other.label)
     const { value, message } = finishText(item.label, RULE, { previous: labelBeforeEdit.current, others })
     if (value !== item.label) onRename(item.id, value)
-    setNote(message && { id: item.id, ...message })
+    showNote(item, message)
   }
 
   return (

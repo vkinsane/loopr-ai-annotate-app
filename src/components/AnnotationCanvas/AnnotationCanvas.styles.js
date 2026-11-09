@@ -1,10 +1,11 @@
 import { alpha } from '@mui/material'
-import { CARD_RADIUS, INK_OUTLINE } from '../../theme.js'
+import { BOX_LABEL_TEXT, CARD_RADIUS, fitPhotoWidth, INK_OUTLINE } from '../../theme.js'
 import { percentRect } from '../../utils'
 
 // Selected and draft boxes use the brand indigo. Other boxes are lime with a navy outline so they show on any paint colour.
 const lineColor = (variant) => (theme) => (variant === 'other' ? theme.palette.brand.lime : theme.palette.primary.main)
 const HANDLE = { hit: 44, dot: 14 }
+const PHOTO_HEIGHT = { xs: 'max(190px, min(50dvh, 100dvh - 376px))', sm: 'max(240px, 50dvh)', md: 'max(240px, 100dvh - 143px)' }
 // Everything drawn on the zoomed photo uses these, so it keeps its size on screen.
 const unzoomed = (px) => `calc(${px}px / var(--zoom, 1))`
 const UNZOOM = 'scale(calc(1 / var(--zoom, 1)))'
@@ -14,8 +15,7 @@ export const styles = {
   root: { gridArea: { md: 'photo' }, alignSelf: 'start', border: 1, borderColor: 'divider', borderRadius: CARD_RADIUS, overflow: 'hidden', bgcolor: 'brand.carbonRaised' },
   // Largest box with the photo's shape that fits: full width, capped by screen height.
   frame: (ratio, moving) => ({
-    position: 'relative', aspectRatio: String(ratio), mx: 'auto', overflow: 'hidden',
-    width: { xs: `min(100%, max(190px, min(50dvh, 100dvh - 376px)) * ${ratio})`, sm: `min(100%, max(240px, 50dvh) * ${ratio})`, md: `min(100%, max(240px, 100dvh - 143px) * ${ratio})` },
+    position: 'relative', aspectRatio: String(ratio), mx: 'auto', overflow: 'hidden', width: fitPhotoWidth(PHOTO_HEIGHT, ratio),
     userSelect: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none', touchAction: 'none', cursor: moving ? 'grab' : 'auto',
   }),
   photo: { display: 'block', width: '100%', height: '100%', pointerEvents: 'none' },
@@ -33,7 +33,7 @@ export const styles = {
     // The selected label starts after the corner handle's dot, so the dot stays visible.
     position: 'absolute', left: unzoomed(selected ? 10 : -2), [below ? 'top' : 'bottom']: '100%', px: 0.5, maxWidth: 160,
     transform: UNZOOM, transformOrigin: `left ${below ? 'top' : 'bottom'}`,
-    fontSize: 11, fontWeight: 600, lineHeight: '16px',
+    ...BOX_LABEL_TEXT,
     color: selected ? 'primary.contrastText' : 'brand.ink', bgcolor: selected ? 'primary.main' : 'brand.lime',
     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', pointerEvents: 'none',
   }),

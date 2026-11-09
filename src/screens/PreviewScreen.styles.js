@@ -1,28 +1,22 @@
-import { CARD_RADIUS, SCREEN_BODY } from '../theme.js'
-
-const MAX_WIDTH = { xs: 600, md: 1200 }
+import { CARD_RADIUS, fitPhotoWidth, PHOTO_PAGE } from '../theme.js'
 
 // The tallest the photo may be. Phones leave room for the result and buttons.
-const PHOTO_HEIGHT = { xs: 'max(140px, min(45dvh, 100dvh - 600px))', sm: '45dvh', md: '(100dvh - 90px)' }
-const mapHeights = (toValue) => Object.fromEntries(Object.entries(PHOTO_HEIGHT).map(([size, height]) => [size, toValue(height)]))
+const PHOTO_HEIGHT = { xs: 'max(140px, min(45dvh, 100dvh - 600px))', sm: '45dvh', md: 'calc(100dvh - 90px)' }
 
 export const styles = {
   // One window tall. Phone and tablet: one column, and on short screens the details scroll with the buttons pinned.
   // Desktop: photo on the left, result and buttons on the right.
   root: {
-    ...SCREEN_BODY, maxWidth: MAX_WIDTH, p: 2, pb: { xs: 0, md: 2 }, display: 'grid', gap: { xs: 1.5, md: 2 },
-    gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 1fr) 380px' },
+    ...PHOTO_PAGE, p: 2, pb: { xs: 0, md: 2 }, gap: { xs: 1.5, md: 2 },
     // max-content: the photo clips its overflow, so an `auto` row could collapse to nothing when space is short.
     gridTemplateRows: { xs: 'max-content 1fr', md: '1fr' },
   },
-  headerWidth: { maxWidth: MAX_WIDTH },
+  headerWidth: { maxWidth: PHOTO_PAGE.maxWidth },
   // Sized from the measured photo before the image loads, so nothing below moves when it appears.
   // `ratio` is null when the photo couldn't be read: a fixed-height frame is used instead.
   photoFrame: (ratio) => ({
     position: 'relative', border: 1, borderColor: 'divider', borderRadius: CARD_RADIUS, overflow: 'hidden', bgcolor: 'brand.carbonRaised', mx: 'auto', alignSelf: 'start',
-    ...(ratio
-      ? { aspectRatio: String(ratio), width: mapHeights((height) => `min(100%, ${height} * ${ratio})`) }
-      : { width: '100%', height: mapHeights((height) => `calc(${height})`) }),
+    ...(ratio ? { aspectRatio: String(ratio), width: fitPhotoWidth(PHOTO_HEIGHT, ratio) } : { width: '100%', height: PHOTO_HEIGHT }),
   }),
   photo: { display: 'block', width: '100%', height: '100%', objectFit: 'contain' },
   zoom: {

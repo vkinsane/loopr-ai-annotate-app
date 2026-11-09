@@ -1,5 +1,5 @@
 import { alpha, keyframes } from '@mui/material'
-import { CARD_RADIUS, cornerLines, INK_OUTLINE } from '../../theme.js'
+import { BOX_LABEL_TEXT, CARD_RADIUS, cornerLines, INK_OUTLINE } from '../../theme.js'
 
 // Timeline (% of 6 s): aim 0–20, shutter flash ~20, quality pill from 30, boxes drawn at ~55 and ~67, fade out 92–100.
 const LOOP = '6s infinite'
@@ -8,11 +8,7 @@ const guides = keyframes`0%, 22% { opacity: 1 } 28%, 100% { opacity: 0 }`
 const pill = keyframes`0%, 28% { opacity: 0; transform: translateY(8px) } 33%, 92% { opacity: 1; transform: none } 100% { opacity: 0 }`
 const drawAt = (start) => keyframes`
   0%, ${start}% { opacity: 0; transform: scale(0.6) } ${start + 6}%, 92% { opacity: 1; transform: none } 100% { opacity: 0 }`
-// Each step is highlighted during its window, with a 2% fade either side. `on` is listed last so it wins at 0% and 100%.
 const STEP_WINDOWS = [[0, 26], [29, 50], [53, 100]]
-const stepHighlight = ([from, to], on, off) => keyframes`
-  0%, ${Math.max(from - 2, 0)}%, ${Math.min(to + 2, 100)}%, 100% { background: ${off.bg}; color: ${off.color}; border-color: ${off.border} }
-  ${from}%, ${to}% { background: ${on.bg}; color: ${on.color}; border-color: ${on.border} }`
 const CONNECTOR = 20 // px of dotted line between two step boxes
 
 // Animations run only when the user hasn't asked for reduced motion; the static styles are the final frame.
@@ -20,7 +16,7 @@ const animate = (animation) => ({ '@media (prefers-reduced-motion: no-preference
 
 // Box positions are % of the sample photo, matching the damage in it.
 const boxBase = { position: 'absolute', boxSizing: 'border-box' }
-const labelBase = { position: 'absolute', px: 0.625, fontSize: 11, fontWeight: 600, lineHeight: '16px', whiteSpace: 'nowrap' }
+const labelBase = { position: 'absolute', px: 0.625, ...BOX_LABEL_TEXT, whiteSpace: 'nowrap' }
 
 export const styles = {
   root: { display: 'flex', flexDirection: 'column', gap: 1.25, mt: 0.5 },
@@ -61,6 +57,11 @@ export const styles = {
     const on = { bg: theme.palette.brand.tint, color: theme.palette.primary.dark, border: theme.palette.primary.main }
     const off = { bg: theme.palette.background.paper, color: theme.palette.text.secondary, border: theme.palette.divider }
     const current = index === STEP_WINDOWS.length - 1 ? on : off
+    const [from, to] = STEP_WINDOWS[index]
+    // Highlighted during its window, with a 2% fade either side. `on` is listed last so it wins at 0% and 100%.
+    const highlight = keyframes`
+      0%, ${Math.max(from - 2, 0)}%, ${Math.min(to + 2, 100)}%, 100% { background: ${off.bg}; color: ${off.color}; border-color: ${off.border} }
+      ${from}%, ${to}% { background: ${on.bg}; color: ${on.color}; border-color: ${on.border} }`
     return {
       position: 'relative', flex: 1, textAlign: 'center', borderRadius: 1, py: 0.75,
       fontFamily: theme.typography.h2.fontFamily, fontSize: 13, fontWeight: 600,
@@ -69,7 +70,7 @@ export const styles = {
         content: '""', position: 'absolute', top: '50%', left: '100%', width: CONNECTOR, ml: '1.5px',
         borderTop: `2px dotted ${theme.palette.primary.light}`,
       },
-      ...animate(`${stepHighlight(STEP_WINDOWS[index], on, off)} ${LOOP}`),
+      ...animate(`${highlight} ${LOOP}`),
     }
   },
   stepNumber: (theme) => ({
