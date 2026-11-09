@@ -17,7 +17,6 @@ src/
 │  ├─ PreviewScreen.jsx
 │  ├─ AnnotateScreen.jsx
 │  ├─ SummaryScreen.jsx        # read-only result + download
-│  └─ __tests__/
 ├─ components/
 │  ├─ StatusBadge/             # ✓ / ! / ✕ — used on 3 screens
 │  ├─ LiveQualityChips/        # resolution, brightness, sharpness chips
@@ -30,7 +29,6 @@ src/
 │  ├─ ChoosePhotoButton/       # file picker fallback when there's no camera
 │  ├─ HeroDemo/                # landing animation
 │  ├─ ConfirmDialog/           # asks before work is lost
-│  └─ __tests__/
 ├─ hooks/
 │  ├─ useCamera.js             # stream + capturePhoto
 │  ├─ useTorch.js
@@ -39,7 +37,6 @@ src/
 │  ├─ useCameraPermission.js   # ask once on How it works
 │  ├─ useScreenHistory.js      # current screen, in step with browser Back / Forward
 │  ├─ index.js                # re-exports, for one-line imports
-│  └─ __tests__/
 └─ utils/
    ├─ cameraErrors.js          # pure
    ├─ quality.js               # pure: thresholds, measures, grades, banner text
@@ -49,8 +46,7 @@ src/
    ├─ annotations.js           # pure reducer
    ├─ exportPhoto.js           # canvas: photo + boxes → JPEG blob
    ├─ index.js                 # re-exports, for one-line imports
-   └─ __tests__/
-e2e/flow.spec.js               # one Playwright test, fake camera
+e2e/*.spec.js                  # Playwright suite (fake camera); see README
 ```
 
 ## UI and theming
@@ -73,7 +69,7 @@ e2e/flow.spec.js               # one Playwright test, fake camera
 - `components/` only for UI used in 2+ places or complex enough to test alone.
 - One folder per component: `StatusBadge/StatusBadge.jsx` + `StatusBadge.styles.js`.
 - `screens/` combine hooks, state and components.
-- Tests in a `__tests__/` folder next to the code they test.
+- Tests live in `e2e/`, one spec per area.
 - Files are created when we build them, never as empty stubs.
 - No component file over 250 lines; split out a component or pure util when it grows.
 - A private helper used in only one place is inlined. Exported `utils/` functions stay separate (pure, testable).

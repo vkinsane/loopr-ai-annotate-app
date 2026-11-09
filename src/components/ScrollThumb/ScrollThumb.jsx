@@ -15,7 +15,7 @@ export default function ScrollThumb({ component = 'span' }) {
     const thumb = thumbRef.current
     const scroller = thumb.parentElement
     // A scrolling element takes no width for its bar only when the browser hides bars.
-    // Measured on a test element, because the list's scrollbar-gutter keeps that width even when no bar is drawn.
+    // Measured on a test element, because the real scroller may not be overflowing yet.
     const probe = document.createElement('div')
     probe.style.cssText = 'position: absolute; visibility: hidden; overflow: scroll; width: 50px; height: 50px'
     document.body.append(probe)

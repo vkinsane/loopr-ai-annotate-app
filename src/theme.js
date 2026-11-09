@@ -122,7 +122,6 @@ export const SCROLL_SHADOWS = (theme) => {
       linear-gradient(${shade}, transparent) top left / calc(100% - ${SCROLLBAR_PX}px) 10px scroll no-repeat,
       linear-gradient(transparent, ${shade}) bottom left / calc(100% - ${SCROLLBAR_PX}px) 10px scroll no-repeat,
       ${paper}`,
-    scrollbarGutter: 'stable', // room is kept for the scrollbar, so rows don't narrow when it appears
   }
 }
 

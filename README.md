@@ -14,6 +14,8 @@ npm run dev       # http://localhost:5173
 npm run build     # production build in dist/
 npm run preview   # serve the production build
 npm run lint      # oxlint
+npx playwright install chromium   # once
+npm run test:e2e  # Playwright; builds the app first
 ```
 
 **Camera access needs a secure page:** `https://` or `localhost`. A phone on the same Wi-Fi opening `http://<laptop-ip>:5173` will load the app, but the camera stays blocked.
@@ -106,6 +108,7 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
 - **No draw/select modes:** the gesture depends on where it starts (corner → resize, box → move, empty photo → draw). A quick tap or a box under 12 screen px is ignored.
 - **Pure logic in `utils/`:** `geometry.js` (draw, move, resize, clamp) and `annotations.js` (reducer). IDs are created outside the reducer, so it stays pure.
 - **A confirmation dialog appears before work is lost** (`components/ConfirmDialog`): "Keep photo" is the safe default. It only appears when there are boxes that would be lost.
+- **Done with no boxes asks first:** "You have not added any annotations. Do you want to proceed?"
 
 ### Code conventions
 - Folders by file type: `screens/`, `components/`, `hooks/` (browser APIs and lifecycle), `utils/` (pure logic).
@@ -138,8 +141,37 @@ Measured in headless Chrome; not yet checked at these sizes on real devices.
 - **While the photo is touched for drawing, the page can't scroll:** on a phone, scroll by touching outside the photo.
 - **Very large photos may fail to download on iPhone:** Safari limits canvas size (about 16.7 MP). The app shows "Couldn't make the photo" in that case.
 - **Checks run in the browser only.** Browser checks can be bypassed, so a future backend must repeat them (OWASP). Today there is no server, so nothing leaves the device.
-- **No automated tests yet.** The pure `utils/` (geometry, reducer, quality, error mapping) are written to be unit-tested first.
 - **Not deployed yet.** The brief requires a public HTTPS deployment.
+
+## Automated tests
+
+Playwright 1.65, Chromium with a fake camera, against the production build. **173 tests: 171 pass, 2 are open findings** (below). `npm audit`: 0 vulnerabilities.
+
+| Area | File | Tests | What is checked |
+|---|---|---|---|
+| Rules | `logic.spec.js` | 50 | Box geometry, reducer, every quality grade boundary, text and file validation, camera error mapping. No browser. |
+| Core flows | `flows.spec.js` | 11 | Camera and chosen-photo flows to download (file name, full pixel size, box and label drawn); Back/Forward; reload; every "lose work" dialog; Done with no boxes. |
+| Annotation | `annotation.spec.js` | 24 | Photo-pixel accuracy in 4 drag directions; clamping; minimum size; move; resize from 4 corners; window resize and rotation; zoom and pan make no box; drawing while zoomed; keyboard delete; touch draw and two-finger gesture. |
+| Quality | `quality.spec.js` | 10 | Generated good, dark, bright, blurry and low-resolution photos; advice; main button; damaged photo; portrait and EXIF rotation; PNG and WebP. |
+| Input | `validation.spec.js` | 14 | Annotation and photo names: characters, paste, limits, other languages, duplicates, trimming. Non-photo, empty and over-30 MB files. |
+| Camera | `camera.spec.js` | 21 | Granted, denied, slow answer, earlier grant, no camera, busy, insecure page, stopped mid-use, retry, page hidden, leaving the screen, torch on/off/failed/missing, ImageCapture fallback, failed capture, two tabs. |
+| Failure handling | `errors.spec.js` | 5 | Slow and failed screen downloads, offline after load, failed download with retry, no console errors. |
+| Screens | `responsive.spec.js` | 16 | 320 × 568, 390 × 844, 820 × 1180, 1440 × 900, 844 × 390 and 200% zoom: no page scroll, every button reachable. Scroll bars only on overflow, including browsers that hide them. Touch targets. |
+| Accessibility | `accessibility.spec.js` | 13 | axe WCAG 2.1 AA on all 6 screens and a dialog; keyboard start; dialog focus trap and Escape; rename and delete by keyboard; tooltip by keyboard; reduced motion. |
+| Privacy | `security.spec.js` | 4 | Markup in names never runs; only GET requests, so the photo is not sent; no storage or cookies; names not logged. |
+| Performance | `performance.spec.js` | 5 | First-load and lazy-chunk size budgets, layout shift under 0.01, 40 boxes, a 27 MP photo at full size. |
+
+**Open findings** (written as expected failures, so each one reports when it is fixed):
+- A failed download of a lazy screen, for example on a bad network, leaves a blank page. There is no error boundary.
+- Under 44 px on a phone: "Choose a photo instead" link (20 px high), New photo (32), zoom tools (40), Edit photo name (36).
+
+**Not covered by these tests:**
+- **Real hardware:** real camera sensors and resolution, the torch, real pinch, iOS permission dialogs. Camera failures and the torch are mocked; pinch is emulated touch input.
+- **iPhone:** Playwright's WebKit is a desktop build with no camera support, so a pass there would not be an iPhone result. It was not run.
+- **Drawing by keyboard:** the app has no way to draw or move a box without a pointer.
+- **On-screen keyboard** over the name fields, **memory** on phones, and **response headers** (needs the deployed site).
+
+**Not applicable:** login, sessions, CSRF, API errors, server-side validation and multi-user load, because the app has no backend.
 
 ## Device testing
 

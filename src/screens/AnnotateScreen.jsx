@@ -17,6 +17,7 @@ import { styles } from './AnnotateScreen.styles.js'
 export default function AnnotateScreen({ photo, quality, annotations, dispatch, onBack, onNewPhoto, onDone }) {
   const { items, selectedId } = annotations
   const [confirming, setConfirming] = useState(false)
+  const [confirmingNoBoxes, setConfirmingNoBoxes] = useState(false)
   const checks = qualityChecks(photo.blob.size, quality)
   const issues = checks.filter((check) => check.grade !== 'good')
   const overall = gradePhoto({ bytes: photo.blob.size, ...quality }).grade
@@ -77,7 +78,7 @@ export default function AnnotateScreen({ photo, quality, annotations, dispatch, 
           </Box>
 
           <Box sx={styles.doneBar}>
-            <Button variant="contained" size="large" fullWidth onClick={onDone}>
+            <Button variant="contained" size="large" fullWidth onClick={() => (items.length > 0 ? onDone() : setConfirmingNoBoxes(true))}>
               {items.length > 0 ? `Done · ${plural(items.length, 'annotation')}` : 'Done'}
             </Button>
           </Box>
@@ -90,6 +91,17 @@ export default function AnnotateScreen({ photo, quality, annotations, dispatch, 
           confirmLabel="Discard"
           onConfirm={onNewPhoto}
           onCancel={() => setConfirming(false)}
+        />
+
+        <ConfirmDialog
+          open={confirmingNoBoxes}
+          title="No annotations added"
+          message="You have not added any annotations. Do you want to proceed?"
+          confirmLabel="Proceed"
+          confirmColor="primary"
+          cancelLabel="Add annotations"
+          onConfirm={onDone}
+          onCancel={() => setConfirmingNoBoxes(false)}
         />
       </Box>
     </ScreenLayout>
