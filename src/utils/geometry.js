@@ -13,12 +13,7 @@ export function rectFromPoints(a, b) {
 
 /** Moves without leaving the photo: at an edge the box stops instead of shrinking. */
 export function moveRect(rect, dx, dy, size) {
-  return {
-    x: clamp(rect.x + dx, 0, size.width - rect.width),
-    y: clamp(rect.y + dy, 0, size.height - rect.height),
-    width: rect.width,
-    height: rect.height,
-  }
+  return { ...rect, x: clamp(rect.x + dx, 0, size.width - rect.width), y: clamp(rect.y + dy, 0, size.height - rect.height) }
 }
 
 /** The opposite corner stays fixed; dragging past it flips the box. */

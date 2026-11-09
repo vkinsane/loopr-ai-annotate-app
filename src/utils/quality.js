@@ -14,7 +14,7 @@ const FILE_SIZE_KB = { poorBelow: 150, goodFrom: 500 }
 // Both are uncalibrated starting values, to be replaced with values measured on real devices.
 export const BRIGHTNESS = { tooDark: 40, dim: 70, bright: 190, tooBright: 220 }
 
-const SHARPNESS = { blurryBelow: 20, softBelow: 60 }
+const SHARPNESS = { poorBelow: 20, goodFrom: 60 }
 // The raw score has no meaning to people and no upper limit, so they see a word.
 export const SHARPNESS_WORDS = { good: 'Sharp', warn: 'A bit blurry', poor: 'Blurry' }
 
@@ -51,17 +51,14 @@ export function laplacianVariance({ pixels, width, height }) {
 /** Takes a grey image from `readGreyImage`. */
 export const measureImage = (image) => ({ brightness: Math.round(meanBrightness(image.pixels)), sharpness: Math.round(laplacianVariance(image)) })
 
-export function gradeResolution(width, height) {
-  const mp = megapixels(width, height)
-  if (mp < RESOLUTION_MP.poorBelow) return 'poor'
-  return mp < RESOLUTION_MP.goodFrom ? 'warn' : 'good'
+function gradeByFloor(value, { poorBelow, goodFrom }) {
+  if (value < poorBelow) return 'poor'
+  return value < goodFrom ? 'warn' : 'good'
 }
 
-export function gradeFileSize(bytes) {
-  const kb = bytes / BYTES_PER_KB
-  if (kb < FILE_SIZE_KB.poorBelow) return 'poor'
-  return kb < FILE_SIZE_KB.goodFrom ? 'warn' : 'good'
-}
+export const gradeResolution = (width, height) => gradeByFloor(megapixels(width, height), RESOLUTION_MP)
+export const gradeFileSize = (bytes) => gradeByFloor(bytes / BYTES_PER_KB, FILE_SIZE_KB)
+export const gradeSharpness = (value) => gradeByFloor(value, SHARPNESS)
 
 export function gradeBrightness(value) {
   if (value < BRIGHTNESS.tooDark || value > BRIGHTNESS.tooBright) return 'poor'
@@ -69,27 +66,17 @@ export function gradeBrightness(value) {
   return 'good'
 }
 
-export function gradeSharpness(value) {
-  if (value < SHARPNESS.blurryBelow) return 'poor'
-  return value < SHARPNESS.softBelow ? 'warn' : 'good'
-}
-
 const DEFAULT_HINT = 'Fill the frame and hold steady'
+const warning = (text) => ({ text, warn: true })
 
 /** Worst problem first. `torch` is { supported, on, failed }. Returns { text, warn }. */
 export function getCaptureHint(quality, torch) {
-  if (torch.failed) return { text: "The torch didn't respond, so try again.", warn: true }
-  if (!quality) return { text: DEFAULT_HINT, warn: false }
-
-  if (gradeBrightness(quality.brightness) !== 'good') {
-    if (quality.brightness > BRIGHTNESS.bright) {
-      const text = torch.on ? 'Too bright, so turn off the torch or move away from strong light.' : 'Too bright, so move away from strong light.'
-      return { text, warn: true }
-    }
-    return { text: torch.supported && !torch.on ? 'Too dark, so turn on the torch.' : 'Too dark, so move to a brighter place.', warn: true }
+  if (torch.failed) return warning("The torch didn't respond, so try again.")
+  if (quality && gradeBrightness(quality.brightness) !== 'good') {
+    if (quality.brightness > BRIGHTNESS.bright) return warning(torch.on ? 'Too bright, so turn off the torch or move away from strong light.' : 'Too bright, so move away from strong light.')
+    return warning(torch.supported && !torch.on ? 'Too dark, so turn on the torch.' : 'Too dark, so move to a brighter place.')
   }
-
-  if (gradeSharpness(quality.sharpness) !== 'good') return { text: 'Slightly blurry, so hold the camera steady.', warn: true }
+  if (quality && gradeSharpness(quality.sharpness) !== 'good') return warning('Slightly blurry, so hold the camera steady.')
   return { text: DEFAULT_HINT, warn: false }
 }
 
@@ -130,38 +117,22 @@ export function gradePhoto({ width, height, bytes, brightness, sharpness }) {
 /** Brightness is measured 0–255 and shown to people as 0–100%. */
 export const brightnessPercent = (value) => Math.round((value / 255) * 100)
 
+const UNMEASURED = { value: '–', grade: null, tip: null }
+
 /**
- * One row per check for display: { label, value, grade, tip }. `quality` is the measured
- * { width, height, brightness, sharpness }, or null while measuring (only file size is known then).
- * `tip` says how to improve the check.
+ * One row per check for display: { label, value, grade, tip }. `tip` says how to improve the check. `quality` is the measured
+ * { width, height, brightness, sharpness }, or null if the photo couldn't be read (only file size is known then).
  */
 export function qualityChecks(bytes, quality) {
-  const measured = Boolean(quality)
   const kb = bytes / BYTES_PER_KB
+  const fileSize = { label: 'File size', value: kb < BYTES_PER_KB ? `${Math.round(kb)} KB` : `${(kb / BYTES_PER_KB).toFixed(1)} MB`, grade: gradeFileSize(bytes), tip: ISSUES.fileSize.tip }
+  if (!quality) return [{ label: 'Resolution', ...UNMEASURED }, fileSize, { label: 'Brightness', ...UNMEASURED }, { label: 'Sharpness', ...UNMEASURED }]
+
+  const { width, height, brightness, sharpness } = quality
   return [
-    {
-      label: 'Resolution',
-      value: measured ? `${quality.width} × ${quality.height} · ${megapixels(quality.width, quality.height).toFixed(1)} MP` : '–',
-      grade: measured ? gradeResolution(quality.width, quality.height) : null,
-      tip: ISSUES.resolution.tip,
-    },
-    {
-      label: 'File size',
-      value: kb < BYTES_PER_KB ? `${Math.round(kb)} KB` : `${(kb / BYTES_PER_KB).toFixed(1)} MB`,
-      grade: gradeFileSize(bytes),
-      tip: ISSUES.fileSize.tip,
-    },
-    {
-      label: 'Brightness',
-      value: measured ? `${brightnessPercent(quality.brightness)}%` : '–',
-      grade: measured ? gradeBrightness(quality.brightness) : null,
-      tip: measured ? brightnessIssue(quality.brightness).tip : null,
-    },
-    {
-      label: 'Sharpness',
-      value: measured ? SHARPNESS_WORDS[gradeSharpness(quality.sharpness)] : '–',
-      grade: measured ? gradeSharpness(quality.sharpness) : null,
-      tip: ISSUES.blurry.tip,
-    },
+    { label: 'Resolution', value: `${width} × ${height} · ${megapixels(width, height).toFixed(1)} MP`, grade: gradeResolution(width, height), tip: ISSUES.resolution.tip },
+    fileSize,
+    { label: 'Brightness', value: `${brightnessPercent(brightness)}%`, grade: gradeBrightness(brightness), tip: brightnessIssue(brightness).tip },
+    { label: 'Sharpness', value: SHARPNESS_WORDS[gradeSharpness(sharpness)], grade: gradeSharpness(sharpness), tip: ISSUES.blurry.tip },
   ]
 }
