@@ -3,11 +3,8 @@ import { Add, Close, Remove } from '@mui/icons-material'
 import { Box, Button, Dialog, IconButton, ThemeProvider, Typography } from '@mui/material'
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch'
 import { cameraTheme } from '../../theme.js'
+import { ZOOM } from '../../utils'
 import { styles } from './ZoomViewer.styles.js'
-
-const MAX_ZOOM = 8
-const ZOOM_STEP = 0.4
-const ZOOM_MS = 150
 
 /** Full-screen photo viewer: pinch or scroll to zoom (1×–8×), drag to move, double-tap to zoom in and out. */
 export default function ZoomViewer({ photoUrl, onClose }) {
@@ -28,7 +25,7 @@ export default function ZoomViewer({ photoUrl, onClose }) {
           <TransformWrapper
             ref={controls}
             minScale={1}
-            maxScale={MAX_ZOOM}
+            maxScale={ZOOM.max}
             doubleClick={{ mode: 'toggle' }}
             onTransform={(_, { scale }) => setZoom(scale)}
           >
@@ -40,13 +37,13 @@ export default function ZoomViewer({ photoUrl, onClose }) {
 
         <Box sx={styles.controls}>
           <Box sx={styles.buttons}>
-            <IconButton aria-label="Zoom out" disabled={zoom <= 1} onClick={() => controls.current.zoomOut(ZOOM_STEP, ZOOM_MS)} sx={styles.control}>
+            <IconButton aria-label="Zoom out" disabled={zoom <= 1} onClick={() => controls.current.zoomOut(ZOOM.step, ZOOM.ms)} sx={styles.control}>
               <Remove />
             </IconButton>
-            <Button disabled={zoom <= 1} onClick={() => controls.current.resetTransform(ZOOM_MS)} sx={styles.control}>
+            <Button disabled={zoom <= 1} onClick={() => controls.current.resetTransform(ZOOM.ms)} sx={styles.control}>
               Fit
             </Button>
-            <IconButton aria-label="Zoom in" disabled={zoom >= MAX_ZOOM} onClick={() => controls.current.zoomIn(ZOOM_STEP, ZOOM_MS)} sx={styles.control}>
+            <IconButton aria-label="Zoom in" disabled={zoom >= ZOOM.max} onClick={() => controls.current.zoomIn(ZOOM.step, ZOOM.ms)} sx={styles.control}>
               <Add />
             </IconButton>
           </Box>

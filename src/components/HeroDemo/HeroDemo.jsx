@@ -1,8 +1,8 @@
 import { Box, Typography } from '@mui/material'
 import samplePart from '../../assets/sample-part.jpg'
+import { CORNERS } from '../../theme.js'
 import { styles } from './HeroDemo.styles.js'
 
-const CORNERS = [['top', 'left'], ['top', 'right'], ['bottom', 'left'], ['bottom', 'right']]
 const STEPS = ['Capture', 'Check', 'Annotate']
 
 /** A 6-second CSS loop of the app's flow. With reduced motion it shows the last frame only. */

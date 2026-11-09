@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { AddBoxOutlined, DeleteOutlined, EditOutlined } from '@mui/icons-material'
 import { Box, IconButton, InputBase, Tooltip, Typography } from '@mui/material'
 import { VISUALLY_HIDDEN } from '../../theme.js'
-import { finishText, TEXT_RULES, validateText } from '../../utils'
+import { boxLabel, finishText, TEXT_RULES, validateText } from '../../utils'
 import ScrollThumb from '../ScrollThumb/ScrollThumb.jsx'
 import { styles } from './AnnotationList.styles.js'
 
@@ -60,7 +60,7 @@ export default function AnnotationList({ items, selectedId, readOnly = false, on
               return (
                 <Box component="li" key={item.id} sx={styles.readOnlyRow}>
                   <Box component="span" aria-hidden sx={styles.swatch(false)} />
-                  <Box component="span" title={item.label || 'Untitled'} sx={styles.readOnlyName}>{item.label || 'Untitled'}</Box>
+                  <Box component="span" title={boxLabel(item)} sx={styles.readOnlyName}>{boxLabel(item)}</Box>
                   <Typography sx={styles.readOnlySize}>{Math.round(item.width)} × {Math.round(item.height)} px</Typography>
                 </Box>
               )

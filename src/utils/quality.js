@@ -1,18 +1,20 @@
 const PIXELS_PER_MEGAPIXEL = 1_000_000
 const BYTES_PER_KB = 1024
 
-// Live frames and photos are measured at the same width, so one set of sharpness thresholds fits both.
 export const GRADE_LABELS = { good: 'Good', warn: 'Warning', poor: 'Poor' }
+/** The MUI palette name for each grade. */
+export const GRADE_COLORS = { good: 'success', warn: 'warning', poor: 'error' }
+// Live frames and photos are measured at the same width, so one set of sharpness thresholds fits both.
 export const ANALYSIS_WIDTH = 320
 
-export const RESOLUTION_MP = { poorBelow: 2, goodFrom: 8 }
-export const FILE_SIZE_KB = { poorBelow: 150, goodFrom: 500 }
+const RESOLUTION_MP = { poorBelow: 2, goodFrom: 8 }
+const FILE_SIZE_KB = { poorBelow: 150, goodFrom: 500 }
 
 // Brightness is mean luma (0–255); sharpness is Laplacian variance at ANALYSIS_WIDTH.
 // Both are uncalibrated starting values, to be replaced with values measured on real devices.
 export const BRIGHTNESS = { tooDark: 40, dim: 70, bright: 190, tooBright: 220 }
 
-export const SHARPNESS = { blurryBelow: 20, softBelow: 60 }
+const SHARPNESS = { blurryBelow: 20, softBelow: 60 }
 // The raw score has no meaning to people and no upper limit, so they see a word.
 export const SHARPNESS_WORDS = { good: 'Sharp', warn: 'A bit blurry', poor: 'Blurry' }
 
@@ -45,6 +47,9 @@ export function laplacianVariance({ pixels, width, height }) {
   const mean = sum / count
   return sumOfSquares / count - mean * mean
 }
+
+/** Takes a grey image from `readGreyImage`. */
+export const measureImage = (image) => ({ brightness: Math.round(meanBrightness(image.pixels)), sharpness: Math.round(laplacianVariance(image)) })
 
 export function gradeResolution(width, height) {
   const mp = megapixels(width, height)
@@ -81,8 +86,7 @@ export function getCaptureHint(quality, torch) {
       const text = torch.on ? 'Too bright, so turn off the torch or move away from strong light.' : 'Too bright, so move away from strong light.'
       return { text, warn: true }
     }
-    if (!torch.supported) return { text: 'Too dark, so move to a brighter place.', warn: true }
-    return { text: torch.on ? 'Too dark, so move to a brighter place.' : 'Too dark, so turn on the torch.', warn: true }
+    return { text: torch.supported && !torch.on ? 'Too dark, so turn on the torch.' : 'Too dark, so move to a brighter place.', warn: true }
   }
 
   if (gradeSharpness(quality.sharpness) !== 'good') return { text: 'Slightly blurry, so hold the camera steady.', warn: true }
@@ -96,44 +100,31 @@ const ISSUES = {
   bright: { problem: 'too bright', advice: 'move away from strong light', tip: 'This photo is too bright, so move away from strong light.' },
   blurry: { problem: 'blurry', advice: 'hold the camera steady', tip: 'This photo is blurry, so hold the camera steady.' },
 }
+const brightnessIssue = (value) => (value < BRIGHTNESS.dim ? ISSUES.dark : ISSUES.bright)
 
 const joinList = (items) => (items.length > 1 ? `${items.slice(0, -1).join(', ')} and ${items.at(-1)}` : items[0])
 // Two checks can share the same advice, and it should only be said once.
 const joinAdvice = (issues) => joinList([...new Set(issues.map((issue) => issue.advice))])
 
-/**
- * Takes { width, height, bytes, brightness, sharpness }.
- * Returns { grades: { resolution, fileSize, brightness, sharpness }, summary: { grade, title, advice } }.
- */
+/** Takes { width, height, bytes, brightness, sharpness }. Returns the overall { grade, title, advice }. */
 export function gradePhoto({ width, height, bytes, brightness, sharpness }) {
-  const grades = {
-    resolution: gradeResolution(width, height),
-    fileSize: gradeFileSize(bytes),
-    brightness: gradeBrightness(brightness),
-    sharpness: gradeSharpness(sharpness),
-  }
   const issues = [
-    { grade: grades.resolution, ...ISSUES.resolution },
-    { grade: grades.fileSize, ...ISSUES.fileSize },
-    { grade: grades.brightness, ...(brightness < BRIGHTNESS.dim ? ISSUES.dark : ISSUES.bright) },
-    { grade: grades.sharpness, ...ISSUES.blurry },
+    { grade: gradeResolution(width, height), ...ISSUES.resolution },
+    { grade: gradeFileSize(bytes), ...ISSUES.fileSize },
+    { grade: gradeBrightness(brightness), ...brightnessIssue(brightness) },
+    { grade: gradeSharpness(sharpness), ...ISSUES.blurry },
   ].filter((issue) => issue.grade !== 'good')
 
   const poor = issues.filter((issue) => issue.grade === 'poor')
   if (poor.length > 0) {
     const list = joinList(poor.map((issue) => issue.problem))
-    return { grades, summary: { grade: 'poor', title: `Photo is ${list}`, advice: `Take the photo again and ${joinAdvice(poor)}.` } }
+    return { grade: 'poor', title: `Photo is ${list}`, advice: `Take the photo again and ${joinAdvice(poor)}.` }
   }
   if (issues.length > 0) {
     const title = issues.length === 1 ? 'Usable, with one warning' : `Usable, with ${issues.length} warnings`
-    return { grades, summary: { grade: 'warn', title, advice: `You can continue, or take the photo again and ${joinAdvice(issues)}.` } }
+    return { grade: 'warn', title, advice: `You can continue, or take the photo again and ${joinAdvice(issues)}.` }
   }
-  return { grades, summary: { grade: 'good', title: 'Photo looks good', advice: 'Ready to annotate.' } }
-}
-
-function formatFileSize(bytes) {
-  const kb = bytes / BYTES_PER_KB
-  return kb < BYTES_PER_KB ? `${Math.round(kb)} KB` : `${(kb / BYTES_PER_KB).toFixed(1)} MB`
+  return { grade: 'good', title: 'Photo looks good', advice: 'Ready to annotate.' }
 }
 
 /** Brightness is measured 0–255 and shown to people as 0–100%. */
@@ -146,6 +137,7 @@ export const brightnessPercent = (value) => Math.round((value / 255) * 100)
  */
 export function qualityChecks(bytes, quality) {
   const measured = Boolean(quality)
+  const kb = bytes / BYTES_PER_KB
   return [
     {
       label: 'Resolution',
@@ -155,7 +147,7 @@ export function qualityChecks(bytes, quality) {
     },
     {
       label: 'File size',
-      value: formatFileSize(bytes),
+      value: kb < BYTES_PER_KB ? `${Math.round(kb)} KB` : `${(kb / BYTES_PER_KB).toFixed(1)} MB`,
       grade: gradeFileSize(bytes),
       tip: ISSUES.fileSize.tip,
     },
@@ -163,7 +155,7 @@ export function qualityChecks(bytes, quality) {
       label: 'Brightness',
       value: measured ? `${brightnessPercent(quality.brightness)}%` : '–',
       grade: measured ? gradeBrightness(quality.brightness) : null,
-      tip: measured ? (quality.brightness < BRIGHTNESS.dim ? ISSUES.dark : ISSUES.bright).tip : null,
+      tip: measured ? brightnessIssue(quality.brightness).tip : null,
     },
     {
       label: 'Sharpness',

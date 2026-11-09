@@ -1,5 +1,7 @@
 // A rect is { x, y, width, height } in photo pixels; a point is { x, y }; a corner is 'top-left' etc.
 
+export const ZOOM = { max: 8, step: 0.4, ms: 150 }
+
 export function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max)
 }

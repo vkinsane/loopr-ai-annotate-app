@@ -1,38 +1,34 @@
 import { lazy, Suspense, useState } from 'react'
 import { ZoomIn } from '@mui/icons-material'
-import { Alert, AlertTitle, Box, Button, CircularProgress } from '@mui/material'
+import { Alert, AlertTitle, Box, Button } from '@mui/material'
 import ConfirmDialog from '../components/ConfirmDialog/ConfirmDialog.jsx'
 import QualityChecks from '../components/QualityChecks/QualityChecks.jsx'
 import ScreenLayout from '../components/ScreenLayout/ScreenLayout.jsx'
+import ScreenLoader from '../components/ScreenLoader/ScreenLoader.jsx'
 import ScrollThumb from '../components/ScrollThumb/ScrollThumb.jsx'
 import { usePhotoQuality } from '../hooks'
-import { gradePhoto, qualityChecks } from '../utils'
+import { GRADE_COLORS, gradePhoto, qualityChecks } from '../utils'
 import { styles } from './PreviewScreen.styles.js'
 
 // Loaded on the first Zoom tap; most photos are never zoomed.
 const ZoomViewer = lazy(() => import('../components/ZoomViewer/ZoomViewer.jsx'))
-const SEVERITY = { good: 'success', warn: 'warning', poor: 'error' }
 const MEASURE_FAILED = { grade: 'poor', title: "Couldn't read this photo", advice: 'Take the photo again to continue.' }
-
-/** `photo` is { blob, url, method }. `onAnnotate` receives the measured quality { width, height, brightness, sharpness }. */
 const TITLE = 'Preview & quality'
 
+/** `photo` is { blob, url, method }. `onAnnotate` receives the measured quality { width, height, brightness, sharpness }. */
 export default function PreviewScreen({ photo, boxCount, onRetake, onAnnotate }) {
   const [zooming, setZooming] = useState(false)
   const [confirming, setConfirming] = useState(false)
   const quality = usePhotoQuality(photo)
   const measured = quality && !quality.failed ? quality : null
-  const summary = quality?.failed ? MEASURE_FAILED : measured && gradePhoto({ bytes: photo.blob.size, ...measured }).summary
+  const summary = quality?.failed ? MEASURE_FAILED : measured && gradePhoto({ bytes: photo.blob.size, ...measured })
   const poor = summary?.grade === 'poor'
 
   // Drawn only once measured: the summary can be 1–4 lines, so showing it later would move the page.
   if (!quality) {
     return (
       <ScreenLayout title={TITLE} headerSx={styles.headerWidth}>
-        <Box component="main" role="status" sx={styles.checking}>
-          <CircularProgress />
-          Checking photo quality…
-        </Box>
+        <ScreenLoader label="Checking photo quality…" />
       </ScreenLayout>
     )
   }
@@ -62,7 +58,7 @@ export default function PreviewScreen({ photo, boxCount, onRetake, onAnnotate })
         </Box>
 
         <Box sx={styles.side}>
-          <Alert severity={SEVERITY[summary.grade]} role={poor ? 'alert' : 'status'}>
+          <Alert severity={GRADE_COLORS[summary.grade]} role={poor ? 'alert' : 'status'}>
             <AlertTitle>{summary.title}</AlertTitle>
             {summary.advice}
           </Alert>

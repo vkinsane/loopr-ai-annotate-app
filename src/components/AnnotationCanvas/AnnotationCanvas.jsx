@@ -2,18 +2,14 @@ import { useRef, useState } from 'react'
 import { Add, PanToolOutlined, Remove } from '@mui/icons-material'
 import { Box, IconButton, Typography } from '@mui/material'
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch'
-import { clamp, isTooSmall, moveRect, rectFromPoints, resizeRect } from '../../utils'
+import { boxLabel, clamp, isTooSmall, labelGoesBelow, moveRect, rectFromPoints, resizeRect, ZOOM } from '../../utils'
 import { styles } from './AnnotationCanvas.styles.js'
 
 const CORNERS = ['top-left', 'top-right', 'bottom-left', 'bottom-right']
 const MIN_BOX_SCREEN_PX = 12
-const LABEL_BELOW_FROM_TOP = 0.08
 const IDLE_HINT = 'Drag on the photo to add an annotation. Drag a box to move it, or a corner to resize it.'
 const DRAW_HINT = 'Lift your finger to add the box. Very small boxes are not added.'
 const MOVE_HINT = 'Drag to move the photo, or pinch to zoom. Tap the hand again to draw and edit boxes.'
-const MAX_ZOOM = 8
-const ZOOM_STEP = 0.4
-const ZOOM_MS = 150
 
 /**
  * Boxes are stored in photo pixels and drawn as percentages of the frame, so they stay on the same
@@ -32,7 +28,7 @@ export default function AnnotationCanvas({ photoUrl, size, items, selectedId, on
   // Lines, labels and handles divide by --zoom, so they stay the same size on screen.
   function handleTransform(_, { scale }) {
     layerRef.current?.style.setProperty('--zoom', scale)
-    setZoomLevel(scale <= 1.01 ? 'fit' : scale >= MAX_ZOOM - 0.01 ? 'max' : 'zoomed')
+    setZoomLevel(scale <= 1.01 ? 'fit' : scale >= ZOOM.max - 0.01 ? 'max' : 'zoomed')
   }
 
   function toPhotoPoint(event) {
@@ -105,7 +101,7 @@ export default function AnnotationCanvas({ photoUrl, size, items, selectedId, on
         <TransformWrapper
           ref={zoomRef}
           minScale={1}
-          maxScale={MAX_ZOOM}
+          maxScale={ZOOM.max}
           doubleClick={{ disabled: true }}
           panning={{ disabled: !moving, velocityDisabled: true }}
           onTransform={handleTransform}
@@ -123,9 +119,9 @@ export default function AnnotationCanvas({ photoUrl, size, items, selectedId, on
               {items.map((item) => {
                 const selected = item.id === selectedId
                 return (
-                  <Box key={item.id} data-id={item.id} title={item.label || 'Untitled'} sx={styles.box(item, size, selected ? 'selected' : 'other')}>
-                    <Box component="span" sx={styles.label(selected, item.y / size.height < LABEL_BELOW_FROM_TOP)}>
-                      {item.label || 'Untitled'}
+                  <Box key={item.id} data-id={item.id} title={boxLabel(item)} sx={styles.box(item, size, selected ? 'selected' : 'other')}>
+                    <Box component="span" sx={styles.label(selected, labelGoesBelow(item, size))}>
+                      {boxLabel(item)}
                     </Box>
                     {selected && CORNERS.map((corner) => <Box key={corner} data-corner={corner} sx={styles.handle(corner)} />)}
                   </Box>
@@ -140,10 +136,10 @@ export default function AnnotationCanvas({ photoUrl, size, items, selectedId, on
           <IconButton aria-label="Move the photo" aria-pressed={moving} disabled={zoomLevel === 'fit'} onClick={() => setHandOn(!handOn)} sx={styles.tool(moving)}>
             <PanToolOutlined fontSize="small" />
           </IconButton>
-          <IconButton aria-label="Zoom out" disabled={zoomLevel === 'fit'} onClick={() => zoomRef.current.zoomOut(ZOOM_STEP, ZOOM_MS)} sx={styles.tool(false)}>
+          <IconButton aria-label="Zoom out" disabled={zoomLevel === 'fit'} onClick={() => zoomRef.current.zoomOut(ZOOM.step, ZOOM.ms)} sx={styles.tool(false)}>
             <Remove fontSize="small" />
           </IconButton>
-          <IconButton aria-label="Zoom in" disabled={zoomLevel === 'max'} onClick={() => zoomRef.current.zoomIn(ZOOM_STEP, ZOOM_MS)} sx={styles.tool(false)}>
+          <IconButton aria-label="Zoom in" disabled={zoomLevel === 'max'} onClick={() => zoomRef.current.zoomIn(ZOOM.step, ZOOM.ms)} sx={styles.tool(false)}>
             <Add fontSize="small" />
           </IconButton>
         </Box>

@@ -1,5 +1,4 @@
-import { CARD_RADIUS } from '../theme.js'
-import { capitalize } from '../utils'
+import { CARD_RADIUS, cornerLines } from '../theme.js'
 
 const LANDSCAPE = '@media (orientation: landscape)'
 const GUIDE = { size: 32, inset: 24, line: '3px solid' }
@@ -24,8 +23,7 @@ export const styles = {
   video: { display: 'block', width: '100%', height: '100%' },
   guide: (vertical, horizontal) => ({
     position: 'absolute', [vertical]: GUIDE.inset, [horizontal]: GUIDE.inset, width: GUIDE.size, height: GUIDE.size,
-    [`border${capitalize(vertical)}`]: GUIDE.line, [`border${capitalize(horizontal)}`]: GUIDE.line,
-    [`border${capitalize(vertical)}${capitalize(horizontal)}Radius`]: 6, color: 'common.white',
+    ...cornerLines(vertical, horizontal, GUIDE.line, 6), color: 'common.white',
   }),
   saving: {
     position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 /**
  * The current screen, kept in step with the browser's Back and Forward buttons. `go` adds a history entry.
@@ -24,10 +24,10 @@ export function useScreenHistory(firstScreen, canShow) {
     return () => window.removeEventListener('popstate', handlePopState)
   }, [firstScreen])
 
-  const go = useCallback((next) => {
+  function go(next) {
     window.history.pushState({ screen: next }, '')
     setScreen(next)
-  }, [])
+  }
 
   return [screen, go]
 }

@@ -1,6 +1,24 @@
 // Rec. 601 luma weights
 const LUMA = { r: 0.299, g: 0.587, b: 0.114 }
 const RGBA_CHANNELS = 4
+const JPEG_QUALITY = 0.92
+
+/** A new canvas of the given size with `source` drawn on it. */
+export function drawToCanvas(source, width, height) {
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const context = canvas.getContext('2d')
+  if (!context) throw new Error('Canvas 2D context is not available')
+  context.drawImage(source, 0, 0)
+  return canvas
+}
+
+export function canvasToJpeg(canvas) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((result) => (result ? resolve(result) : reject(new Error('Could not encode the photo'))), 'image/jpeg', JPEG_QUALITY)
+  })
+}
 
 /** Returns { pixels, width, height } with one byte of luma per pixel. */
 export function readGreyImage(canvas, source, sourceWidth, sourceHeight, width) {

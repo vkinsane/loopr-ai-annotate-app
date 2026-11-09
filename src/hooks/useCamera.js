@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { IN_USE_ERROR, UNSUPPORTED_ERROR, canUseCamera, toCameraError } from '../utils'
+import { IN_USE_ERROR, UNSUPPORTED_ERROR, canUseCamera, canvasToJpeg, drawToCanvas, toCameraError } from '../utils'
 
 // `ideal` never rejects, unlike `exact` or `min`. 4:3 matches most phone sensors, so nothing is cropped to 16:9.
 const CONSTRAINTS = {
@@ -10,8 +10,6 @@ const CONSTRAINTS = {
     height: { ideal: 3072 },
   },
 }
-
-const JPEG_QUALITY = 0.92
 
 function isPageVisible() {
   return document.visibilityState === 'visible'
@@ -103,20 +101,7 @@ export function useCamera(videoRef) {
         }
       }
 
-      const canvas = document.createElement('canvas')
-      canvas.width = video.videoWidth
-      canvas.height = video.videoHeight
-      const context = canvas.getContext('2d')
-      if (!context) throw new Error('Canvas 2D context is not available')
-      context.drawImage(video, 0, 0)
-      const blob = await new Promise((resolve, reject) => {
-        canvas.toBlob(
-          (result) => (result ? resolve(result) : reject(new Error('Could not encode the photo'))),
-          'image/jpeg',
-          JPEG_QUALITY,
-        )
-      })
-      return toPhoto(blob, 'canvas')
+      return toPhoto(await canvasToJpeg(drawToCanvas(video, video.videoWidth, video.videoHeight)), 'canvas')
     } catch (error) {
       video.play().catch((playError) => console.warn('Could not resume the preview', playError))
       throw error

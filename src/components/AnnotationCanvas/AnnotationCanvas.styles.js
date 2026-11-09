@@ -1,6 +1,6 @@
 import { alpha } from '@mui/material'
-import { CARD_RADIUS } from '../../theme.js'
-import { toPercent } from '../../utils'
+import { CARD_RADIUS, INK_OUTLINE } from '../../theme.js'
+import { percentRect } from '../../utils'
 
 // Selected and draft boxes use the brand indigo. Other boxes are lime with a navy outline so they show on any paint colour.
 const lineColor = (variant) => (theme) => (variant === 'other' ? theme.palette.brand.lime : theme.palette.primary.main)
@@ -11,7 +11,7 @@ const UNZOOM = 'scale(calc(1 / var(--zoom, 1)))'
 
 export const styles = {
   // One bordered card: the photo, with the hint as its footer. The backdrop fills the sides of a portrait photo.
-  root: { gridArea: { md: 'photo' }, alignSelf: 'start', border: 1, borderColor: 'divider', borderRadius: CARD_RADIUS, overflow: 'hidden', bgcolor: 'brand.photoBackdrop' },
+  root: { gridArea: { md: 'photo' }, alignSelf: 'start', border: 1, borderColor: 'divider', borderRadius: CARD_RADIUS, overflow: 'hidden', bgcolor: 'brand.carbonRaised' },
   // Largest box with the photo's shape that fits: full width, capped by screen height.
   frame: (ratio, moving) => ({
     position: 'relative', aspectRatio: String(ratio), mx: 'auto', overflow: 'hidden',
@@ -24,12 +24,10 @@ export const styles = {
   // While the hand is on, touches pass through to the zoom library.
   layer: (moving) => ({ position: 'absolute', inset: 0, touchAction: 'none', cursor: 'crosshair', pointerEvents: moving ? 'none' : 'auto' }),
   box: (rect, size, variant) => ({
-    position: 'absolute', boxSizing: 'border-box', cursor: 'move',
-    left: toPercent(rect.x, size.width), top: toPercent(rect.y, size.height),
-    width: toPercent(rect.width, size.width), height: toPercent(rect.height, size.height),
+    position: 'absolute', boxSizing: 'border-box', cursor: 'move', ...percentRect(rect, size),
     border: `${unzoomed(variant === 'selected' ? 3 : 2)} ${variant === 'draft' ? 'dashed' : 'solid'}`, borderColor: lineColor(variant),
     bgcolor: (theme) => alpha(lineColor(variant)(theme), 0.14), zIndex: variant === 'other' ? 0 : 1,
-    boxShadow: variant === 'other' ? (theme) => `0 0 0 ${unzoomed(1)} ${theme.palette.brand.ink}, inset 0 0 0 ${unzoomed(1)} ${theme.palette.brand.ink}` : 'none',
+    boxShadow: variant === 'other' ? (theme) => INK_OUTLINE(theme, unzoomed(1)) : 'none',
   }),
   label: (selected, below) => ({
     // The selected label starts after the corner handle's dot, so the dot stays visible.

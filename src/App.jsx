@@ -30,22 +30,18 @@ function App() {
     return true
   }
 
-  function startOver() {
-    setPhoto(null)
-    setQuality(null)
-    setPhotoName('')
-    dispatch({ type: 'reset' })
-    go('capture')
-  }
-
-  // A new photo replaces the old one and its boxes. A picked photo skips the camera.
-  function handleNewPhoto(newPhoto) {
+  // A new photo replaces the old one and its boxes.
+  function replacePhoto(newPhoto, nextScreen) {
     setPhoto(newPhoto)
     setQuality(null)
     setPhotoName('')
     dispatch({ type: 'reset' })
-    go('preview')
+    go(nextScreen)
   }
+
+  const startOver = () => replacePhoto(null, 'capture')
+  // A picked photo skips the camera.
+  const handleNewPhoto = (newPhoto) => replacePhoto(newPhoto, 'preview')
 
   function handleMeasured(measured) {
     setQuality(measured)

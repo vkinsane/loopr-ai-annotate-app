@@ -1,20 +1,18 @@
 import { alpha } from '@mui/material'
-import { CARD_RADIUS } from '../../theme.js'
-import { toPercent } from '../../utils'
+import { CARD_RADIUS, INK_OUTLINE } from '../../theme.js'
+import { percentRect } from '../../utils'
 
 export const styles = {
   frame: (ratio) => ({
     position: 'relative', aspectRatio: String(ratio), mx: 'auto', alignSelf: 'start',
     width: { xs: `min(100%, max(60px, min(42dvh, 100dvh - 520px)) * ${ratio})`, sm: `min(100%, 36dvh * ${ratio})`, md: `min(100%, (100dvh - 90px) * ${ratio})` },
-    border: 1, borderColor: 'divider', borderRadius: CARD_RADIUS, overflow: 'hidden', bgcolor: 'brand.photoBackdrop',
+    border: 1, borderColor: 'divider', borderRadius: CARD_RADIUS, overflow: 'hidden', bgcolor: 'brand.carbonRaised',
   }),
   photo: { display: 'block', width: '100%', height: '100%' },
   box: (rect, size) => ({
-    position: 'absolute', boxSizing: 'border-box',
-    left: toPercent(rect.x, size.width), top: toPercent(rect.y, size.height),
-    width: toPercent(rect.width, size.width), height: toPercent(rect.height, size.height),
+    position: 'absolute', boxSizing: 'border-box', ...percentRect(rect, size),
     border: 2, borderColor: 'brand.lime', bgcolor: (theme) => alpha(theme.palette.brand.lime, 0.14),
-    boxShadow: (theme) => `0 0 0 1px ${theme.palette.brand.ink}, inset 0 0 0 1px ${theme.palette.brand.ink}`,
+    boxShadow: (theme) => INK_OUTLINE(theme),
   }),
   label: (below) => ({
     position: 'absolute', left: -2, [below ? 'top' : 'bottom']: '100%', px: 0.5, maxWidth: 160,

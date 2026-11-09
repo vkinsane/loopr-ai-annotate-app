@@ -1,6 +1,5 @@
 import { alpha, keyframes } from '@mui/material'
-import { CARD_RADIUS } from '../../theme.js'
-import { capitalize } from '../../utils'
+import { CARD_RADIUS, cornerLines, INK_OUTLINE } from '../../theme.js'
 
 // Timeline (% of 6 s): aim 0–20, shutter flash ~20, quality pill from 30, boxes drawn at ~55 and ~67, fade out 92–100.
 const LOOP = '6s infinite'
@@ -28,15 +27,14 @@ export const styles = {
   frame: (theme) => ({
     // Phone and tablet: shrinks on short screens so the page still fits. The steps below keep their full width.
     width: { xs: 'min(100%, max(120px, 100dvh - 500px) * 4 / 3)', sm: 'min(100%, max(200px, 100dvh - 590px) * 4 / 3)', md: '100%' }, mx: 'auto',
-    position: 'relative', aspectRatio: '4 / 3', borderRadius: CARD_RADIUS, overflow: 'hidden', bgcolor: 'brand.photoBackdrop',
+    position: 'relative', aspectRatio: '4 / 3', borderRadius: CARD_RADIUS, overflow: 'hidden', bgcolor: 'brand.carbonRaised',
     boxShadow: `0 12px 32px ${alpha(theme.palette.brand.ink, 0.18)}`,
   }),
   photo: { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' },
   guides: { position: 'absolute', inset: 18, opacity: 0, ...animate(`${guides} ${LOOP}`) },
   corner: (vertical, horizontal) => ({
     position: 'absolute', [vertical]: 0, [horizontal]: 0, width: 24, height: 24, color: 'brand.snow',
-    [`border${capitalize(vertical)}`]: '3px solid', [`border${capitalize(horizontal)}`]: '3px solid',
-    [`border${capitalize(vertical)}${capitalize(horizontal)}Radius`]: 5,
+    ...cornerLines(vertical, horizontal, '3px solid', 5),
   }),
   flash: { position: 'absolute', inset: 0, bgcolor: 'brand.white', opacity: 0, ...animate(`${flash} ${LOOP}`) },
   boxSelected: (theme) => ({
@@ -48,7 +46,7 @@ export const styles = {
   boxOther: (theme) => ({
     ...boxBase, left: '17.5%', top: '49.3%', width: '7%', height: '7.5%',
     border: 2, borderColor: 'brand.lime', bgcolor: alpha(theme.palette.brand.lime, 0.14),
-    boxShadow: `0 0 0 1px ${theme.palette.brand.ink}, inset 0 0 0 1px ${theme.palette.brand.ink}`,
+    boxShadow: INK_OUTLINE(theme),
     ...animate(`${drawAt(64)} ${LOOP}`),
   }),
   labelOther: { ...labelBase, left: -2, top: '100%', mt: 0.25, bgcolor: 'brand.lime', color: 'brand.ink' },

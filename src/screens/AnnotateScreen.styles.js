@@ -1,18 +1,20 @@
-import { TABLE_HEADER } from '../theme.js'
+import { SCREEN_BODY, TABLE_HEADER } from '../theme.js'
+
+const MAX_WIDTH = 1200
 
 // The screen is exactly one window tall: the photo shrinks to fit and the annotation list scrolls inside.
 // Phone: one column, Done at the bottom. Tablet: same column, quality as a 2 × 2 grid.
 // Desktop: photo on the left; list, quality and Done in a 370 px sidebar whose bottom lines up with the photo's.
 export const styles = {
   root: {
-    position: 'relative', flex: 1, minHeight: 0, width: '100%', overflowY: 'auto', maxWidth: 1200, mx: 'auto', p: 2, pb: { xs: 0, md: 2 }, display: 'grid', gap: 2,
+    ...SCREEN_BODY, maxWidth: MAX_WIDTH, p: 2, pb: { xs: 0, md: 2 }, display: 'grid', gap: 2,
     gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 1fr) 370px' },
     // max-content: the photo card clips its overflow, so an `auto` row could collapse and let the sidebar overlap it.
     // The minimums stop the sidebar being squeezed on very short screens: the screen scrolls instead of overlapping.
     gridTemplateRows: { xs: 'max-content minmax(201px, 1fr)', sm: 'max-content minmax(381px, 1fr)', md: 'max-content' }, alignContent: { md: 'start' },
     gridTemplateAreas: { md: '"photo side"' },
   },
-  headerWidth: { maxWidth: 1200 },
+  headerWidth: { maxWidth: MAX_WIDTH },
   qualityPill: { display: { xs: 'none', sm: 'block' } },
   newPhoto: { flexShrink: 0, ml: 1 },
   // Desktop: height 0 + min-height 100% means the photo alone sets the row height; a long list scrolls instead of growing it.

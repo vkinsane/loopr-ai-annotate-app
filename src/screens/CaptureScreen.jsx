@@ -4,13 +4,12 @@ import { Box, ButtonBase, CircularProgress, IconButton, ThemeProvider, Typograph
 import BackButton from '../components/BackButton/BackButton.jsx'
 import LiveQualityChips from '../components/LiveQualityChips/LiveQualityChips.jsx'
 import { useCamera, useLiveQuality, useTorch } from '../hooks'
-import { cameraTheme } from '../theme.js'
+import { cameraTheme, CORNERS } from '../theme.js'
 import { getCaptureHint } from '../utils'
 import CameraErrorScreen from './CameraErrorScreen.jsx'
 import { styles } from './CaptureScreen.styles.js'
 
 const DEFAULT_ASPECT_RATIO = 4 / 3
-const CORNERS = [['top', 'left'], ['top', 'right'], ['bottom', 'left'], ['bottom', 'right']]
 
 /** `onCapture` and `onPickPhoto` both receive { blob, url, method }. */
 export default function CaptureScreen({ onBack, onCapture, onPickPhoto }) {
@@ -18,8 +17,9 @@ export default function CaptureScreen({ onBack, onCapture, onPickPhoto }) {
   const { state, retry, capture } = useCamera(videoRef)
   const [capturing, setCapturing] = useState(false)
   const [captureFailed, setCaptureFailed] = useState(false)
-  const torch = useTorch(state.status === 'live' ? state.track : null)
-  const quality = useLiveQuality(videoRef, state.status === 'live' && !capturing)
+  const live = state.status === 'live'
+  const torch = useTorch(live ? state.track : null)
+  const quality = useLiveQuality(videoRef, live && !capturing)
 
   if (state.status === 'error') {
     return (
@@ -42,7 +42,7 @@ export default function CaptureScreen({ onBack, onCapture, onPickPhoto }) {
     }
   }
 
-  const aspectRatio = state.status === 'live' ? state.width / state.height : DEFAULT_ASPECT_RATIO
+  const aspectRatio = live ? state.width / state.height : DEFAULT_ASPECT_RATIO
   const hint = captureFailed ? { text: "Couldn't take the photo, so try again.", warn: true } : getCaptureHint(quality, torch)
 
   return (
@@ -52,12 +52,12 @@ export default function CaptureScreen({ onBack, onCapture, onPickPhoto }) {
           <Box sx={styles.topBar}>
             <BackButton disabled={capturing} onClick={onBack} sx={styles.back} />
             <LiveQualityChips
-              resolution={state.status === 'live' ? { width: state.width, height: state.height } : null}
+              resolution={live ? { width: state.width, height: state.height } : null}
               quality={quality}
             />
           </Box>
           <Box sx={styles.viewport}>
-            <Box sx={styles.frame(aspectRatio, state.status === 'live')}>
+            <Box sx={styles.frame(aspectRatio, live)}>
               {/* playsInline and muted are required for inline autoplay on iOS Safari. */}
               <video ref={videoRef} autoPlay playsInline muted aria-label="Live camera view" style={styles.video} />
               {CORNERS.map(([vertical, horizontal]) => (
@@ -77,7 +77,7 @@ export default function CaptureScreen({ onBack, onCapture, onPickPhoto }) {
           <Typography sx={styles.hint(hint.warn)}>{hint.text}</Typography>
           <ButtonBase
             aria-label="Take photo"
-            disabled={state.status !== 'live' || capturing}
+            disabled={!live || capturing}
             onClick={handleCapture}
             sx={styles.shutter}
           >

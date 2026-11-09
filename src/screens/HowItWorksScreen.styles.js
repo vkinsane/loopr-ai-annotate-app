@@ -1,13 +1,15 @@
-import { CARD_RADIUS } from '../theme.js'
+import { CARD_RADIUS, SCREEN_BODY } from '../theme.js'
+
+const MAX_WIDTH = { xs: 480, sm: 608, md: 1168 }
 
 // Phone and tablet: one column, Open camera pinned to the bottom (tablet column 560 px).
 // Desktop: the three steps side by side, tips and Open camera in one row at the bottom. Nothing is vertically centred: centring moves the page when a step grows.
 export const styles = {
   root: {
-    position: 'relative', flex: 1, minHeight: 0, width: '100%', overflowY: 'auto', maxWidth: { xs: 480, sm: 608, md: 1168 }, mx: 'auto', px: { xs: 2, sm: 3 }, pt: { xs: 1, sm: 3 }, pb: { md: 5 },
+    ...SCREEN_BODY, maxWidth: MAX_WIDTH, px: { xs: 2, sm: 3 }, pt: { xs: 1, sm: 3 }, pb: { md: 5 },
     display: 'flex', flexDirection: 'column',
   },
-  headerWidth: { maxWidth: { xs: 480, sm: 608, md: 1168 }, px: { xs: 2, sm: 3 } },
+  headerWidth: { maxWidth: MAX_WIDTH, px: { xs: 2, sm: 3 } },
   steps: {
     listStyle: 'none', m: 0, mt: { xs: 1, sm: 0 }, p: 0, gap: { xs: 1.5, md: 2.5 },
     display: { xs: 'flex', md: 'grid' }, flexDirection: 'column', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
@@ -24,7 +26,7 @@ export const styles = {
   stepText: { typography: 'body2', color: 'text.secondary' },
   // Each state is one 52 px control plus one line, so the page doesn't move when the state changes.
   permission: { display: 'flex', flexDirection: 'column', gap: 1.5 },
-  noCamera: { typography: 'body2', color: 'text.secondary', textAlign: 'center' },
+  helperText: { typography: 'body2', color: 'text.secondary', textAlign: 'center' },
   allowed: {
     height: 52, borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1,
     bgcolor: 'success.tint', color: 'success.dark', typography: 'button', fontSize: 15,

@@ -1,8 +1,8 @@
 import { Check, CheckCircleOutlined, CropFree, PanToolOutlined, PhotoCameraOutlined, WbSunnyOutlined } from '@mui/icons-material'
 import { Alert, AlertTitle, Box, Button, CircularProgress, Paper, Typography } from '@mui/material'
+import ChoosePhotoButton from '../components/ChoosePhotoButton/ChoosePhotoButton.jsx'
 import ScreenLayout from '../components/ScreenLayout/ScreenLayout.jsx'
 import ScrollThumb from '../components/ScrollThumb/ScrollThumb.jsx'
-import ChoosePhotoButton from '../components/ChoosePhotoButton/ChoosePhotoButton.jsx'
 import { useCameraPermission } from '../hooks'
 import { VISUALLY_HIDDEN } from '../theme.js'
 import { styles } from './HowItWorksScreen.styles.js'
@@ -30,29 +30,18 @@ export default function HowItWorksScreen({ onBack, onStart, onPickPhoto }) {
   const allowed = state.status === 'allowed'
 
   const noCamera = (
-    <Typography sx={styles.noCamera}>
+    <Typography sx={styles.helperText}>
       No camera? <ChoosePhotoButton asLink onPick={onPickPhoto} />
     </Typography>
   )
 
   return (
-    <ScreenLayout title="Before you start" onBack={onBack} backLabel="Back" headerSx={styles.headerWidth}>
+    <ScreenLayout title="Before you start" onBack={onBack} headerSx={styles.headerWidth}>
       <Box sx={styles.root}>
         <ScrollThumb />
         <Box component="ol" sx={styles.steps}>
           <Paper component="li" variant="outlined" sx={styles.step}>
-            <Box sx={styles.stepHeading}>
-              <Box component="span" sx={styles.stepNumber(allowed)}>
-                {allowed ? <Check fontSize="small" /> : 1}
-                {allowed && <Box component="span" sx={VISUALLY_HIDDEN}>Step 1 done</Box>}
-              </Box>
-              <Box>
-                <Typography component="h2" sx={styles.stepTitle}>
-                  Allow the camera
-                </Typography>
-                <Typography sx={styles.stepText}>Used only to take inspection photos. Photos stay on this device.</Typography>
-              </Box>
-            </Box>
+            <StepHeading number={1} done={allowed} title="Allow the camera" text="Used only to take inspection photos. Photos stay on this device." />
 
             <Box aria-live="polite" sx={styles.permission}>
               {state.status === 'idle' && (
@@ -68,7 +57,7 @@ export default function HowItWorksScreen({ onBack, onStart, onPickPhoto }) {
                   <Button variant="outlined" size="large" disabled startIcon={<CircularProgress size={18} color="inherit" />}>
                     Waiting for your answer…
                   </Button>
-                  <Typography sx={styles.noCamera}>
+                  <Typography sx={styles.helperText}>
                     Choose <strong>Allow</strong> in the pop-up.
                   </Typography>
                 </>
@@ -79,7 +68,7 @@ export default function HowItWorksScreen({ onBack, onStart, onPickPhoto }) {
                     <CheckCircleOutlined fontSize="small" />
                     Camera allowed
                   </Box>
-                  <Typography sx={styles.noCamera}>You are ready. Tap Open camera.</Typography>
+                  <Typography sx={styles.helperText}>You are ready. Tap Open camera.</Typography>
                 </>
               )}
               {state.status === 'error' && (
@@ -113,17 +102,7 @@ export default function HowItWorksScreen({ onBack, onStart, onPickPhoto }) {
 
           {LATER_STEPS.map(({ title, text }, index) => (
             <Paper component="li" variant="outlined" key={title} sx={styles.laterStep(state.status === 'error')}>
-              <Box sx={styles.stepHeading}>
-                <Box component="span" sx={styles.stepNumber(false)}>
-                  {index + 2}
-                </Box>
-                <Box>
-                  <Typography component="h2" sx={styles.stepTitle}>
-                    {title}
-                  </Typography>
-                  <Typography sx={styles.stepText}>{text}</Typography>
-                </Box>
-              </Box>
+              <StepHeading number={index + 2} title={title} text={text} />
             </Paper>
           ))}
         </Box>
@@ -153,5 +132,20 @@ export default function HowItWorksScreen({ onBack, onStart, onPickPhoto }) {
         </Box>
       </Box>
     </ScreenLayout>
+  )
+}
+
+function StepHeading({ number, done = false, title, text }) {
+  return (
+    <Box sx={styles.stepHeading}>
+      <Box component="span" sx={styles.stepNumber(done)}>
+        {done ? <Check fontSize="small" /> : number}
+        {done && <Box component="span" sx={VISUALLY_HIDDEN}>Step {number} done</Box>}
+      </Box>
+      <Box>
+        <Typography component="h2" sx={styles.stepTitle}>{title}</Typography>
+        <Typography sx={styles.stepText}>{text}</Typography>
+      </Box>
+    </Box>
   )
 }

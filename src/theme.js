@@ -78,7 +78,7 @@ export const theme = createTheme({
     divider: BRAND.border,
     // Lighter than MUI's grey so a disabled button reads as "not yet", not as broken. Text still passes AA.
     action: { disabledBackground: '#e9edf5', disabled: '#6b7b92' },
-    brand: { ...BRAND, photoBackdrop: BRAND.carbonRaised },
+    brand: BRAND,
   },
 })
 
@@ -127,11 +127,19 @@ export const SCROLL_SHADOWS = (theme) => {
 }
 
 // Strings, not numbers: in MUI's sx, width/height values from 0 to 1 mean a percentage (1 = 100%).
-export const VISUALLY_HIDDEN = {
-  position: 'absolute',
-  width: '1px',
-  height: '1px',
-  overflow: 'hidden',
-  clip: 'rect(0 0 0 0)',
-  whiteSpace: 'nowrap',
-}
+export const VISUALLY_HIDDEN = { position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap' }
+
+/** The part of a screen below the header bar. It does its own scrolling; position: relative is for ScrollThumb. */
+export const SCREEN_BODY = { position: 'relative', flex: 1, minHeight: 0, width: '100%', overflowY: 'auto', mx: 'auto' }
+
+/** A navy line just outside and inside a lime box, so it shows on any photo. */
+export const INK_OUTLINE = (theme, width = '1px') => `0 0 0 ${width} ${theme.palette.brand.ink}, inset 0 0 0 ${width} ${theme.palette.brand.ink}`
+
+export const CORNERS = [['top', 'left'], ['top', 'right'], ['bottom', 'left'], ['bottom', 'right']]
+const capitalize = (word) => word[0].toUpperCase() + word.slice(1)
+
+/** The two border lines and the rounding of one viewfinder corner. */
+export const cornerLines = (vertical, horizontal, line, radius) => ({
+  [`border${capitalize(vertical)}`]: line, [`border${capitalize(horizontal)}`]: line,
+  [`border${capitalize(vertical)}${capitalize(horizontal)}Radius`]: radius,
+})

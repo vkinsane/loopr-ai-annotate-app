@@ -2,16 +2,17 @@ import { useRef, useState } from 'react'
 import { EditOutlined, FileDownloadOutlined } from '@mui/icons-material'
 import { Box, Button, IconButton, InputAdornment, Paper, TextField, Typography, useTheme } from '@mui/material'
 import AnnotationList from '../components/AnnotationList/AnnotationList.jsx'
-import ScreenLayout from '../components/ScreenLayout/ScreenLayout.jsx'
-import ScrollThumb from '../components/ScrollThumb/ScrollThumb.jsx'
 import ConfirmDialog from '../components/ConfirmDialog/ConfirmDialog.jsx'
 import PhotoWithBoxes from '../components/PhotoWithBoxes/PhotoWithBoxes.jsx'
+import ScreenLayout from '../components/ScreenLayout/ScreenLayout.jsx'
+import ScrollThumb from '../components/ScrollThumb/ScrollThumb.jsx'
 import StatusBadge from '../components/StatusBadge/StatusBadge.jsx'
 import { exportAnnotatedPhoto, finishText, GRADE_LABELS, gradePhoto, TEXT_RULES, validateText } from '../utils'
 import { styles } from './SummaryScreen.styles.js'
 
 const DEFAULT_NAME = 'annotated-photo'
 const NAME_RULE = TEXT_RULES.photoName
+const REVOKE_URL_AFTER_MS = 1000
 
 /** Read-only result: the annotated photo, a short summary, and a download of the photo with the boxes drawn on. */
 export default function SummaryScreen({ photo, quality, items, photoName, onPhotoNameChange, onBack, onNewPhoto }) {
@@ -20,7 +21,12 @@ export default function SummaryScreen({ photo, quality, items, photoName, onPhot
   const [nameNote, setNameNote] = useState(null) // the message from validation: shown in place of the caption, so nothing moves
   const nameInput = useRef(null)
   const [confirming, setConfirming] = useState(false)
-  const grade = gradePhoto({ bytes: photo.blob.size, ...quality }).summary.grade
+  const grade = gradePhoto({ bytes: photo.blob.size, ...quality }).grade
+
+  function applyName({ value, message }) {
+    onPhotoNameChange(value)
+    setNameNote(message)
+  }
 
   async function handleDownload() {
     setDownload('working')
@@ -31,7 +37,7 @@ export default function SummaryScreen({ photo, quality, items, photoName, onPhot
       const link = Object.assign(document.createElement('a'), { href: url, download: `${photoName.trim() || DEFAULT_NAME}.jpg` })
       link.click()
       // Some browsers start the download after click() returns, so the URL is freed a little later.
-      window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+      window.setTimeout(() => URL.revokeObjectURL(url), REVOKE_URL_AFTER_MS)
       setDownload('done')
     } catch (error) {
       console.error('Photo download failed', error)
@@ -69,16 +75,8 @@ export default function SummaryScreen({ photo, quality, items, photoName, onPhot
               value={photoName}
               placeholder={DEFAULT_NAME}
               inputRef={nameInput}
-              onChange={(event) => {
-                const { value, message } = validateText(event.target.value, NAME_RULE)
-                onPhotoNameChange(value)
-                setNameNote(message)
-              }}
-              onBlur={() => {
-                const { value, message } = finishText(photoName, NAME_RULE)
-                onPhotoNameChange(value)
-                setNameNote(message)
-              }}
+              onChange={(event) => applyName(validateText(event.target.value, NAME_RULE))}
+              onBlur={() => applyName(finishText(photoName, NAME_RULE))}
               onKeyDown={(event) => event.key === 'Enter' && event.currentTarget.querySelector('input')?.blur()}
               slotProps={{
                 inputLabel: { shrink: true },

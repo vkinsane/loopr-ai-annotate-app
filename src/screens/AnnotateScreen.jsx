@@ -7,10 +7,8 @@ import QualityChecks from '../components/QualityChecks/QualityChecks.jsx'
 import ScreenLayout from '../components/ScreenLayout/ScreenLayout.jsx'
 import ScrollThumb from '../components/ScrollThumb/ScrollThumb.jsx'
 import StatusBadge from '../components/StatusBadge/StatusBadge.jsx'
-import { gradePhoto, qualityChecks } from '../utils'
+import { gradePhoto, plural, qualityChecks } from '../utils'
 import { styles } from './AnnotateScreen.styles.js'
-
-const plural = (count, one, many = `${one}s`) => `${count} ${count === 1 ? one : many}`
 
 /**
  * `photo` is { blob, url }, `quality` the measured { width, height, brightness, sharpness }.
@@ -21,7 +19,7 @@ export default function AnnotateScreen({ photo, quality, annotations, dispatch, 
   const [confirming, setConfirming] = useState(false)
   const checks = qualityChecks(photo.blob.size, quality)
   const issues = checks.filter((check) => check.grade !== 'good')
-  const overall = gradePhoto({ bytes: photo.blob.size, ...quality }).summary.grade
+  const overall = gradePhoto({ bytes: photo.blob.size, ...quality }).grade
 
   // Delete removes the selected box and Escape deselects, except while typing a label.
   useEffect(() => {

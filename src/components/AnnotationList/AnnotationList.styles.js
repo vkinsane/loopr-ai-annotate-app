@@ -1,5 +1,8 @@
 import { SCROLL_SHADOWS, TABLE_BODY_RADIUS, TABLE_HEADER } from '../../theme.js'
 
+const ROW_LINE = { '&:not(:last-of-type)': { borderBottom: 1, borderColor: 'divider' } }
+const ROW_BUTTON = { width: { xs: 44, md: 36 }, height: { xs: 44, md: 36 } }
+
 export const styles = {
   // Inside a fixed-height sidebar, the list scrolls on its own and the heading stays.
   // Takes all spare height, empty or not, so adding the first box doesn't move what is below.
@@ -24,10 +27,9 @@ export const styles = {
   row: (selected) => ({
     display: 'flex', alignItems: 'center', columnGap: 1, pl: 1.5, pr: 0.5, cursor: 'pointer', transition: 'background-color 120ms',
     bgcolor: selected ? 'brand.tint' : 'transparent', '&:hover': { bgcolor: selected ? 'brand.tint' : 'action.hover' },
-    boxShadow: selected ? (theme) => `inset 3px 0 0 ${theme.palette.primary.main}` : 'none',
-    '&:not(:last-of-type)': { borderBottom: 1, borderColor: 'divider' },
+    boxShadow: selected ? (theme) => `inset 3px 0 0 ${theme.palette.primary.main}` : 'none', ...ROW_LINE,
   }),
-  readOnlyRow: { display: 'flex', alignItems: 'center', gap: 1.25, px: 1.75, py: 1.5, '&:not(:last-of-type)': { borderBottom: 1, borderColor: 'divider' } },
+  readOnlyRow: { display: 'flex', alignItems: 'center', gap: 1.25, px: 1.75, py: 1.5, ...ROW_LINE },
   readOnlyName: { flexGrow: 1, minWidth: 0, typography: 'body1', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
   readOnlySize: { flexShrink: 0, typography: 'caption', color: 'text.secondary', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' },
   // Same colours as the box on the photo: indigo when selected, lime with a navy outline otherwise.
@@ -42,6 +44,6 @@ export const styles = {
   // Phones need the room for the name; the Summary screen shows the size.
   size: { display: { xs: 'none', sm: 'block' }, typography: 'caption', color: 'text.secondary', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' },
   note: (note) => ({ typography: 'caption', fontSize: 13, bgcolor: note?.warn ? 'warning.dark' : 'brand.ink', color: 'common.white' }),
-  edit: { width: { xs: 44, md: 36 }, height: { xs: 44, md: 36 }, flexShrink: 0, color: 'text.secondary', '& svg': { fontSize: { xs: 20, md: 18 } } },
-  remove: (selected) => ({ width: { xs: 44, md: 36 }, height: { xs: 44, md: 36 }, color: selected ? 'error.main' : 'text.secondary', '& svg': { fontSize: { md: 20 } } }),
+  edit: { ...ROW_BUTTON, flexShrink: 0, color: 'text.secondary', '& svg': { fontSize: { xs: 20, md: 18 } } },
+  remove: (selected) => ({ ...ROW_BUTTON, color: selected ? 'error.main' : 'text.secondary', '& svg': { fontSize: { md: 20 } } }),
 }
