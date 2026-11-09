@@ -1,4 +1,4 @@
-# Loopr Annotate
+# <img src="docs/logo.svg" alt="" width="32" height="32" align="absmiddle"> Loopr Annotate
 
 A mobile-first web app for photo inspection: take a photo, check its quality, and annotate it with labelled boxes.
 
@@ -26,10 +26,7 @@ npm run dev       # http://localhost:5173
 npm run build     # production build in dist/
 npm run preview   # serve the production build
 npm run lint      # oxlint
-npm run test:e2e  # Playwright; builds the app first
 ```
-
-**Camera access needs a secure page:** `https://` or `localhost`. A phone on the same Wi-Fi opening `http://<laptop-ip>:5173` will load the app, but the camera stays blocked.
 
 </details>
 
@@ -105,24 +102,6 @@ npm run test:e2e  # Playwright; builds the app first
 - Folders by file type: `screens/`, `components/`, `hooks/` (browser APIs and lifecycle), `utils/` (pure logic).
 - No component file over 250 lines. Styles live in a `*.styles.js` file next to each component.
 - See [ARCHITECTURE.md](ARCHITECTURE.md) for the full structure and rules.
-
-</details>
-
-<details>
-<summary><strong>Known limitations</strong></summary>
-
-- **Thresholds are not calibrated.** The sharpness values in particular are starting points. They need measuring from sharp and deliberately blurred photos on the target devices.
-- **File size is a weak quality signal:** it depends on JPEG compression as much as on detail.
-- **Nothing is saved:** annotations live in memory only, and reloading the page loses the photo and the boxes. The only export is the downloaded JPEG; there is no JSON export of the boxes.
-- **No undo.** A deleted box can't be brought back.
-- **iPhone:**
-  - No `ImageCapture`, so the photo is a video frame. Its resolution depends on what the stream delivers.
-  - The browser's address bar can't be hidden from a web page.
-  - The "Camera access is blocked" steps describe Chrome's site settings; on iPhone the permission is in the iOS Settings app.
-- **While the photo is touched for drawing, the page can't scroll:** on a phone, scroll by touching outside the photo.
-- **Very large photos may fail to download on iPhone:** Safari limits canvas size (about 16.7 MP). The app shows "Couldn't make the photo" in that case.
-- **Checks run in the browser only.** Browser checks can be bypassed, so a future backend must repeat them (OWASP). Today there is no server, so nothing leaves the device.
-- **Not deployed yet.** The brief requires a public HTTPS deployment.
 
 </details>
 
