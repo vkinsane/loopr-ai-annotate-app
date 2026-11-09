@@ -47,8 +47,6 @@ npm run dev       # open the URL it prints, usually http://localhost:5173
 
 ### Stack
 - **React + Vite, JavaScript (no TypeScript).**
-  - The brief asks for TypeScript; I removed it to cut type noise.
-  - Trade-off: no compile-time checks. Data shapes are described in short doc comments, and oxlint catches common mistakes.
 - **State:** `App` holds the photo, its measured quality, its name and the annotations (`useReducer` with a pure reducer), so moving between screens keeps them. `useScreenHistory` keeps the current screen in step with the browser's Back and Forward buttons, without a router. Other state stays in each screen.
 
 ### Camera
@@ -78,7 +76,7 @@ npm run dev       # open the URL it prints, usually http://localhost:5173
 </details>
 
 <details>
-<summary><strong>Folder structure (by file type)</strong></summary>
+<summary><strong>Folder structure</strong></summary>
 
 ```
 src/
@@ -133,22 +131,6 @@ e2e/*.spec.js                  # Playwright suite; see Testing
 </details>
 
 <details>
-<summary><strong>UI and theming</strong></summary>
-
-- **Material UI** (`@mui/material` + Emotion) for components; styled with the `sx` prop and theme values.
-- **Imports:** one line per package (`import { Box, Chip } from '@mui/material'`). The production build tree-shakes unused components and icons; bundle size was unchanged when we switched.
-- **Themes** in `theme.js`: light app theme plus a dark camera theme; `CssBaseline` provides the reset.
-- **Design tokens live only in `theme.js`.** Style files use theme paths (`'primary.main'`, `'brand.lime'`, `typography: 'h1'`), never hex values.
-  - Palette follows loopr.ai's public site: indigo `#3c4fc9` (actions), carbon `#05091c` (camera), lime `#cefe6f` (accent, other boxes). No Loopr logo or artwork.
-  - Type scale: h1 22 · h2 17 · subtitle1 16 · body1 15 · body2 14 · caption 13 · overline 12 (uppercase labels).
-  - Radius: 6px controls (`shape.borderRadius`), 16px cards (`CARD_RADIUS`). Spacing: MUI's 8px unit, 0.5 steps for 4px.
-  - Shared component styles are theme overrides (large buttons, focus ring, alert titles), not repeated per screen.
-- **Fonts:** Outfit (headings, buttons) and DM Sans (body), from Google Fonts in `index.html`. Fall back to `system-ui`.
-- **AnnotationCanvas is custom**: MUI has no drawing tools, and this logic is a core evaluation point.
-
-</details>
-
-<details>
 <summary><strong>External libraries used</strong></summary>
 
 **In the app**
@@ -168,8 +150,6 @@ e2e/*.spec.js                  # Playwright suite; see Testing
 | `oxlint` | Linting |
 | `@playwright/test` | Automated browser tests |
 | `@axe-core/playwright` | Automatic accessibility checks |
-
-No router, state library, or canvas or annotation library.
 
 </details>
 
