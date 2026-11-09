@@ -1,6 +1,6 @@
 # <img src="docs/logo.svg" alt="" width="32" height="32" align="absmiddle"> Loopr Annotate
 
-Loopr Annotate is a mobile-first web application for visual inspection. It captures high-resolution photos, evaluates their quality in real time, and supports precise annotation with labelled boxes.
+Loopr Annotate is a web application for visual inspection. It captures high-resolution photos, evaluates their quality in real time, and supports precise annotation with labelled boxes.
 
 **Flow:** Landing → Before you start (camera permission) → Capture → Preview & quality → Annotate → Summary
 
@@ -30,14 +30,13 @@ npm run dev       # open the URL it prints, usually http://localhost:5173
 - **Preview & quality**
   - Resolution, file size, brightness and sharpness, each graded Good / Warning / Poor.
   - A summary banner with advice, e.g. "Photo is too dark and blurry".
-  - Rows that aren't Good have an (i) button that says how to improve. Sharpness is shown as a word (Sharp / A bit blurry / Blurry), not a score.
   - Full-screen zoom: pinch or scroll to zoom (up to 8×), drag to move, double-tap to zoom in and out.
   - Retake or Annotate. For a poor photo, Retake becomes the main button.
 - **Annotate**
   - Draw a box by dragging on the photo; drag a box to move it; drag a corner to resize it.
-  - Label, select and delete boxes from the list. Delete / Escape keys work on desktop.
+  - Label, select and delete boxes from the list.
   - Zoom while annotating: pinch, scroll or + and −. The hand button moves the photo. Boxes, labels and handles keep their size on screen.
-  - Works with mouse, touch and pen. Boxes stay on the same pixels at any screen size or rotation.
+  - Boxes stay on the same pixels at any screen size or rotation.
 - **Choose a photo** (no camera): only JPEG, PNG, WebP or HEIC, checked from the file's first bytes, not its name; not empty; up to 30 MB.
 
 </details>
@@ -58,20 +57,20 @@ npm run dev       # open the URL it prints, usually http://localhost:5173
 - **Torch:** the on/off state is read from `getSettings()` on every render, never stored, so the button shows the real hardware state.
 
 ### Quality
-- **Brightness** is how light or dark the photo is overall. The app makes a greyscale copy, where every pixel is a number from 0 (black) to 255 (white), and takes the average. A low average means the photo is too dark; a very high one means it is overexposed.
-- **Sharpness** is how clearly the photo shows edges and fine detail. The app compares each pixel with the four around it (the Laplacian method): in a sharp photo, neighbouring pixels differ strongly at edges, while blur smooths those differences away. The score is how much these differences vary across the photo, so a higher score means a sharper photo.
+- **Brightness** is how light or dark the photo is overall.
+- **Sharpness** is how clearly the photo shows edges and fine detail.
 - **Thresholds** (`utils/quality.js`):
 
 | Check | Good | Warning | Poor |
 |---|---|---|---|
 | Resolution | ≥ 8 MP | 2–8 MP | < 2 MP |
 | File size | ≥ 500 KB | 150–500 KB | < 150 KB |
-| Brightness (0–255; shown as %) | 70–190 | 40–70 or 190–220 | < 40 or > 220 |
+| Brightness (shown as %) | 70–190 | 40–70 or 190–220 | < 40 or > 220 |
 | Sharpness | ≥ 60 | 20–60 | < 20 |
 
 ### Annotation
-- **Boxes are stored in photo pixels and drawn as percentages of the frame.** A box at `left: 25%` stays on the same pixels at any size or rotation, without resize listeners.
-- **HTML elements, not SVG or canvas:** real text labels, fixed 44 px corner touch targets, and hit-testing from the DOM.
+- **Boxes are stored in photo pixels and drawn as percentages of the frame.** A box at `left: 25%` stays on the same pixels at any size or rotation.
+- **HTML elements, not SVG or canvas:** real text labels and fixed 44 px corner touch targets.
 
 </details>
 
@@ -160,21 +159,21 @@ e2e/*.spec.js                  # Playwright suite; see Testing
 
 ```bash
 npx playwright install chromium
-npm run test:e2e  # Playwright; builds the app first
+npm run test:e2e  # builds the app, then runs all tests
 ```
 
-Run in Chromium with a simulated camera, on the production build. **174 tests: 172 pass, 2 are open findings**. No known security problems in the dependencies.
+The tests run in the Chromium browser with a simulated camera, on the final build of the app.
 
 | Area | What is checked |
 |---|---|
-| Rules | <ul><li>Box position and size calculations</li><li>Adding, changing and deleting boxes</li><li>Every quality grade boundary</li><li>Text and file validation</li><li>The right message for each camera error</li><li>Runs without a browser</li></ul> |
-| Core flows | <ul><li>Camera and chosen-photo flows to download: file name, full pixel size, box and label drawn</li><li>Back and Forward</li><li>Reload</li><li>Every "lose work" dialog</li><li>Done with no boxes</li></ul> |
-| Annotation | <ul><li>Boxes land on the right part of the photo, whichever way they are drawn</li><li>Boxes stay inside the photo</li><li>Minimum size</li><li>Move</li><li>Resize from 4 corners</li><li>Window resize and rotation</li><li>Zoom and pan make no box</li><li>Drawing while zoomed</li><li>Keyboard delete</li><li>Touch draw and two-finger gesture</li></ul> |
-| Quality | <ul><li>Good, dark, bright, blurry and low-resolution photos</li><li>Advice</li><li>Main button</li><li>Damaged photo</li><li>Portrait and rotated photos</li><li>PNG and WebP</li></ul> |
-| Input | <ul><li>Annotation and photo names: characters, paste, limits, other languages, duplicates, trimming</li><li>Non-photo, empty and over-30 MB files</li></ul> |
-| Camera | <ul><li>Granted, denied, slow answer, earlier grant</li><li>No camera, busy, insecure page, stopped mid-use</li><li>Retry</li><li>Page hidden, leaving the screen</li><li>Torch on, off, failed and missing</li><li>Capture still works where full-resolution photos are not available</li><li>Failed capture</li><li>Two tabs</li></ul> |
-| Failure handling | <ul><li>Slow and failed screen downloads</li><li>Offline after load</li><li>Failed download with retry</li><li>No console errors</li></ul> |
-| Screens | <ul><li>320 × 568, 390 × 844, 820 × 1180, 1440 × 900, 844 × 390 and 200% zoom: no page scroll, every button reachable</li><li>Scroll bars only on overflow, including browsers that hide them</li><li>Touch targets</li></ul> |
-| Accessibility | <ul><li>Automatic accessibility checks on all 6 screens and a dialog</li><li>Starting the flow with the keyboard</li><li>The keyboard stays inside an open dialog, and Escape closes it</li><li>Rename and delete by keyboard</li><li>Tooltip by keyboard</li><li>Reduced motion</li></ul> |
+| Logic | <ul><li>Box position and size calculations</li><li>Adding, changing and deleting boxes</li><li>The exact limits between Good, Warning and Poor</li><li>Which names and files are accepted</li><li>The right message for each camera error</li><li>These tests run without opening a browser</li></ul> |
+| Main flows | <ul><li>From the camera or a chosen photo through to download: correct file name, full image size, boxes and labels on the photo</li><li>Browser Back and Forward buttons</li><li>Reloading the page</li><li>Every warning shown before work is lost</li><li>Finishing with no boxes</li></ul> |
+| Annotation | <ul><li>Boxes land on the right part of the photo, whichever way they are drawn</li><li>Boxes stay inside the photo</li><li>Very small boxes are ignored</li><li>Moving a box</li><li>Resizing a box from each corner</li><li>Boxes stay in place when the screen size or orientation changes</li><li>Zooming and moving the photo do not create boxes</li><li>Drawing while zoomed in</li><li>Deleting a box with the keyboard</li><li>Drawing with one finger; two fingers do not draw a box</li></ul> |
+| Photo quality | <ul><li>Good, dark, bright, blurry and low-resolution photos</li><li>The advice shown for each problem</li><li>The main button changes for a poor photo</li><li>Damaged photos are reported</li><li>Portrait and rotated photos</li><li>PNG and WebP photos</li></ul> |
+| Names and files | <ul><li>Annotation and photo names: allowed characters, pasted text, length limits, other languages, repeated names, extra spaces</li><li>Files that are refused: not a photo, empty, or over 30 MB</li></ul> |
+| Camera | <ul><li>Permission allowed, denied, slow to answer, or allowed on an earlier visit</li><li>No camera, camera busy, page not secure, or camera stopping during use</li><li>Trying again after an error</li><li>The camera is released when the page is hidden or the user leaves the screen</li><li>Torch on, off, failed and not available</li><li>Capture still works where full-resolution photos are not available</li><li>A photo that fails to capture</li><li>The camera open in two tabs</li></ul> |
+| Failure handling | <ul><li>A screen that is slow or fails to download</li><li>Losing the internet after the app has loaded</li><li>A failed photo download, then trying again</li><li>No errors during a full run</li></ul> |
+| Screen sizes | <ul><li>From small phones (320 × 568) to desktops (1440 × 900), phones held sideways, and 200% browser zoom: no page scrolling, and every button can be reached</li><li>Scroll bars appear only when content does not fit</li><li>The tap size of every button on phones</li></ul> |
+| Accessibility | <ul><li>Automatic accessibility checks on all 6 screens and a dialog</li><li>Starting the flow with the keyboard</li><li>The keyboard stays inside an open dialog, and Escape closes it</li><li>Renaming and deleting boxes with the keyboard</li><li>Opening the info tips with the keyboard</li><li>Animations stop when the user asks for less motion</li></ul> |
 
 </details>
