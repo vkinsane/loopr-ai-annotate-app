@@ -13,7 +13,7 @@ Loopr Annotate is a web application for visual inspection. It captures high-reso
 git clone https://github.com/vkinsane/loopr-ai-annotate-app.git
 cd loopr-ai-annotate-app
 npm install
-npm run dev       # open the URL it prints, usually http://localhost:5173
+npm run dev
 ```
 
 </details>
@@ -92,7 +92,7 @@ src/
 │  ├─ AnnotateScreen.jsx
 │  ├─ SummaryScreen.jsx        # read-only result + download
 ├─ components/
-│  ├─ StatusBadge/             # ✓ / ! / ✕ — used on 4 screens
+│  ├─ StatusBadge/             # coloured quality grade, with an optional info tip; used on 4 screens
 │  ├─ LiveQualityChips/        # resolution, brightness, sharpness chips
 │  ├─ AnnotationCanvas/        # photo + boxes + pointer gestures
 │  ├─ AnnotationList/
