@@ -99,7 +99,7 @@ src/
 │  ├─ AnnotateScreen.jsx
 │  ├─ SummaryScreen.jsx        # read-only result + download
 ├─ components/
-│  ├─ StatusBadge/             # ✓ / ! / ✕ — used on 3 screens
+│  ├─ StatusBadge/             # ✓ / ! / ✕ — used on 4 screens
 │  ├─ LiveQualityChips/        # resolution, brightness, sharpness chips
 │  ├─ AnnotationCanvas/        # photo + boxes + pointer gestures
 │  ├─ AnnotationList/
@@ -114,7 +114,7 @@ src/
 │  ├─ ScreenLoader/            # shown while a screen downloads
 │  ├─ ScrollThumb/             # scroll bar for browsers that hide theirs
 ├─ hooks/
-│  ├─ useCamera.js             # stream + capturePhoto
+│  ├─ useCamera.js             # stream + capture
 │  ├─ useTorch.js
 │  ├─ useLiveQuality.js
 │  ├─ usePhotoQuality.js       # brightness + sharpness of the captured photo
@@ -122,16 +122,16 @@ src/
 │  ├─ useScreenHistory.js      # current screen, in step with browser Back / Forward
 │  ├─ index.js                # re-exports, for one-line imports
 └─ utils/
-   ├─ cameraErrors.js          # pure
+   ├─ cameraErrors.js          # browser error → message; can this browser use the camera
    ├─ quality.js               # pure: thresholds, measures, grades, banner text
    ├─ image.js                 # canvas: blob/video → small grey pixel array
-   ├─ format.js                # toPercent, capitalize
+   ├─ format.js                # percentRect, plural
    ├─ geometry.js              # pure
    ├─ annotations.js           # pure reducer
    ├─ exportPhoto.js           # canvas: photo + boxes → JPEG blob
-   ├─ validation.js            # pure: text and picked-file checks
+   ├─ validation.js            # text and picked-file checks
    ├─ index.js                 # re-exports, for one-line imports
-e2e/*.spec.js                  # Playwright suite (fake camera); see Testing
+e2e/*.spec.js                  # Playwright suite; see Testing
 ```
 
 ### UI and theming
@@ -147,23 +147,22 @@ e2e/*.spec.js                  # Playwright suite (fake camera); see Testing
 - **AnnotationCanvas is custom**: MUI has no drawing tools, and this logic is a core evaluation point.
 
 ### Rules
-- `utils/` has no React. Everything except `image.js` is pure.
+- `utils/` has no React. `geometry.js`, `annotations.js`, `quality.js` and `format.js` are pure; `image.js` and `exportPhoto.js` use canvas.
 - `hooks/` wrap browser APIs with React lifecycle and cleanup.
-- `components/` only for UI used in 2+ places or complex enough to test alone.
 - One folder per component: `StatusBadge/StatusBadge.jsx` + `StatusBadge.styles.js`.
 - `screens/` combine hooks, state and components.
 - Tests live in `e2e/`, one spec per area.
 - Files are created when we build them, never as empty stubs.
 - No component file over 250 lines; split out a component or pure util when it grows.
-- A private helper used in only one place is inlined. Exported `utils/` functions stay separate (pure, testable).
+- A private helper used in only one place is inlined. Exported `utils/` functions stay separate, so they can be tested.
 - One import line per module or folder: `import { useCamera, useTorch } from '../hooks'`.
 - Comments only where the code can't say it: browser quirks, uncalibrated values, data shapes.
-- Styles live in a `*.styles.js` file next to their component (`export const styles = { … }`); JSX uses `sx={styles.root}`. State-dependent styles are functions: `sx={styles.torch(on)}`.
+- Styles live in a `*.styles.js` file next to their component (`export const styles = { … }`); JSX uses `sx={styles.root}`, and plain `<img>` and `<video>` tags use `style={styles.photo}`. State-dependent styles are functions: `sx={styles.torch(on)}`.
 
 ### Code principles
 - **Readable:** clear names, small single-job functions, early returns, named constants, comments explain *why*.
 - **Simple:** KISS, YAGNI; small duplication beats the wrong abstraction.
-- **Separated:** UI in components/screens, browser APIs in hooks, logic in pure `utils/`.
+- **Separated:** UI in components/screens, browser APIs in hooks, logic in `utils/`.
 - **SOLID, React-style:** one reason to change per file; small focused props; hooks hide browser APIs behind small interfaces.
 - **Reliable:** validate at boundaries (camera and browser APIs); never swallow errors; immutable state; test behaviour.
 - **Maintainable:** small commits, delete dead code, record decisions and trade-offs here.
