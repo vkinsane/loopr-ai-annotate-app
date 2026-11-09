@@ -7,8 +7,9 @@ export const styles = {
   root: {
     flex: 1, minHeight: 0, width: '100%', overflowY: 'auto', maxWidth: 1200, mx: 'auto', p: 2, pb: { xs: 0, md: 2 }, display: 'grid', gap: 2,
     gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 1fr) 370px' },
+    // max-content: the photo card clips its overflow, so an `auto` row could collapse and let the sidebar overlap it.
     // The minimums stop the sidebar being squeezed on very short screens: the screen scrolls instead of overlapping.
-    gridTemplateRows: { xs: 'auto minmax(201px, 1fr)', sm: 'auto minmax(381px, 1fr)', md: 'auto' }, alignContent: { md: 'start' },
+    gridTemplateRows: { xs: 'max-content minmax(201px, 1fr)', sm: 'max-content minmax(381px, 1fr)', md: 'max-content' }, alignContent: { md: 'start' },
     gridTemplateAreas: { md: '"photo side"' },
   },
   headerWidth: { maxWidth: 1200 },

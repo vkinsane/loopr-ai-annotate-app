@@ -15,7 +15,7 @@ export const styles = {
   // Largest box with the photo's shape that fits: full width, capped by screen height.
   frame: (ratio, moving) => ({
     position: 'relative', aspectRatio: String(ratio), mx: 'auto', overflow: 'hidden',
-    width: { xs: `min(100%, max(100px, min(50dvh, 100dvh - 376px)) * ${ratio})`, sm: `min(100%, 50dvh * ${ratio})`, md: `min(100%, (100dvh - 143px) * ${ratio})` },
+    width: { xs: `min(100%, max(190px, min(50dvh, 100dvh - 376px)) * ${ratio})`, sm: `min(100%, max(240px, 50dvh) * ${ratio})`, md: `min(100%, max(240px, 100dvh - 143px) * ${ratio})` },
     userSelect: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none', touchAction: 'none', cursor: moving ? 'grab' : 'auto',
   }),
   photo: { display: 'block', width: '100%', height: '100%', pointerEvents: 'none' },

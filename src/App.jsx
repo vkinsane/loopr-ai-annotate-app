@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useReducer, useState } from 'react'
+import ScreenLoader from './components/ScreenLoader/ScreenLoader.jsx'
 import { useScreenHistory } from './hooks'
 import CaptureScreen from './screens/CaptureScreen.jsx'
 import HowItWorksScreen from './screens/HowItWorksScreen.jsx'
@@ -61,7 +62,7 @@ function App() {
   if (screen === 'preview') return <PreviewScreen photo={photo} boxCount={annotations.items.length} onRetake={startOver} onAnnotate={handleMeasured} />
 
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<ScreenLoader />}>
       {screen === 'summary' ? (
         <SummaryScreen
           photo={photo}
