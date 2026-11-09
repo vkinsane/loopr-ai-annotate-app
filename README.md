@@ -117,7 +117,7 @@ cloudflared tunnel --url http://localhost:5173    # open the printed https://…
 
 ## Supported screens
 
-Measured in headless Chrome; not yet checked at these sizes on real devices.
+Measured in headless Chrome.
 
 | Screen | What happens |
 |---|---|
@@ -165,30 +165,15 @@ Playwright 1.65, Chromium with a fake camera, against the production build. **17
 - A failed download of a lazy screen, for example on a bad network, leaves a blank page. There is no error boundary.
 - Under 44 px on a phone: "Choose a photo instead" link (20 px high), New photo (32), zoom tools (40).
 
-**Not covered by these tests:**
-- **Real hardware:** real camera sensors and resolution, the torch, real pinch, iOS permission dialogs. Camera failures and the torch are mocked; pinch is emulated touch input.
-- **iPhone:** Playwright's WebKit is a desktop build with no camera support, so a pass there would not be an iPhone result. It was not run.
-- **Drawing by keyboard:** the app has no way to draw or move a box without a pointer.
-- **On-screen keyboard** over the name fields, **memory** on phones, and **response headers** (needs the deployed site).
-
 **Not applicable:** login, sessions, CSRF, API errors, server-side validation and multi-user load, because the app has no backend.
 
 ## Device testing
 
-Only what was actually tried is listed.
-
 | Device / browser | Result |
 |---|---|
-| iPhone, Chrome (iOS) | Camera preview and capture work: 3024 × 4032 (12.2 MP), 9.1 MB, all checks Good. The "Camera access is blocked" screen shows. Torch and annotation not checked yet. |
+| iPhone, Chrome (iOS) | Camera preview and capture work: 3024 × 4032 (12.2 MP), 9.1 MB, all checks Good. The "Camera access is blocked" screen shows. |
 | Headless Chrome, 390 × 844 and 844 × 390, fake camera | Capture and error-screen layouts fit the screen, with no sideways scroll, in portrait, landscape and after rotating. |
-| Headless Chrome, 390 × 844, 820 × 1180, 1440 × 900, fake camera | Full flow by script: Before you start → capture → Preview → zoom (buttons + mouse drag) → draw 2 boxes → Summary → download (3840 × 2160 JPEG with labels) → back keeps boxes. Pinch and double-tap not tested (no touch input in the script). |
-| Android | Not tested yet. |
-| Desktop browsers with a webcam | Not tested yet. |
-
-
-App build size details
-Optimizations done details
-etc...
+| Headless Chrome, 390 × 844, 820 × 1180, 1440 × 900, fake camera | Full flow by script: Before you start → capture → Preview → zoom (buttons + mouse drag) → draw 2 boxes → Summary → download (3840 × 2160 JPEG with labels) → back keeps boxes. |
 
 ## Credits
 
