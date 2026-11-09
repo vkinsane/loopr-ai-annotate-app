@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
-import { drag, openAnnotate, openBeforeYouStart, openCapture, openPreview } from './helpers.js'
+import { finishAnnotating, openAnnotate, openAnnotateWithBox, openBeforeYouStart, openCapture, openPreview } from './helpers.js'
 
 const WCAG_AA = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']
 
@@ -32,15 +32,12 @@ test.describe('axe, WCAG 2.1 AA', () => {
     await expectNoViolations(page)
   })
   test('Annotate with boxes', async ({ page }) => {
-    await openAnnotate(page)
-    await drag(page, [0.2, 0.2], [0.7, 0.7])
+    await openAnnotateWithBox(page)
     await expectNoViolations(page)
   })
   test('Summary', async ({ page }) => {
-    await openAnnotate(page)
-    await drag(page, [0.2, 0.2], [0.7, 0.7])
-    await page.getByRole('button', { name: /^Done/ }).click()
-    await expect(page.getByRole('heading', { name: 'Inspection summary' })).toBeVisible()
+    await openAnnotateWithBox(page)
+    await finishAnnotating(page)
     await expectNoViolations(page)
   })
   test('Dialog', async ({ page }) => {
@@ -60,8 +57,7 @@ test('the first steps work with the keyboard alone', async ({ page }) => {
 })
 
 test('a dialog starts on the safe choice, traps focus and closes on Escape', async ({ page }) => {
-  await openAnnotate(page)
-  await drag(page, [0.2, 0.2], [0.7, 0.7])
+  await openAnnotateWithBox(page)
   const newPhoto = page.getByRole('button', { name: 'New photo' })
   await newPhoto.focus()
   await page.keyboard.press('Enter')
@@ -77,8 +73,7 @@ test('a dialog starts on the safe choice, traps focus and closes on Escape', asy
 })
 
 test('a box can be renamed and deleted from the keyboard', async ({ page }) => {
-  await openAnnotate(page)
-  await drag(page, [0.2, 0.2], [0.7, 0.7])
+  await openAnnotateWithBox(page)
   const name = page.getByLabel('Name of annotation 1')
   await name.focus()
   await page.keyboard.press('ControlOrMeta+A')

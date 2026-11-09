@@ -1,12 +1,7 @@
 import { expect, test } from '@playwright/test'
-import { boxesInPhotoPixels, downloadPhoto, drag, inspectJpeg, makePhoto, openAnnotate, openBeforeYouStart, openPreview, PHOTO, pickFile } from './helpers.js'
+import { boxesInPhotoPixels, downloadPhoto, drag, finishAnnotating, inspectJpeg, makePhoto, openAnnotate, openAnnotateWithBox, openBeforeYouStart, openPreview, PHOTO, pickFile } from './helpers.js'
 
 const isLime = ([r, g, b]) => g > 180 && r > 120 && b < 170
-
-async function goToSummary(page) {
-  await page.getByRole('button', { name: /^Done/ }).click()
-  await expect(page.getByRole('heading', { name: 'Inspection summary' })).toBeVisible()
-}
 
 test('camera flow: permission, capture, check, annotate, download', async ({ page }) => {
   await openBeforeYouStart(page)
@@ -25,7 +20,7 @@ test('camera flow: permission, capture, check, annotate, download', async ({ pag
 
   await drag(page, [0.2, 0.3], [0.6, 0.7])
   await page.getByLabel('Name of annotation 1').fill('Dent')
-  await goToSummary(page)
+  await finishAnnotating(page)
   await page.getByLabel('Photo name', { exact: true }).fill('check-1')
   const { name, jpeg } = await downloadPhoto(page)
 
@@ -43,7 +38,7 @@ test('chosen photo flow: download has full size, box line and label', async ({ p
   await expect(page.getByRole('button', { name: 'Zoom in' })).toBeVisible()
   await drag(page, [0.25, 0.25], [0.75, 0.75])
   const [box] = await boxesInPhotoPixels(page)
-  await goToSummary(page)
+  await finishAnnotating(page)
   const { name, jpeg } = await downloadPhoto(page)
 
   expect(name).toBe('annotated-photo.jpg')
@@ -75,16 +70,14 @@ test('Done with no boxes asks first', async ({ page }) => {
 })
 
 test('Done with a box goes straight to Summary', async ({ page }) => {
-  await openAnnotate(page)
-  await drag(page, [0.2, 0.2], [0.5, 0.5])
-  await goToSummary(page)
+  await openAnnotateWithBox(page)
+  await finishAnnotating(page)
   await expect(page.getByRole('dialog')).toHaveCount(0)
 })
 
 test('browser Back and Forward keep the photo and boxes', async ({ page }) => {
-  await openAnnotate(page)
-  await drag(page, [0.2, 0.2], [0.5, 0.5])
-  await goToSummary(page)
+  await openAnnotateWithBox(page)
+  await finishAnnotating(page)
   await page.goBack()
   await expect(page.getByLabel('Name of annotation 1')).toHaveValue('Annotation 1')
   await page.goForward()
@@ -99,8 +92,7 @@ test('reload mid-flow returns to a working start, not a broken screen', async ({
 })
 
 test('New photo asks only when boxes would be lost', async ({ page }) => {
-  await openAnnotate(page)
-  await drag(page, [0.2, 0.2], [0.5, 0.5])
+  await openAnnotateWithBox(page)
   const dialog = page.getByRole('dialog', { name: 'Discard this photo?' })
   await page.getByRole('button', { name: 'New photo' }).click()
   await expect(dialog).toContainText('1 box')
@@ -120,17 +112,15 @@ test('New photo with no boxes does not ask', async ({ page }) => {
 })
 
 test('Retake on Preview asks when boxes exist', async ({ page }) => {
-  await openAnnotate(page)
-  await drag(page, [0.2, 0.2], [0.5, 0.5])
+  await openAnnotateWithBox(page)
   await page.getByRole('button', { name: 'Back to Preview' }).click()
   await page.getByRole('button', { name: 'Retake' }).click()
   await expect(page.getByRole('dialog')).toContainText('boxes you drew')
 })
 
 test('Take new photo asks until the photo is downloaded', async ({ page }) => {
-  await openAnnotate(page)
-  await drag(page, [0.2, 0.2], [0.5, 0.5])
-  await goToSummary(page)
+  await openAnnotateWithBox(page)
+  await finishAnnotating(page)
   await page.getByRole('button', { name: 'Take new photo' }).click()
   await expect(page.getByRole('dialog')).toContainText("haven't downloaded")
   await page.getByRole('button', { name: 'Keep photo' }).click()

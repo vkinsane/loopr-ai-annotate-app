@@ -1,23 +1,20 @@
 import { expect, test } from '@playwright/test'
-import { downloadPhoto, drag, openAnnotate } from './helpers.js'
+import { downloadPhoto, drag, finishAnnotating, openAnnotate, openAnnotateWithBox } from './helpers.js'
 
 const XSS = '<img src=x onerror="window.__xss=1">'
 
 test('markup in a box name is never run', async ({ page }) => {
-  await openAnnotate(page)
-  await drag(page, [0.2, 0.2], [0.7, 0.7])
+  await openAnnotateWithBox(page)
   await page.getByLabel('Name of annotation 1').fill(XSS)
   await page.getByLabel('Name of annotation 1').blur()
-  await page.getByRole('button', { name: /^Done/ }).click()
-  await expect(page.getByRole('heading', { name: 'Inspection summary' })).toBeVisible()
+  await finishAnnotating(page)
   expect(await page.evaluate(() => window.__xss)).toBeUndefined()
   await expect(page.locator('img[src="x"]')).toHaveCount(0)
 })
 
 test('markup in the photo name is never run', async ({ page }) => {
-  await openAnnotate(page)
-  await drag(page, [0.2, 0.2], [0.7, 0.7])
-  await page.getByRole('button', { name: /^Done/ }).click()
+  await openAnnotateWithBox(page)
+  await finishAnnotating(page)
   const name = page.getByLabel('Photo name', { exact: true })
   await name.fill(XSS)
   expect(await name.inputValue()).not.toMatch(/[<>"=]/)
@@ -33,7 +30,7 @@ test('the photo never leaves the device and nothing is stored', async ({ page })
   const url = page.url()
   await drag(page, [0.2, 0.2], [0.7, 0.7])
   await page.getByLabel('Name of annotation 1').fill('secret name')
-  await page.getByRole('button', { name: /^Done/ }).click()
+  await finishAnnotating(page)
   await downloadPhoto(page)
 
   expect(sent).toEqual([])
@@ -46,9 +43,8 @@ test('the photo never leaves the device and nothing is stored', async ({ page })
 test('names are not written to the console', async ({ page }) => {
   const logs = []
   page.on('console', (message) => logs.push(message.text()))
-  await openAnnotate(page)
-  await drag(page, [0.2, 0.2], [0.7, 0.7])
+  await openAnnotateWithBox(page)
   await page.getByLabel('Name of annotation 1').fill('secret name')
-  await page.getByRole('button', { name: /^Done/ }).click()
+  await finishAnnotating(page)
   expect(logs.filter((line) => line.includes('secret'))).toEqual([])
 })

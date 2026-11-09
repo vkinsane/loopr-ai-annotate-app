@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { boxesInPhotoPixels, canvasBoxes, drag, dragScreen, expectRect, openAnnotate, photoImage, PHOTO, screenPoint } from './helpers.js'
+import { boxesInPhotoPixels, canvasBoxes, drag, dragScreen, expectRect, openAnnotate, PHOTO, photoImage, screenPoint } from './helpers.js'
 
 const px = ([fx, fy]) => ({ x: fx * PHOTO.width, y: fy * PHOTO.height })
 const rectBetween = (a, b) => ({ x: Math.min(a.x, b.x), y: Math.min(a.y, b.y), width: Math.abs(a.x - b.x), height: Math.abs(a.y - b.y) })
@@ -115,7 +115,7 @@ test.describe('with a mouse', () => {
     expectRect(box, { x: 0.4 * PHOTO.width, y: 0.4 * PHOTO.height, width: 0.2 * PHOTO.width, height: 0.2 * PHOTO.height })
   })
 
-  test('Delete and Backspace remove the selected box; Escape deselects', async ({ page }) => {
+  test('Delete and Backspace remove the selected box', async ({ page }) => {
     await drag(page, [0.1, 0.1], [0.3, 0.3])
     await drag(page, [0.5, 0.5], [0.7, 0.7])
     await page.keyboard.press('Delete')
@@ -124,6 +124,13 @@ test.describe('with a mouse', () => {
     await page.getByLabel(/Name of annotation 1/).blur()
     await page.keyboard.press('Backspace')
     await expect(canvasBoxes(page)).toHaveCount(0)
+  })
+
+  test('Escape deselects and keeps the box', async ({ page }) => {
+    await drag(page, A, B)
+    await page.keyboard.press('Escape')
+    await expect(corner(page, 'top-left')).toHaveCount(0)
+    await expect(canvasBoxes(page)).toHaveCount(1)
   })
 
   test('Delete while typing a name edits the text only', async ({ page }) => {
@@ -155,7 +162,7 @@ test.describe('with a mouse', () => {
 test.describe('with touch', () => {
   test.use({ viewport: { width: 390, height: 844 }, hasTouch: true })
 
-  async function touch(page, client, type, points) {
+  async function touch(client, type, points) {
     await client.send('Input.dispatchTouchEvent', { type, touchPoints: points.map(({ x, y }, id) => ({ x, y, id })) })
   }
 
@@ -164,10 +171,10 @@ test.describe('with touch', () => {
     const client = await page.context().newCDPSession(page)
     const from = await screenPoint(page, A)
     const to = await screenPoint(page, B)
-    await touch(page, client, 'touchStart', [from])
-    await touch(page, client, 'touchMove', [{ x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 }])
-    await touch(page, client, 'touchMove', [to])
-    await touch(page, client, 'touchEnd', [])
+    await touch(client, 'touchStart', [from])
+    await touch(client, 'touchMove', [{ x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 }])
+    await touch(client, 'touchMove', [to])
+    await touch(client, 'touchEnd', [])
     expectRect((await boxesInPhotoPixels(page))[0], EXPECTED, 16)
   })
 
@@ -176,10 +183,10 @@ test.describe('with touch', () => {
     const client = await page.context().newCDPSession(page)
     const a = await screenPoint(page, [0.45, 0.5])
     const b = await screenPoint(page, [0.55, 0.5])
-    await touch(page, client, 'touchStart', [a, b])
-    await touch(page, client, 'touchMove', [{ x: a.x - 40, y: a.y }, { x: b.x + 40, y: b.y }])
-    await touch(page, client, 'touchMove', [{ x: a.x - 80, y: a.y }, { x: b.x + 80, y: b.y }])
-    await touch(page, client, 'touchEnd', [])
+    await touch(client, 'touchStart', [a, b])
+    await touch(client, 'touchMove', [{ x: a.x - 40, y: a.y }, { x: b.x + 40, y: b.y }])
+    await touch(client, 'touchMove', [{ x: a.x - 80, y: a.y }, { x: b.x + 80, y: b.y }])
+    await touch(client, 'touchEnd', [])
     await expect(canvasBoxes(page)).toHaveCount(0)
   })
 })

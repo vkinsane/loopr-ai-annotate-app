@@ -61,6 +61,17 @@ export async function openAnnotate(page, options) {
   await expect(page.getByRole('button', { name: 'Zoom in' })).toBeVisible()
 }
 
+/** Annotate with one box already drawn. */
+export async function openAnnotateWithBox(page, options) {
+  await openAnnotate(page, options)
+  await drag(page, [0.2, 0.2], [0.5, 0.5])
+}
+
+export async function finishAnnotating(page) {
+  await page.getByRole('button', { name: /^Done/ }).click()
+  await expect(page.getByRole('heading', { name: 'Inspection summary' })).toBeVisible()
+}
+
 export async function openCapture(page) {
   await openBeforeYouStart(page)
   await page.getByRole('button', { name: 'Allow camera permissions' }).click()

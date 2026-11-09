@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { downloadPhoto, drag, openAnnotate, openBeforeYouStart, pickFile } from './helpers.js'
+import { downloadPhoto, drag, finishAnnotating, openAnnotate, openBeforeYouStart, pickFile } from './helpers.js'
 
 const MB = 1024 * 1024
 const label = (page, number = 1) => page.getByLabel(`Name of annotation ${number}`)
@@ -68,7 +68,7 @@ test.describe('photo name', () => {
   test.beforeEach(async ({ page }) => {
     await openAnnotate(page)
     await drag(page, [0.1, 0.1], [0.3, 0.3])
-    await page.getByRole('button', { name: /^Done/ }).click()
+    await finishAnnotating(page)
   })
   const name = (page) => page.getByLabel('Photo name', { exact: true })
 
@@ -86,7 +86,7 @@ test.describe('photo name', () => {
   test('survives going back to Annotate', async ({ page }) => {
     await name(page).fill('front-door')
     await page.getByRole('button', { name: 'Back to Annotate' }).click()
-    await page.getByRole('button', { name: /^Done/ }).click()
+    await finishAnnotating(page)
     await expect(name(page)).toHaveValue('front-door')
   })
 })

@@ -139,9 +139,8 @@ test.describe('on the camera screen', () => {
       const { videoWidth, videoHeight } = document.querySelector('video')
       return { videoWidth, videoHeight }
     })
-    expect(videoWidth).toBeGreaterThan(0)
+    expect(videoWidth * videoHeight).toBeGreaterThan(0)
     await expect(page.getByRole('main')).toContainText(`${(videoWidth * videoHeight / 1e6).toFixed(1)}`)
-    expect(videoHeight).toBeGreaterThan(0)
   })
 })
 

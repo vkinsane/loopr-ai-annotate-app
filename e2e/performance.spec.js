@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { gzipSync } from 'node:zlib'
 import { expect, test } from '@playwright/test'
-import { canvasBoxes, downloadPhoto, drag, inspectJpeg, makePhoto, openAnnotate, pickFile } from './helpers.js'
+import { canvasBoxes, downloadPhoto, drag, finishAnnotating, inspectJpeg, makePhoto, openAnnotate, pickFile } from './helpers.js'
 
 const KB = 1024
 const FIRST_LOAD_BUDGET_KB = 200
@@ -34,8 +34,7 @@ test('nothing jumps while working', async ({ page }) => {
   await openAnnotate(page)
   await drag(page, [0.1, 0.1], [0.4, 0.4])
   await drag(page, [0.5, 0.5], [0.8, 0.8])
-  await page.getByRole('button', { name: /^Done/ }).click()
-  await expect(page.getByRole('heading', { name: 'Inspection summary' })).toBeVisible()
+  await finishAnnotating(page)
   await page.waitForTimeout(300)
   expect(await page.evaluate(() => window.__shift)).toBeLessThan(MAX_LAYOUT_SHIFT)
 })
@@ -60,7 +59,7 @@ test('a 27 MP photo goes through at full size', async ({ page }) => {
   await page.getByRole('button', { name: 'Annotate' }).click()
   await expect(page.getByRole('button', { name: 'Zoom in' })).toBeVisible()
   await drag(page, [0.2, 0.2], [0.7, 0.7])
-  await page.getByRole('button', { name: /^Done/ }).click()
+  await finishAnnotating(page)
   const { jpeg } = await downloadPhoto(page)
   const { width, height } = await inspectJpeg(page, jpeg)
   expect({ width, height }).toEqual(SIZE)

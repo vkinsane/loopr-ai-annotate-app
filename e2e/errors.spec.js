@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { downloadPhoto, drag, openAnnotate, openPreview } from './helpers.js'
+import { downloadPhoto, drag, finishAnnotating, openAnnotateWithBox, openPreview } from './helpers.js'
 
 const ANNOTATE_CHUNK = '**/assets/AnnotateScreen-*.js'
 
@@ -24,21 +24,18 @@ test('a failed screen download does not leave a blank page', async ({ page }) =>
 })
 
 test('screens already loaded keep working offline', async ({ page, context }) => {
-  await openAnnotate(page)
-  await drag(page, [0.2, 0.2], [0.5, 0.5])
-  await page.getByRole('button', { name: /^Done/ }).click()
-  await expect(page.getByRole('heading', { name: 'Inspection summary' })).toBeVisible()
+  await openAnnotateWithBox(page)
+  await finishAnnotating(page)
   await context.setOffline(true)
   await page.getByRole('button', { name: 'Back to Annotate' }).click()
   await drag(page, [0.6, 0.6], [0.8, 0.8])
-  await page.getByRole('button', { name: /^Done/ }).click()
+  await finishAnnotating(page)
   expect((await downloadPhoto(page)).name).toBe('annotated-photo.jpg')
 })
 
 test('a failed download says so and can be retried', async ({ page }) => {
-  await openAnnotate(page)
-  await drag(page, [0.2, 0.2], [0.5, 0.5])
-  await page.getByRole('button', { name: /^Done/ }).click()
+  await openAnnotateWithBox(page)
+  await finishAnnotating(page)
   await page.evaluate(() => {
     window.__real = window.createImageBitmap
     window.createImageBitmap = () => Promise.reject(new Error('test'))
@@ -53,9 +50,8 @@ test('no page errors in a full run', async ({ page }) => {
   const errors = []
   page.on('pageerror', (error) => errors.push(error.message))
   page.on('console', (message) => message.type() === 'error' && errors.push(message.text()))
-  await openAnnotate(page)
-  await drag(page, [0.2, 0.2], [0.5, 0.5])
-  await page.getByRole('button', { name: /^Done/ }).click()
+  await openAnnotateWithBox(page)
+  await finishAnnotating(page)
   await downloadPhoto(page)
   expect(errors).toEqual([])
 })

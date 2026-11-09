@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { drag, openAnnotate, openPreview, pageOverflow, SIZES } from './helpers.js'
+import { drag, finishAnnotating, openAnnotate, openPreview, pageOverflow, SIZES } from './helpers.js'
 
 const MIN_TOUCH_PX = 44
 const ALL_SIZES = { ...SIZES, 'desktop at 200% zoom': [720, 450] }
@@ -46,8 +46,7 @@ for (const [name, [width, height]] of Object.entries(ALL_SIZES)) {
       await expectFits(page, 'preview')
       await expectButtonsReachable(page, 'preview')
       await page.getByRole('button', { name: 'Annotate' }).click()
-      await page.getByRole('button', { name: /^Done/ }).click()
-      await heading(page, 'Inspection summary')
+      await finishAnnotating(page)
       await expectFits(page, 'summary')
       await expectButtonsReachable(page, 'summary')
     })
@@ -80,7 +79,7 @@ test.describe('phone touch targets', () => {
   }
 
   test('every button on every screen is at least 44 px', async ({ page }) => {
-    test.fail(true, 'Open finding: the Choose a photo link, New photo, the zoom tools and Edit photo name are smaller.')
+    test.fail(true, 'Open finding: the Choose a photo link, New photo and the zoom tools are smaller.')
     await page.goto('/')
     await expectTouchSize(page, 'landing')
     await page.getByRole('button', { name: 'Start inspection' }).click()
@@ -92,8 +91,7 @@ test.describe('phone touch targets', () => {
     await expect(page.getByRole('button', { name: 'Zoom in' })).toBeVisible()
     await drag(page, [0.2, 0.2], [0.7, 0.7])
     await expectTouchSize(page, 'annotate')
-    await page.getByRole('button', { name: /^Done/ }).click()
-    await heading(page, 'Inspection summary')
+    await finishAnnotating(page)
     await expectTouchSize(page, 'summary')
   })
 })

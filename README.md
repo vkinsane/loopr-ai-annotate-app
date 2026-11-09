@@ -145,13 +145,13 @@ Measured in headless Chrome; not yet checked at these sizes on real devices.
 
 ## Automated tests
 
-Playwright 1.65, Chromium with a fake camera, against the production build. **173 tests: 171 pass, 2 are open findings** (below). `npm audit`: 0 vulnerabilities.
+Playwright 1.65, Chromium with a fake camera, against the production build. **174 tests: 172 pass, 2 are open findings** (below). `npm audit`: 0 vulnerabilities.
 
 | Area | File | Tests | What is checked |
 |---|---|---|---|
 | Rules | `logic.spec.js` | 50 | Box geometry, reducer, every quality grade boundary, text and file validation, camera error mapping. No browser. |
 | Core flows | `flows.spec.js` | 11 | Camera and chosen-photo flows to download (file name, full pixel size, box and label drawn); Back/Forward; reload; every "lose work" dialog; Done with no boxes. |
-| Annotation | `annotation.spec.js` | 24 | Photo-pixel accuracy in 4 drag directions; clamping; minimum size; move; resize from 4 corners; window resize and rotation; zoom and pan make no box; drawing while zoomed; keyboard delete; touch draw and two-finger gesture. |
+| Annotation | `annotation.spec.js` | 25 | Photo-pixel accuracy in 4 drag directions; clamping; minimum size; move; resize from 4 corners; window resize and rotation; zoom and pan make no box; drawing while zoomed; keyboard delete; touch draw and two-finger gesture. |
 | Quality | `quality.spec.js` | 10 | Generated good, dark, bright, blurry and low-resolution photos; advice; main button; damaged photo; portrait and EXIF rotation; PNG and WebP. |
 | Input | `validation.spec.js` | 14 | Annotation and photo names: characters, paste, limits, other languages, duplicates, trimming. Non-photo, empty and over-30 MB files. |
 | Camera | `camera.spec.js` | 21 | Granted, denied, slow answer, earlier grant, no camera, busy, insecure page, stopped mid-use, retry, page hidden, leaving the screen, torch on/off/failed/missing, ImageCapture fallback, failed capture, two tabs. |
@@ -163,7 +163,7 @@ Playwright 1.65, Chromium with a fake camera, against the production build. **17
 
 **Open findings** (written as expected failures, so each one reports when it is fixed):
 - A failed download of a lazy screen, for example on a bad network, leaves a blank page. There is no error boundary.
-- Under 44 px on a phone: "Choose a photo instead" link (20 px high), New photo (32), zoom tools (40), Edit photo name (36).
+- Under 44 px on a phone: "Choose a photo instead" link (20 px high), New photo (32), zoom tools (40).
 
 **Not covered by these tests:**
 - **Real hardware:** real camera sensors and resolution, the torch, real pinch, iOS permission dialogs. Camera failures and the torch are mocked; pinch is emulated touch input.
