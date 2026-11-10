@@ -1,14 +1,13 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { Close, Flip, RestartAlt, RotateLeft, RotateRight } from '@mui/icons-material'
 import { Box, Button, CircularProgress, Dialog, IconButton, ThemeProvider, Typography } from '@mui/material'
+import { useCropDrag } from '../../hooks'
 import { cameraTheme, CORNERS } from '../../theme.js'
-import { canvasToJpeg, clamp, editPhoto, isTooSmall, moveRect, rectFromPoints, resizeRect, turnedSize } from '../../utils'
+import { canvasToJpeg, editPhoto, turnedSize } from '../../utils'
 import { styles } from './PhotoEditor.styles.js'
 
 const PREVIEW_MAX_PX = 1600
-const MIN_CROP_SHARE = 0.05 // of the photo's shorter side
 const NO_EDIT = { rotation: 0, flipped: false }
-const TITLE_ID = 'photo-editor-title'
 
 const fullCrop = ({ width, height }) => ({ x: 0, y: 0, width, height })
 const percent = (value, total) => `${(value / total) * 100}%`
@@ -19,7 +18,7 @@ const percent = (value, total) => `${(value / total) * 100}%`
  */
 export default function PhotoEditor({ blob, onApply, onClose }) {
   const canvasRef = useRef(null)
-  const drag = useRef(null)
+  const titleId = useId()
   const [bitmap, setBitmap] = useState(null)
   const [edit, setEdit] = useState(NO_EDIT)
   const [crop, setCrop] = useState(null)
@@ -43,6 +42,7 @@ export default function PhotoEditor({ blob, onApply, onClose }) {
   }, [blob])
 
   const size = bitmap && turnedSize(bitmap, edit.rotation)
+  const cropDrag = useCropDrag(crop, size, setCrop)
 
   // The preview shows the whole turned photo; the crop box sits over it.
   useEffect(() => {
@@ -63,34 +63,6 @@ export default function PhotoEditor({ blob, onApply, onClose }) {
   // A mirrored photo turns the other way, so "right" still turns what's on screen to the right.
   const turn = (direction) => change({ ...edit, rotation: (edit.rotation + direction * (edit.flipped ? -90 : 90) + 360) % 360 })
 
-  function toPhotoPoint(event) {
-    const box = event.currentTarget.getBoundingClientRect()
-    return {
-      x: clamp(((event.clientX - box.left) / box.width) * size.width, 0, size.width),
-      y: clamp(((event.clientY - box.top) / box.height) * size.height, 0, size.height),
-    }
-  }
-
-  // On a corner: resize. Inside the box: move it. Elsewhere: draw a new box.
-  function handlePointerDown(event) {
-    event.currentTarget.setPointerCapture(event.pointerId)
-    const start = toPhotoPoint(event)
-    const corner = event.target.dataset.corner
-    const inside = start.x > crop.x && start.x < crop.x + crop.width && start.y > crop.y && start.y < crop.y + crop.height
-    drag.current = { start, rect: crop, mode: corner ?? (inside ? 'move' : 'draw') }
-  }
-
-  function handlePointerMove(event) {
-    if (!drag.current) return
-    const { start, rect, mode } = drag.current
-    const point = toPhotoPoint(event)
-    const next = mode === 'move' ? moveRect(rect, point.x - start.x, point.y - start.y, size)
-      : mode === 'draw' ? rectFromPoints(start, point)
-        : resizeRect(rect, mode, point)
-    // A box too small to see is ignored, so a tap doesn't lose the crop.
-    if (!isTooSmall(next, MIN_CROP_SHARE * Math.min(size.width, size.height))) setCrop(next)
-  }
-
   const edited = edit.rotation !== 0 || edit.flipped || crop?.width !== size?.width || crop?.height !== size?.height
 
   async function apply() {
@@ -106,12 +78,12 @@ export default function PhotoEditor({ blob, onApply, onClose }) {
   const busy = status !== 'ready'
   return (
     <ThemeProvider theme={cameraTheme}>
-      <Dialog fullScreen open onClose={onClose} aria-labelledby={TITLE_ID} slotProps={{ paper: { sx: styles.paper } }}>
+      <Dialog fullScreen open onClose={onClose} aria-labelledby={titleId} slotProps={{ paper: { sx: styles.paper } }}>
         <Box sx={styles.top}>
           <IconButton aria-label="Cancel editing" onClick={onClose} sx={styles.close}>
             <Close />
           </IconButton>
-          <Typography component="h2" id={TITLE_ID} sx={styles.title}>Edit photo</Typography>
+          <Typography component="h2" id={titleId} sx={styles.title}>Edit photo</Typography>
           <Button variant="contained" disabled={busy || !edited} onClick={apply} sx={styles.done}>
             {status === 'saving' ? 'Saving…' : 'Done'}
           </Button>
@@ -120,13 +92,7 @@ export default function PhotoEditor({ blob, onApply, onClose }) {
         <Box sx={styles.viewport}>
           {status === 'loading' && <CircularProgress aria-label="Opening photo" />}
           {status === 'failed' && <Typography role="alert">Couldn't edit this photo, so close and try again.</Typography>}
-          <Box
-            sx={styles.frame(size, status === 'failed')}
-            onPointerDown={busy ? undefined : handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={() => (drag.current = null)}
-            onPointerCancel={() => (drag.current = null)}
-          >
+          <Box sx={styles.frame(size, status === 'failed')} {...(!busy && cropDrag)}>
             <Box component="canvas" ref={canvasRef} role="img" aria-label="Photo being edited" sx={styles.canvas} />
             {crop && size && (
               <Box

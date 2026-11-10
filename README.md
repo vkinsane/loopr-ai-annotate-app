@@ -117,12 +117,10 @@ npm run dev
 
 - **Video frame instead of a full photo on iPhone:** iPhone Safari has no `ImageCapture`, so its photos are the size of the video stream (often 4032 × 3024, sometimes less), not the full sensor.
 - **Cropped live view on phones held upright:** filling the screen looks better than black bars, but the photo shows a little more at the sides than the screen.
-- **Fixed quality thresholds:** simple and explainable, but a dark subject or a plain wall can be graded worse than it is.
 - **File size as a check:** a weak proxy for detail, because JPEG compression also changes it. It is shown, but it never blocks.
 - **Edits clear the boxes:** keeping them through a crop or turn would need box transforms. A warning is simpler and safe.
 - **Browser Back starts over** once the camera has opened. That prevents half-finished states, but it loses the work after a warning.
 - **No storage:** nothing is saved or uploaded, so a reload loses the work. This keeps photos private.
-- **Plain JavaScript:** faster to write, but there is no compile-time check of props and data shapes.
 
 </details>
 
@@ -130,12 +128,6 @@ npm run dev
 <summary><strong>What could be better</strong></summary>
 
 - **Real-device testing:** the level, exposure, camera switching and iPhone photo orientation were tested with simulated sensors and cameras only.
-- **Photos taken sideways on iPhone** can be saved turned on their side, because the canvas copy of the video frame doesn't apply the turn the video applies. A fix at capture time is planned.
-- **Known bugs** (kept as failing tests): a blank page when a screen fails to download, and a few buttons under 44 px on phones.
-- **Code:**
-  - Screen-size values and the dark round-button style are repeated in a few style files.
-  - `ConfirmDialog` uses fixed element IDs.
-  - The photo editor's crop dragging could move into its own hook.
 - **Quality:** thresholds tuned from real photos on several phones, and a check for glare.
 - **Annotation:** undo and redo, keyboard moving and resizing of boxes, and keeping boxes through a crop or turn.
 - **Saving work:** keep the photo and boxes in IndexedDB, so a reload or a browser Back doesn't lose them.
@@ -164,7 +156,7 @@ src/
 │  ├─ ChoosePhotoButton/, ConfirmDialog/, BackButton/
 │  ├─ ScreenLayout/, ScreenLoader/, ScrollThumb/, DrawHint/, HeroDemo/
 ├─ hooks/                      # useCamera, useCameraList, useCameraPermission, useTorch, useExposure,
-│                              # useDeviceTilt, useLiveQuality, usePhotoQuality, useScreenHistory
+│                              # useCropDrag, useDeviceTilt, useLiveQuality, usePhotoQuality, useScreenHistory
 └─ utils/                      # pure logic: geometry, annotations, quality, camera (tilt), validation,
                                # cameraErrors, format; canvas: image (grey copy, edits), exportPhoto
 e2e/*.spec.js                  # Playwright suite; see Testing

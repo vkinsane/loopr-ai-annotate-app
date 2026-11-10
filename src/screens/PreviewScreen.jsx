@@ -9,7 +9,7 @@ import ScreenLoader from '../components/ScreenLoader/ScreenLoader.jsx'
 import ScrollThumb from '../components/ScrollThumb/ScrollThumb.jsx'
 import StatusBadge from '../components/StatusBadge/StatusBadge.jsx'
 import { GRADE_COLORS, gradePhoto, qualityChecks } from '../utils'
-import { COMPACT_QUERY } from '../theme.js'
+import { COMPACT_QUERY, SHORT_QUERY } from '../theme.js'
 import { styles } from './PreviewScreen.styles.js'
 
 // Loaded on the first tap; most photos are never opened full screen or edited.
@@ -17,17 +17,17 @@ const ZoomViewer = lazy(() => import('../components/ZoomViewer/ZoomViewer.jsx'))
 const PhotoEditor = lazy(() => import('../components/PhotoEditor/PhotoEditor.jsx'))
 const MEASURE_FAILED = { grade: 'poor', title: "Couldn't read this photo", advice: 'Take the photo again to continue.' }
 const TITLE = 'Preview & quality'
-const SHORT_SCREEN = '(max-height: 599.95px)'
 
 /** `photo` is { blob, url, method }; `quality` is what usePhotoQuality returns for it. `onEdit` gets the edited photo's blob. */
 export default function PreviewScreen({ photo, quality, boxCount, onRetake, onAnnotate, onEdit }) {
   const [zooming, setZooming] = useState(false)
   const [editing, setEditing] = useState(false)
   const [confirming, setConfirming] = useState(null) // 'retake' | 'edit' (both lose the boxes) | 'quality'
-  // On short screens, such as a phone held sideways, the open panel would cover the photo, so it starts closed.
-  const [detailsOpen, setDetailsOpen] = useState(() => !window.matchMedia(SHORT_SCREEN).matches)
   // Phones show the result over the photo, so the photo can fill the screen.
   const compact = useMediaQuery(COMPACT_QUERY, { noSsr: true })
+  // On short screens, such as a phone held sideways, the open panel would cover the photo, so it starts closed.
+  const short = useMediaQuery(SHORT_QUERY, { noSsr: true })
+  const [detailsOpen, setDetailsOpen] = useState(!short)
   const measured = quality && !quality.failed ? quality : null
   const summary = quality?.failed ? MEASURE_FAILED : measured && gradePhoto({ bytes: photo.blob.size, ...measured })
   const poor = summary?.grade === 'poor'

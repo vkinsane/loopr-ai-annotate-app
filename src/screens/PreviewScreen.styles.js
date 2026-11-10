@@ -1,7 +1,4 @@
-import { CARD_RADIUS, CLEAR_OF_PANEL, COMPACT, PHOTO_PAGE } from '../theme.js'
-
-// The tallest the photo may be beside the sidebar.
-const PHOTO_HEIGHT = 'calc(100dvh - 90px)'
+import { CARD_RADIUS, CLEAR_OF_PANEL, COMPACT, ON_PHOTO_BUTTON, PHOTO_MAX_HEIGHT, PHOTO_PAGE } from '../theme.js'
 
 export const styles = {
   // One window tall. Wide screens: photo on the left, result and buttons on the right.
@@ -13,7 +10,7 @@ export const styles = {
   // Compact: the card fills the screen, and the photo is centred in the part above the closed panel.
   photoFrame: (ratio) => ({
     position: 'relative', border: 1, borderColor: 'divider', borderRadius: CARD_RADIUS, overflow: 'hidden', bgcolor: 'brand.carbonRaised', mx: 'auto',
-    alignSelf: 'start', width: ratio ? `min(100%, ${PHOTO_HEIGHT} * ${ratio})` : '100%', height: ratio ? 'auto' : PHOTO_HEIGHT,
+    alignSelf: 'start', width: ratio ? `min(100%, ${PHOTO_MAX_HEIGHT} * ${ratio})` : '100%', height: ratio ? 'auto' : PHOTO_MAX_HEIGHT,
     aspectRatio: ratio ? String(ratio) : 'auto',
     [COMPACT]: { alignSelf: 'stretch', width: '100%', height: '100%', aspectRatio: 'auto', ...CLEAR_OF_PANEL },
   }),
@@ -22,7 +19,7 @@ export const styles = {
   photoTools: { position: 'absolute', right: 10, bottom: 10, display: 'flex', gap: 1, [COMPACT]: { bottom: 'auto', top: 10 } },
   photoTool: {
     height: 44, px: 1.75, borderRadius: 999,
-    bgcolor: 'brand.scrim', color: 'brand.snow', typography: 'button', fontSize: 14, '&:hover': { bgcolor: 'brand.carbon' },
+    ...ON_PHOTO_BUTTON, typography: 'button', fontSize: 14,
   },
   advice: { typography: 'body2' },
   side: { display: 'flex', flexDirection: 'column', gap: 1.5 },

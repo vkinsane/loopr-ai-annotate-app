@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react'
 import { Box } from '@mui/material'
+import { TOUCH_QUERY } from '../../theme.js'
 import { clamp } from '../../utils'
 import { styles } from './ScrollThumb.styles.js'
 
 const MIN_THUMB_PX = 32
-const TOUCH = '(pointer: coarse)'
 
 /**
  * A scroll bar for browsers that hide theirs until you scroll, such as iPhone Safari.
@@ -22,7 +22,7 @@ export default function ScrollThumb({ component = 'span' }) {
     const probe = document.createElement('div')
     probe.style.cssText = 'position: absolute; visibility: hidden; overflow: scroll; width: 50px; height: 50px'
     document.body.append(probe)
-    const browserHidesBars = probe.offsetWidth === probe.clientWidth || window.matchMedia(TOUCH).matches
+    const browserHidesBars = probe.offsetWidth === probe.clientWidth || window.matchMedia(TOUCH_QUERY).matches
     probe.remove()
 
     function update() {

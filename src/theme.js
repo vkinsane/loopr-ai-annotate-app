@@ -8,6 +8,12 @@ const BRAND = {
   lime: '#cefe6f', limeDark: '#a8d94a', white: '#ffffff', snow: '#f8fafc', scrim: 'rgba(5, 9, 28, 0.55)',
   gridLine: 'rgba(255, 255, 255, 0.4)',
 }
+
+// Screen sizes under MUI's md (900) and sm (600) breakpoints, and touch screens.
+export const NARROW_QUERY = '(max-width: 899.95px)'
+export const SHORT_QUERY = '(max-height: 599.95px)'
+export const TOUCH_QUERY = '(pointer: coarse)'
+
 const SCROLLBAR_PX = 8
 const HEADING_FONT = "'Outfit', system-ui, sans-serif"
 
@@ -60,7 +66,7 @@ const shared = {
         },
         '@keyframes screen-in': { from: { opacity: 0 } },
         // iPhone Safari zooms the page into a field whose text is under 16 px, and the layout breaks while typing.
-        '@media (pointer: coarse)': { '.MuiInputBase-root .MuiInputBase-input': { fontSize: 16 } },
+        [`@media ${TOUCH_QUERY}`]: { '.MuiInputBase-root .MuiInputBase-input': { fontSize: 16 } },
         // Shown only when an area's content overflows, and then always, even in browsers that hide scrollbars until you scroll.
         '*::-webkit-scrollbar': { width: SCROLLBAR_PX, height: SCROLLBAR_PX },
         '*::-webkit-scrollbar-track': { background: theme.palette.brand.tint },
@@ -133,7 +139,7 @@ export const VISUALLY_HIDDEN = { position: 'absolute', width: '1px', height: '1p
 
 // Phones and tablets, held either way, and small windows: the photo fills the screen and the details sit over it.
 // Computers with a big enough window show the details in a sidebar.
-export const COMPACT_QUERY = '(max-width: 899.95px), (max-height: 599.95px), (pointer: coarse)'
+export const COMPACT_QUERY = `${NARROW_QUERY}, ${SHORT_QUERY}, ${TOUCH_QUERY}`
 export const COMPACT = `@media ${COMPACT_QUERY}`
 
 // The details panel over the photo on compact screens: its inset from the card's edge, and its header and button rows.
@@ -152,8 +158,12 @@ export const PHOTO_PAGE = {
   [COMPACT]: { gridTemplateColumns: 'minmax(0, 1fr)' },
 }
 
-/** The widest a photo of this shape can be: the full column, unless `heights` (a CSS height per breakpoint) stops it first. */
-export const fitPhotoWidth = (heights, ratio) => Object.fromEntries(Object.entries(heights).map(([size, height]) => [size, `min(100%, ${height} * ${ratio})`]))
+// The tallest a photo may be beside a sidebar: the window less the header bar (57 px) and the page's padding (32 px).
+export const PHOTO_MAX_HEIGHT = 'calc(100dvh - 90px)'
+
+// Buttons and labels over a photo or the camera view: dark and see-through, so they read on any picture.
+export const ON_PHOTO = { bgcolor: 'brand.scrim', color: 'brand.snow' }
+export const ON_PHOTO_BUTTON = { ...ON_PHOTO, '&:hover': { bgcolor: 'brand.carbon' } }
 
 export const BOX_LABEL_TEXT = { fontSize: 11, fontWeight: 600, lineHeight: '16px' }
 

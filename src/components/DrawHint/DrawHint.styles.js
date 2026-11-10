@@ -1,4 +1,5 @@
 import { alpha, keyframes } from '@mui/material'
+import { ON_PHOTO, TOUCH_QUERY } from '../../theme.js'
 
 // One loop drags from START to END (% of the photo). Two loops, then the hint fades out.
 const LOOP_S = 2.4
@@ -23,7 +24,7 @@ const loop = (frames) => animate(`${frames} ${LOOP_S}s ease-in-out ${LOOPS} both
 export const styles = {
   root: {
     display: 'none', position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none',
-    '@media (pointer: coarse)': { display: 'block' },
+    [`@media ${TOUCH_QUERY}`]: { display: 'block' },
     ...animate(`${fadeOut} 0.3s ${LOOP_S * LOOPS}s forwards`),
   },
   box: {
@@ -40,6 +41,6 @@ export const styles = {
   // Just under the drawn box, clear of the tools and badge at the edges and the phone panel at the bottom.
   caption: {
     position: 'absolute', left: '50%', top: `${END.top + 5}%`, transform: 'translateX(-50%)', px: 1.5, py: 0.75, borderRadius: 999,
-    whiteSpace: 'nowrap', bgcolor: 'brand.scrim', color: 'brand.snow', typography: 'caption', fontWeight: 600,
+    whiteSpace: 'nowrap', ...ON_PHOTO, typography: 'caption', fontWeight: 600,
   },
 }
