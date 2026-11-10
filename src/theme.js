@@ -131,23 +131,19 @@ export const SCROLL_SHADOWS = (theme) => {
 // Strings, not numbers: in MUI's sx, width/height values from 0 to 1 mean a percentage (1 = 100%).
 export const VISUALLY_HIDDEN = { position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap' }
 
-/** The part of a screen below the header bar. It does its own scrolling; position: relative is for ScrollThumb. */
-// Phones held either way and tablets held upright: the photo fills the screen and the details sit over it.
-// Wider screens that are also tall enough (computers, tablets held sideways) show the details in a sidebar.
-export const COMPACT_QUERY = '(max-width: 899.95px), (max-height: 599.95px)'
+// Phones and tablets, held either way, and small windows: the photo fills the screen and the details sit over it.
+// Computers with a big enough window show the details in a sidebar.
+export const COMPACT_QUERY = '(max-width: 899.95px), (max-height: 599.95px), (pointer: coarse)'
 export const COMPACT = `@media ${COMPACT_QUERY}`
 
-// Phones held sideways (also compact): too short for a panel under the photo, so it runs down the right side.
-export const SIDEWAYS = '@media (max-height: 599.95px) and (orientation: landscape)'
-
-// The details panel over the photo on compact screens: its inset from the card's edge, its header and button rows,
-// and its width when it runs down the side.
-export const OVERLAY = { inset: 8, row: 48, gap: 8, sideWidth: 340 }
-// The photo is centred in the space the closed panel leaves: above it, or beside it when sideways.
+// The details panel over the photo on compact screens: its inset from the card's edge, and its header and button rows.
+export const OVERLAY = { inset: 8, row: 48, gap: 8 }
+// The closed panel: header row and button row. The photo is centred in the space above it.
 export const OVERLAY_CLOSED_PX = OVERLAY.inset * 2 + OVERLAY.row * 2 + OVERLAY.gap
-export const CLEAR_OF_PANEL = { pb: `${OVERLAY_CLOSED_PX}px` } // inside a style's [COMPACT] block
-export const CLEAR_OF_SIDE_PANEL = { pb: 0, pr: `${OVERLAY.inset * 2 + OVERLAY.sideWidth}px` } // as its [SIDEWAYS] block
+// The same inset as the panel on every side, so the photo's edges line up with the panel's.
+export const CLEAR_OF_PANEL = { p: `${OVERLAY.inset}px`, pb: `${OVERLAY_CLOSED_PX}px` } // inside a style's [COMPACT] block
 
+/** The part of a screen below the header bar. It does its own scrolling; position: relative is for ScrollThumb. */
 export const SCREEN_BODY = { position: 'relative', flex: 1, minHeight: 0, width: '100%', overflowY: 'auto', mx: 'auto' }
 
 /** Preview and Summary. Wide screens: photo on the left, details in a 380 px column on the right. Compact: the photo only. */

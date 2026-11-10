@@ -17,13 +17,15 @@ const ZoomViewer = lazy(() => import('../components/ZoomViewer/ZoomViewer.jsx'))
 const PhotoEditor = lazy(() => import('../components/PhotoEditor/PhotoEditor.jsx'))
 const MEASURE_FAILED = { grade: 'poor', title: "Couldn't read this photo", advice: 'Take the photo again to continue.' }
 const TITLE = 'Preview & quality'
+const SHORT_SCREEN = '(max-height: 599.95px)'
 
 /** `photo` is { blob, url, method }; `quality` is what usePhotoQuality returns for it. `onEdit` gets the edited photo's blob. */
 export default function PreviewScreen({ photo, quality, boxCount, onRetake, onAnnotate, onEdit }) {
   const [zooming, setZooming] = useState(false)
   const [editing, setEditing] = useState(false)
   const [confirming, setConfirming] = useState(null) // 'retake' | 'edit' (both lose the boxes) | 'quality'
-  const [detailsOpen, setDetailsOpen] = useState(true)
+  // On short screens, such as a phone held sideways, the open panel would cover the photo, so it starts closed.
+  const [detailsOpen, setDetailsOpen] = useState(() => !window.matchMedia(SHORT_SCREEN).matches)
   // Phones show the result over the photo, so the photo can fill the screen.
   const compact = useMediaQuery(COMPACT_QUERY, { noSsr: true })
   const measured = quality && !quality.failed ? quality : null

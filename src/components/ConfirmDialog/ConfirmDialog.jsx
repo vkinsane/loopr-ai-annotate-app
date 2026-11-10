@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import { Close } from '@mui/icons-material'
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton } from '@mui/material'
 import { styles } from './ConfirmDialog.styles.js'
@@ -8,14 +9,16 @@ import { styles } from './ConfirmDialog.styles.js'
  */
 export default function ConfirmDialog({ open, title, message, confirmLabel, cancelLabel = 'Keep photo', confirmColor = 'error', secondary, onConfirm, onCancel }) {
   const { label, onClick, disabled } = secondary ?? { label: cancelLabel, onClick: onCancel }
+  // Unique per dialog, so two open at once never share a label.
+  const id = useId()
   return (
-    <Dialog open={open} onClose={onCancel} aria-labelledby="confirm-title" aria-describedby="confirm-message" slotProps={{ paper: { sx: styles.paper } }}>
-      <DialogTitle id="confirm-title" sx={styles.title}>{title}</DialogTitle>
+    <Dialog open={open} onClose={onCancel} aria-labelledby={`${id}-title`} aria-describedby={`${id}-message`} slotProps={{ paper: { sx: styles.paper } }}>
+      <DialogTitle id={`${id}-title`} sx={styles.title}>{title}</DialogTitle>
       <IconButton autoFocus aria-label="Close" onClick={onCancel} sx={styles.close}>
         <Close />
       </IconButton>
       <DialogContent>
-        <DialogContentText id="confirm-message">{message}</DialogContentText>
+        <DialogContentText id={`${id}-message`}>{message}</DialogContentText>
       </DialogContent>
       <DialogActions sx={styles.actions}>
         <Button disabled={disabled} onClick={onClick} sx={styles.action}>{label}</Button>

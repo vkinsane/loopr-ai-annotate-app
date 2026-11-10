@@ -1,10 +1,11 @@
-import { CARD_RADIUS, cornerLines, SIDEWAYS } from '../theme.js'
+import { CARD_RADIUS, cornerLines } from '../theme.js'
 
 const LANDSCAPE = '@media (orientation: landscape)'
 // Phones and tablets held upright: the camera view fills the screen, and the top bar and controls sit over it.
-const PHONE = '@media (max-width: 899.95px) and (orientation: portrait)'
-// Phones held sideways (SIDEWAYS): the whole view, as tall as the screen, with the top bar and the controls column over it.
+const PHONE = '@media (orientation: portrait) and (max-width: 899.95px), (orientation: portrait) and (pointer: coarse)'
+// Phones and tablets held sideways: the whole view, as tall as the screen, with the top bar and the controls column over it.
 // Not cropped to fill the width: a 4:3 view on a wide screen would lose more than a third.
+const SIDEWAYS = '@media (orientation: landscape) and (max-height: 599.95px), (orientation: landscape) and (pointer: coarse)'
 const CONTROLS_PX = 180
 const GUIDE = { size: 32, inset: 24, line: '3px solid' }
 // On phones the guides frame the part of the view that the top bar and controls don't cover.

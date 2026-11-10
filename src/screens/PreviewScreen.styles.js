@@ -1,4 +1,4 @@
-import { CARD_RADIUS, CLEAR_OF_PANEL, CLEAR_OF_SIDE_PANEL, COMPACT, PHOTO_PAGE, SIDEWAYS } from '../theme.js'
+import { CARD_RADIUS, CLEAR_OF_PANEL, COMPACT, PHOTO_PAGE } from '../theme.js'
 
 // The tallest the photo may be beside the sidebar.
 const PHOTO_HEIGHT = 'calc(100dvh - 90px)'
@@ -16,14 +16,10 @@ export const styles = {
     alignSelf: 'start', width: ratio ? `min(100%, ${PHOTO_HEIGHT} * ${ratio})` : '100%', height: ratio ? 'auto' : PHOTO_HEIGHT,
     aspectRatio: ratio ? String(ratio) : 'auto',
     [COMPACT]: { alignSelf: 'stretch', width: '100%', height: '100%', aspectRatio: 'auto', ...CLEAR_OF_PANEL },
-    [SIDEWAYS]: CLEAR_OF_SIDE_PANEL,
   }),
   photo: { display: 'block', width: '100%', height: '100%', objectFit: 'contain' },
-  // Compact: top right, clear of the result panel at the bottom. Sideways: top left, clear of the panel on the right.
-  photoTools: {
-    position: 'absolute', right: 10, bottom: 10, display: 'flex', gap: 1,
-    [COMPACT]: { bottom: 'auto', top: 10 }, [SIDEWAYS]: { right: 'auto', left: 10 },
-  },
+  // Compact: top right, clear of the result panel at the bottom.
+  photoTools: { position: 'absolute', right: 10, bottom: 10, display: 'flex', gap: 1, [COMPACT]: { bottom: 'auto', top: 10 } },
   photoTool: {
     height: 44, px: 1.75, borderRadius: 999,
     bgcolor: 'brand.scrim', color: 'brand.snow', typography: 'button', fontSize: 14, '&:hover': { bgcolor: 'brand.carbon' },

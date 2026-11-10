@@ -1,4 +1,4 @@
-import { CARD_RADIUS, CLEAR_OF_PANEL, CLEAR_OF_SIDE_PANEL, COMPACT, PHOTO_PAGE, SIDEWAYS } from '../theme.js'
+import { CARD_RADIUS, CLEAR_OF_PANEL, COMPACT, PHOTO_PAGE } from '../theme.js'
 
 // One window tall, like Annotate: the photo shrinks to fit and the list scrolls inside.
 // Wide screens: photo on the left, details and actions on the right. Compact: the details sit over the photo.
@@ -13,7 +13,6 @@ export const styles = {
       position: 'relative', minHeight: 0, display: 'grid', placeItems: 'center', containerType: 'size',
       border: 1, borderColor: 'divider', borderRadius: CARD_RADIUS, overflow: 'hidden', bgcolor: 'brand.carbonRaised', ...CLEAR_OF_PANEL,
     },
-    [SIDEWAYS]: CLEAR_OF_SIDE_PANEL,
   },
   headerWidth: { maxWidth: PHOTO_PAGE.maxWidth },
   side: { display: 'flex', flexDirection: 'column', gap: 2, minHeight: 0 },
@@ -33,7 +32,9 @@ export const styles = {
   }),
   // A solid field, so its border and text read on the see-through panel too. The default name is a placeholder, so it is a shade lighter.
   // The label sits on the top border, half over the panel, so it gets the field's background too.
+  // Compact: the top margin keeps the floating label clear of the panel's divider.
   nameField: {
+    [COMPACT]: { mt: 0.75 },
     '& .MuiOutlinedInput-root': { bgcolor: 'background.paper' }, '& input::placeholder': { color: 'text.secondary', opacity: 1 },
     '& .MuiInputLabel-root': { bgcolor: 'background.paper', px: 0.75, ml: -0.75, borderRadius: 1 }, // the field's corner radius
   },
