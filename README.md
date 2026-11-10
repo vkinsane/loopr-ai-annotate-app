@@ -116,8 +116,6 @@ npm run dev
 <summary><strong>Trade-offs</strong></summary>
 
 - **Video frame instead of a full photo on iPhone:** iPhone Safari has no `ImageCapture`, so its photos are the size of the video stream (often 4032 × 3024, sometimes less), not the full sensor.
-- **Cropped live view on phones held upright:** filling the screen looks better than black bars, but the photo shows a little more at the sides than the screen.
-- **File size as a check:** a weak proxy for detail, because JPEG compression also changes it. It is shown, but it never blocks.
 - **Edits clear the boxes:** keeping them through a crop or turn would need box transforms. A warning is simpler and safe.
 - **Browser Back starts over** once the camera has opened. That prevents half-finished states, but it loses the work after a warning.
 - **No storage:** nothing is saved or uploaded, so a reload loses the work. This keeps photos private.
