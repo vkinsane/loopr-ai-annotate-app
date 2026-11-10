@@ -62,7 +62,7 @@ test('a dialog starts on the safe choice, traps focus and closes on Escape', asy
   await newPhoto.focus()
   await page.keyboard.press('Enter')
   const dialog = page.getByRole('dialog')
-  await expect(page.getByRole('button', { name: 'Keep photo' })).toBeFocused()
+  await expect(page.getByRole('button', { name: 'Close' })).toBeFocused()
   for (let i = 0; i < 5; i++) {
     await page.keyboard.press('Tab')
     expect(await page.evaluate(() => Boolean(document.activeElement.closest('[role=dialog]') || document.activeElement.hasAttribute('data-testid')))).toBe(true)
@@ -87,7 +87,7 @@ test('a box can be renamed and deleted from the keyboard', async ({ page }) => {
 
 test('the info tooltip opens with the keyboard', async ({ page }) => {
   await openPreview(page, { width: 1000, height: 800 })
-  await page.getByRole('button', { name: 'Zoom photo' }).focus()
+  await page.getByRole('button', { name: 'Open photo full screen' }).focus()
   await page.keyboard.press('Tab')
   expect(await focusedName(page)).toBe('More information')
   await expect(page.getByRole('tooltip')).toBeVisible()

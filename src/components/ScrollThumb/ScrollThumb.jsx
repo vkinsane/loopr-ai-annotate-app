@@ -1,8 +1,10 @@
 import { useEffect, useRef } from 'react'
 import { Box } from '@mui/material'
+import { clamp } from '../../utils'
 import { styles } from './ScrollThumb.styles.js'
 
 const MIN_THUMB_PX = 32
+const TOUCH = '(pointer: coarse)'
 
 /**
  * A scroll bar for browsers that hide theirs until you scroll, such as iPhone Safari.
@@ -16,10 +18,11 @@ export default function ScrollThumb({ component = 'span' }) {
     const scroller = thumb.parentElement
     // A scrolling element takes no width for its bar only when the browser hides bars.
     // Measured on a test element, because the real scroller may not be overflowing yet.
+    // Touch screens count too: iPhone browsers hide the bar, but the test element doesn't always show it.
     const probe = document.createElement('div')
     probe.style.cssText = 'position: absolute; visibility: hidden; overflow: scroll; width: 50px; height: 50px'
     document.body.append(probe)
-    const browserHidesBars = probe.offsetWidth === probe.clientWidth
+    const browserHidesBars = probe.offsetWidth === probe.clientWidth || window.matchMedia(TOUCH).matches
     probe.remove()
 
     function update() {
@@ -30,8 +33,11 @@ export default function ScrollThumb({ component = 'span' }) {
       if (!show) return
       const height = Math.max(MIN_THUMB_PX, (clientHeight * clientHeight) / scrollHeight)
       thumb.style.height = `${height}px`
-      // The bar scrolls with the content, so scrollTop first keeps it in view.
-      thumb.style.transform = `translateY(${scrollTop + (scrollTop / range) * (clientHeight - height)}px)`
+      // iPhone's bounce reports scrollTop past the ends. Unclamped, the bar would move below the content,
+      // make the scroll area taller, and let it scroll on into empty space.
+      const top = clamp(scrollTop, 0, range)
+      // The bar scrolls with the content, so the scroll position first keeps it in view.
+      thumb.style.transform = `translateY(${top + (top / range) * (clientHeight - height)}px)`
     }
 
     update()

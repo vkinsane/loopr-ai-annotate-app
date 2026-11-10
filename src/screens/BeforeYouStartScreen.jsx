@@ -1,4 +1,4 @@
-import { Check, CheckCircleOutlined, CropFree, PanToolOutlined, PhotoCameraOutlined, WbSunnyOutlined } from '@mui/icons-material'
+import { CenterFocusStrongOutlined, Check, CheckCircleOutlined, CropFree, HighlightAltOutlined, PanToolOutlined, PhotoCameraOutlined, WbSunnyOutlined } from '@mui/icons-material'
 import { Alert, AlertTitle, Box, Button, CircularProgress, Paper, Typography } from '@mui/material'
 import ChoosePhotoButton from '../components/ChoosePhotoButton/ChoosePhotoButton.jsx'
 import ScreenLayout from '../components/ScreenLayout/ScreenLayout.jsx'
@@ -7,12 +7,15 @@ import { useCameraPermission } from '../hooks'
 import { VISUALLY_HIDDEN } from '../theme.js'
 import { styles } from './BeforeYouStartScreen.styles.js'
 
+// Icons, not numbers: these steps happen on later screens, so they must not look like tasks for this one.
 const LATER_STEPS = [
   {
+    Icon: CenterFocusStrongOutlined,
     title: 'Capture & check',
     text: 'You get tips while you aim. After you take the photo, the app checks its resolution, file size, brightness and sharpness.',
   },
   {
+    Icon: HighlightAltOutlined,
     title: 'Annotate the photo',
     text: 'Drag on the photo to draw a box, then give it a name. Drag a box to move it, or a corner to resize it.',
   },
@@ -41,7 +44,7 @@ export default function BeforeYouStartScreen({ onBack, onStart, onPickPhoto }) {
         <ScrollThumb />
         <Box component="ol" sx={styles.steps}>
           <Paper component="li" variant="outlined" sx={styles.step}>
-            <StepHeading number={1} done={allowed} title="Allow the camera" text="Used only to take inspection photos. Photos stay on this device." />
+            <StepHeading Icon={PhotoCameraOutlined} done={allowed} title="Allow the camera" text="Used only to take inspection photos. Photos stay on this device." />
 
             <Box aria-live="polite" sx={styles.permission}>
               {state.status === 'idle' && (
@@ -68,7 +71,7 @@ export default function BeforeYouStartScreen({ onBack, onStart, onPickPhoto }) {
                     <CheckCircleOutlined fontSize="small" />
                     Camera allowed
                   </Box>
-                  <Typography sx={styles.helperText}>You are ready. Tap Open camera.</Typography>
+                  <Typography sx={styles.helperText}>You are ready to take the photo.</Typography>
                 </>
               )}
               {state.status === 'error' && (
@@ -100,9 +103,9 @@ export default function BeforeYouStartScreen({ onBack, onStart, onPickPhoto }) {
             </Box>
           </Paper>
 
-          {LATER_STEPS.map(({ title, text }, index) => (
+          {LATER_STEPS.map(({ Icon, title, text }) => (
             <Paper component="li" variant="outlined" key={title} sx={styles.laterStep(state.status === 'error')}>
-              <StepHeading number={index + 2} title={title} text={text} />
+              <StepHeading Icon={Icon} title={title} text={text} />
             </Paper>
           ))}
         </Box>
@@ -124,9 +127,9 @@ export default function BeforeYouStartScreen({ onBack, onStart, onPickPhoto }) {
           </Box>
 
           <Box sx={styles.footer}>
-            <Typography sx={styles.footerHint}>{allowed ? 'Your camera is ready.' : 'Allow the camera to continue.'}</Typography>
+            <Typography sx={styles.footerHint}>{allowed ? 'Read the steps above, then continue.' : 'Allow the camera to continue.'}</Typography>
             <Button variant="contained" size="large" fullWidth disabled={!allowed} onClick={onStart}>
-              Open camera
+              Got it, open camera
             </Button>
           </Box>
         </Box>
@@ -135,12 +138,12 @@ export default function BeforeYouStartScreen({ onBack, onStart, onPickPhoto }) {
   )
 }
 
-function StepHeading({ number, done = false, title, text }) {
+function StepHeading({ Icon, done = false, title, text }) {
   return (
     <Box sx={styles.stepHeading}>
-      <Box component="span" sx={styles.stepNumber(done)}>
-        {done ? <Check fontSize="small" /> : number}
-        {done && <Box component="span" sx={VISUALLY_HIDDEN}>Step {number} done</Box>}
+      <Box component="span" sx={styles.stepIcon(done)}>
+        {done ? <Check fontSize="small" /> : <Icon aria-hidden fontSize="small" />}
+        {done && <Box component="span" sx={VISUALLY_HIDDEN}>Done</Box>}
       </Box>
       <Box>
         <Typography component="h2" sx={styles.stepTitle}>{title}</Typography>

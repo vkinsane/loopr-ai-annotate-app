@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { drag, finishAnnotating, openAnnotate, openPreview, pageOverflow, SIZES } from './helpers.js'
+import { annotate, drag, finishAnnotating, openAnnotate, openPreview, pageOverflow, photoImage, SIZES } from './helpers.js'
 
 const MIN_TOUCH_PX = 44
 const ALL_SIZES = { ...SIZES, 'desktop at 200% zoom': [720, 450] }
@@ -39,13 +39,13 @@ for (const [name, [width, height]] of Object.entries(ALL_SIZES)) {
 
       await openAnnotate(page)
       await expectFits(page, 'annotate empty')
-      await drag(page, [0.2, 0.2], [0.7, 0.7])
+      await drag(page, [0.25, 0.35], [0.7, 0.7]) // below the zoom tools, which are at the top on phones
       await expectFits(page, 'annotate')
       await expectButtonsReachable(page, 'annotate')
       await page.getByRole('button', { name: 'Back to Preview' }).click()
       await expectFits(page, 'preview')
       await expectButtonsReachable(page, 'preview')
-      await page.getByRole('button', { name: 'Annotate' }).click()
+      await annotate(page)
       await finishAnnotating(page)
       await expectFits(page, 'summary')
       await expectButtonsReachable(page, 'summary')
@@ -87,12 +87,34 @@ test.describe('phone touch targets', () => {
     await expectTouchSize(page, 'before you start')
     await openPreview(page, { width: 1000, height: 800 })
     await expectTouchSize(page, 'preview')
-    await page.getByRole('button', { name: 'Annotate' }).click()
+    await annotate(page)
     await expect(page.getByRole('button', { name: 'Zoom in' })).toBeVisible()
     await drag(page, [0.2, 0.2], [0.7, 0.7])
     await expectTouchSize(page, 'annotate')
     await finishAnnotating(page)
     await expectTouchSize(page, 'summary')
+  })
+})
+
+test.describe('phone details panel', () => {
+  test.use({ viewport: { width: 390, height: 640 }, hasTouch: true })
+
+  test('Preview and Summary show the details over the photo and can minimise them', async ({ page }) => {
+    await openPreview(page)
+    const checks = page.getByRole('list', { name: 'Quality checks' })
+    await expect(checks).toBeVisible()
+    await page.getByRole('button', { expanded: true }).click()
+    await expect(checks).toBeHidden()
+    await page.getByRole('button', { expanded: false }).click()
+    await expect(checks).toBeVisible()
+    await annotate(page)
+    await drag(page, [0.2, 0.2], [0.6, 0.6])
+    await finishAnnotating(page)
+    const name = page.getByRole('textbox', { name: 'Photo name' })
+    await expect(name).toBeVisible()
+    await page.getByRole('button', { name: /1 annotation/, expanded: true }).click()
+    await expect(name).toBeHidden()
+    await expectFits(page, 'summary')
   })
 })
 
@@ -136,5 +158,19 @@ test.describe('scroll bars', () => {
       await drawMany(page, 14)
       await expect(thumb(page)).toBeVisible()
     })
+  })
+})
+
+test.describe('phone held sideways', () => {
+  test.use({ viewport: { width: SIZES.landscapePhone[0], height: SIZES.landscapePhone[1] }, hasTouch: true })
+
+  test('the details run down the side, clear of the photo', async ({ page }) => {
+    await openPreview(page, { width: 900, height: 1200 })
+    const photo = await photoImage(page).boundingBox()
+    const annotateButton = await page.getByRole('button', { name: 'Annotate' }).boundingBox()
+    // The image box spans the card, so the photo's right edge is where the centred picture ends.
+    const pictureRight = photo.x + photo.width / 2 + (photo.height * 0.75) / 2
+    expect(annotateButton.x).toBeGreaterThan(pictureRight)
+    expect(annotateButton.y + annotateButton.height).toBeLessThanOrEqual(SIZES.landscapePhone[1])
   })
 })

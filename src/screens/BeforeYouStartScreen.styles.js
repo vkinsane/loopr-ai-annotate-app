@@ -3,7 +3,7 @@ import { CARD_RADIUS, SCREEN_BODY } from '../theme.js'
 const MAX_WIDTH = { xs: 480, sm: 608, md: 1168 }
 
 // Phone and tablet: one column, Open camera pinned to the bottom (tablet column 560 px).
-// Desktop: the three steps side by side, tips and Open camera in one row at the bottom. Nothing is vertically centred: centring moves the page when a step grows.
+// Desktop: the three steps side by side, tips and Open camera in one row below them. Nothing is vertically centred: centring moves the page when a step grows.
 export const styles = {
   root: {
     ...SCREEN_BODY, maxWidth: MAX_WIDTH, px: { xs: 2, sm: 3 }, pt: { xs: 1, sm: 3 }, pb: { md: 5 },
@@ -17,9 +17,8 @@ export const styles = {
   step: { borderRadius: CARD_RADIUS, p: { xs: 2, sm: 2.5, md: 3 }, display: 'flex', flexDirection: 'column', gap: { xs: 1.75, md: 2 } },
   laterStep: (hideOnSmall) => ({ ...styles.step, display: { xs: hideOnSmall ? 'none' : 'flex', md: 'flex' } }),
   stepHeading: { display: 'flex', flexDirection: { md: 'column' }, gap: 1.75 },
-  stepNumber: (done) => ({
+  stepIcon: (done) => ({
     flexShrink: 0, width: 32, height: 32, borderRadius: '50%', display: 'grid', placeItems: 'center',
-    typography: 'body1', fontWeight: 700,
     bgcolor: done ? 'success.tint' : 'brand.tint', color: done ? 'success.main' : 'primary.dark',
   }),
   stepTitle: { typography: 'h2', mb: 0.5 },
@@ -32,9 +31,10 @@ export const styles = {
     bgcolor: 'success.tint', color: 'success.dark', typography: 'button', fontSize: 15,
   },
   errorSteps: { m: 0, pl: 2.25, display: 'flex', flexDirection: 'column', gap: 0.5 },
-  // Desktop: tips and Open camera in one row at the bottom. Phone and tablet: the wrapper drops out of the layout
+  // Desktop: tips and Open camera in one row right under the steps, so wide screens have no gap in the middle.
+  // Phone and tablet: the wrapper drops out of the layout
   // (display: contents) and Open camera is pinned to the bottom, so hiding steps for the blocked-camera help moves nothing.
-  bottom: { display: { xs: 'contents', md: 'flex' }, alignItems: 'flex-end', gap: 3, mt: 'auto', pt: 2.5 },
+  bottom: { display: { xs: 'contents', md: 'flex' }, alignItems: 'flex-end', gap: 3, pt: 3 },
   tips: (hideOnSmall) => ({
     display: { xs: hideOnSmall ? 'none' : 'flex', md: 'flex' }, flexGrow: { md: 1 }, mt: { xs: 1.5, md: 0 },
     px: { xs: 2, md: 3 }, py: { xs: 1.75, md: 0 }, height: { md: 52 }, borderRadius: CARD_RADIUS, bgcolor: 'brand.tint',

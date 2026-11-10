@@ -55,9 +55,17 @@ export async function openPreview(page, options) {
   await expect(page.getByRole('button', { name: 'Retake' })).toBeVisible()
 }
 
+/** Taps Annotate on Preview. A photo whose quality isn't good asks first (the default test photo is low resolution), so that is confirmed. */
+export async function annotate(page) {
+  await page.getByRole('button', { name: 'Annotate' }).click()
+  const anyway = page.getByRole('button', { name: 'Annotate anyway' })
+  await expect(anyway.or(page.getByRole('button', { name: 'Zoom in' }))).toBeVisible()
+  if (await anyway.isVisible()) await anyway.click()
+}
+
 export async function openAnnotate(page, options) {
   await openPreview(page, options)
-  await page.getByRole('button', { name: 'Annotate' }).click()
+  await annotate(page)
   await expect(page.getByRole('button', { name: 'Zoom in' })).toBeVisible()
 }
 

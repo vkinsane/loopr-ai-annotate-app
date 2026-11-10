@@ -52,3 +52,28 @@ export async function readPhotoGreyImage(blob, width) {
     bitmap.close()
   }
 }
+
+/** The photo's size after `rotation` (degrees, a multiple of 90). */
+export function turnedSize({ width, height }, rotation) {
+  return rotation % 180 === 0 ? { width, height } : { width: height, height: width }
+}
+
+/**
+ * A new canvas with the photo turned `rotation` degrees clockwise, mirrored left to right if `flipped`, then cut to
+ * `crop` (a rect in pixels of the turned photo). `scale` below 1 makes a smaller copy, for the on-screen preview.
+ */
+export function editPhoto(source, { rotation, flipped, crop }, scale = 1) {
+  const turned = turnedSize(source, rotation)
+  const canvas = document.createElement('canvas')
+  canvas.width = Math.round(crop.width * scale)
+  canvas.height = Math.round(crop.height * scale)
+  const context = canvas.getContext('2d')
+  if (!context) throw new Error('Canvas 2D context is not available')
+  // Read bottom to top: the photo is turned about its centre, then mirrored on screen, then cut.
+  context.scale(scale, scale)
+  context.translate(turned.width / 2 - crop.x, turned.height / 2 - crop.y)
+  if (flipped) context.scale(-1, 1)
+  context.rotate((rotation * Math.PI) / 180)
+  context.drawImage(source, -source.width / 2, -source.height / 2)
+  return canvas
+}

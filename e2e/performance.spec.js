@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { gzipSync } from 'node:zlib'
 import { expect, test } from '@playwright/test'
-import { canvasBoxes, downloadPhoto, drag, finishAnnotating, inspectJpeg, makePhoto, openAnnotate, pickFile } from './helpers.js'
+import { annotate, canvasBoxes, downloadPhoto, drag, finishAnnotating, inspectJpeg, makePhoto, openAnnotate, pickFile } from './helpers.js'
 
 const KB = 1024
 const FIRST_LOAD_BUDGET_KB = 200
@@ -56,7 +56,7 @@ test('a 27 MP photo goes through at full size', async ({ page }) => {
   const photo = await makePhoto(page, SIZE)
   await page.getByRole('button', { name: 'Start inspection' }).click()
   await pickFile(page, photo)
-  await page.getByRole('button', { name: 'Annotate' }).click()
+  await annotate(page)
   await expect(page.getByRole('button', { name: 'Zoom in' })).toBeVisible()
   await drag(page, [0.2, 0.2], [0.7, 0.7])
   await finishAnnotating(page)

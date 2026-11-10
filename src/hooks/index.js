@@ -1,5 +1,8 @@
 export { useCamera } from './useCamera.js'
+export { useCameraList } from './useCameraList.js'
 export { useCameraPermission } from './useCameraPermission.js'
+export { useDeviceTilt } from './useDeviceTilt.js'
+export { useExposure } from './useExposure.js'
 export { useLiveQuality } from './useLiveQuality.js'
 export { usePhotoQuality } from './usePhotoQuality.js'
 export { useScreenHistory } from './useScreenHistory.js'

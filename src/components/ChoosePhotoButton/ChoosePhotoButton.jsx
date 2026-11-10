@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { ImageOutlined } from '@mui/icons-material'
-import { Alert, Button, Link, Snackbar } from '@mui/material'
+import { Alert, Button, IconButton, Link, Snackbar } from '@mui/material'
 import { validatePhotoFile } from '../../utils'
 import { styles } from './ChoosePhotoButton.styles.js'
 
@@ -12,9 +12,9 @@ const ERROR_POSITION = { vertical: 'bottom', horizontal: 'center' }
 /**
  * Fallback when the camera can't be used: picks an existing photo from the device.
  * `onPick` receives { blob, url, method: 'upload' }, the same shape as a camera capture.
- * `asLink` renders an inline text link; otherwise a full-width button with `variant`.
+ * `asLink` renders an inline text link, `asIcon` a round icon button styled by `sx`; otherwise a full-width button with `variant`.
  */
-export default function ChoosePhotoButton({ onPick, asLink = false, variant = 'outlined' }) {
+export default function ChoosePhotoButton({ onPick, asLink = false, asIcon = false, variant = 'outlined', disabled, sx }) {
   const inputRef = useRef(null)
   const [error, setError] = useState(null)
 
@@ -38,7 +38,11 @@ export default function ChoosePhotoButton({ onPick, asLink = false, variant = 'o
   return (
     <>
       <input ref={inputRef} type="file" accept={ACCEPT} hidden onChange={handleChange} />
-      {asLink ? (
+      {asIcon ? (
+        <IconButton aria-label={label} disabled={disabled} onClick={open} sx={sx}>
+          <ImageOutlined />
+        </IconButton>
+      ) : asLink ? (
         <Link component="button" type="button" onClick={open} sx={styles.link}>
           {label}
         </Link>

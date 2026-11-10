@@ -1,11 +1,14 @@
 import { boxLabel } from './annotations.js'
 import { canvasToJpeg, drawToCanvas } from './image.js'
 
+export const DEFAULT_PHOTO_NAME = 'annotated-photo'
+const REVOKE_URL_AFTER_MS = 1000
+
 /**
- * Draws the boxes and labels onto the full-size photo and returns a JPEG blob.
+ * Draws the boxes and labels onto the full-size photo and downloads it as `name`.jpg.
  * Lines and text scale with the photo width, so they look the same as on screen.
  */
-export async function exportAnnotatedPhoto(blob, items, colors) {
+export async function downloadAnnotatedPhoto(blob, items, colors, name) {
   const bitmap = await createImageBitmap(blob)
   const canvas = drawToCanvas(bitmap, bitmap.width, bitmap.height)
   const context = canvas.getContext('2d')
@@ -36,5 +39,8 @@ export async function exportAnnotatedPhoto(blob, items, colors) {
     context.fillText(text, x + padding, labelY + padding)
   }
 
-  return canvasToJpeg(canvas)
+  const url = URL.createObjectURL(await canvasToJpeg(canvas))
+  Object.assign(document.createElement('a'), { href: url, download: `${name.trim() || DEFAULT_PHOTO_NAME}.jpg` }).click()
+  // Some browsers start the download after click() returns, so the URL is freed a little later.
+  window.setTimeout(() => URL.revokeObjectURL(url), REVOKE_URL_AFTER_MS)
 }

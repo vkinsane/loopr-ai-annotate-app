@@ -2,7 +2,10 @@ import { Box } from '@mui/material'
 import { boxLabel, labelGoesBelow, plural } from '../../utils'
 import { styles } from './PhotoWithBoxes.styles.js'
 
-/** Read-only photo with every box in lime. Positions are percentages, like AnnotationCanvas, so they fit any width. */
+/**
+ * Read-only photo with every box in lime. Positions are percentages, like AnnotationCanvas, so they fit any width.
+ * With no boxes there is no list beside it, so on tablets the photo can be taller.
+ */
 export default function PhotoWithBoxes({ photoUrl, size, items }) {
   return (
     <Box sx={styles.frame(size.width / size.height)}>

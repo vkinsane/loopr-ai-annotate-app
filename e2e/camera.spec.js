@@ -184,6 +184,7 @@ test.describe('torch', () => {
     await openCapture(page)
     await expect(shutter(page)).toBeEnabled()
     await expect(torch(page)).toHaveCount(0)
+    await expect(page.getByText('Torch not available')).toBeVisible()
   })
 
   test('shows the state the track reports', async ({ page }) => {
@@ -203,6 +204,133 @@ test.describe('torch', () => {
     await expect(page.getByText("The torch didn't respond, so try again.")).toBeVisible()
     await expect(torch(page)).toHaveAttribute('aria-pressed', 'false')
   })
+})
+
+// A camera that offers exposure from −1 to +1 EV in thirds, like many Android phones.
+async function mockExposure(page, fails) {
+  await page.addInitScript((fails) => {
+    let value = 0
+    const { getCapabilities, getSettings } = MediaStreamTrack.prototype
+    MediaStreamTrack.prototype.getCapabilities = function () {
+      return { ...getCapabilities.call(this), exposureCompensation: { min: -1, max: 1, step: 1 / 3 } }
+    }
+    MediaStreamTrack.prototype.getSettings = function () {
+      return { ...getSettings.call(this), exposureCompensation: value }
+    }
+    MediaStreamTrack.prototype.applyConstraints = async function (constraints) {
+      if (fails) throw new DOMException('test', 'OverconstrainedError')
+      value = constraints.advanced[0].exposureCompensation
+    }
+  }, fails)
+}
+
+test.describe('exposure', () => {
+  const brighter = (page) => page.getByRole('button', { name: 'Brighter' })
+  const value = (page) => page.getByRole('group', { name: 'Exposure' }).locator('output')
+
+  test('is hidden when the camera has none', async ({ page }) => {
+    await openCapture(page)
+    await expect(shutter(page)).toBeEnabled()
+    await expect(page.getByRole('group', { name: 'Exposure' })).toHaveCount(0)
+  })
+
+  test('steps by a third and stops at the limit', async ({ page }) => {
+    await mockExposure(page, false)
+    await openCapture(page)
+    await expect(value(page)).toHaveText('0 EV')
+    await brighter(page).click()
+    await expect(value(page)).toHaveText('+0.3 EV')
+    await brighter(page).click()
+    await brighter(page).click()
+    await expect(value(page)).toHaveText('+1 EV')
+    await expect(brighter(page)).toBeDisabled()
+    await page.getByRole('button', { name: 'Darker' }).click()
+    await expect(value(page)).toHaveText('+0.7 EV')
+  })
+
+  test('a failed change says so', async ({ page }) => {
+    await mockExposure(page, true)
+    await openCapture(page)
+    await brighter(page).click()
+    await expect(page.getByText("The exposure didn't change, so try again.")).toBeVisible()
+    await expect(value(page)).toHaveText('0 EV')
+  })
+})
+
+test.describe('level', () => {
+  const tiltPhone = (page, gravity) => page.evaluate((gravity) => {
+    window.dispatchEvent(new DeviceMotionEvent('devicemotion', { accelerationIncludingGravity: gravity }))
+  }, gravity)
+
+  test('is hidden until the phone reports its tilt', async ({ page }) => {
+    await openCapture(page)
+    await expect(shutter(page)).toBeEnabled()
+    await expect(page.getByText('Level', { exact: true })).toHaveCount(0)
+    await tiltPhone(page, { x: -1.7, y: 9.65, z: 0 }) // turned 10° clockwise
+    await expect(page.getByText('Turn left 10°')).toBeVisible()
+    await tiltPhone(page, { x: 0, y: 9.8, z: 0 })
+    await expect(page.getByText('Level', { exact: true })).toBeVisible()
+  })
+
+  test('is not offered on a computer', async ({ page }) => {
+    await openCapture(page)
+    await expect(shutter(page)).toBeEnabled()
+    await expect(page.getByRole('button', { name: 'Show level' })).toHaveCount(0)
+  })
+
+  test.describe('on a phone', () => {
+    test.use({ viewport: { width: 390, height: 844 }, hasTouch: true })
+
+    test('a tap asks for motion first, as iPhone needs', async ({ page }) => {
+      await page.addInitScript(() => {
+        DeviceMotionEvent.requestPermission = async () => 'granted'
+      })
+      await openCapture(page)
+      await page.getByRole('button', { name: 'Show level' }).click()
+      await tiltPhone(page, { x: 0, y: 2, z: 9.6 }) // nearly flat on a table
+      await expect(page.getByText('Hold flat: 12° off')).toBeVisible()
+      await expect(page.getByRole('button', { name: 'Show level' })).toHaveCount(0)
+    })
+  })
+})
+
+test.describe('choosing a camera', () => {
+  const switchButton = (page) => page.getByRole('button', { name: 'Switch camera' })
+
+  test('the list is hidden with only one camera', async ({ page }) => {
+    await openCapture(page)
+    await expect(shutter(page)).toBeEnabled()
+    await expect(switchButton(page)).toHaveCount(0)
+  })
+
+  test('another camera can be picked from the list', async ({ page }) => {
+    // A second camera next to the fake one. Asking for it opens the fake one, and the request is kept to check.
+    await page.addInitScript(() => {
+      const { enumerateDevices, getUserMedia } = MediaDevices.prototype
+      MediaDevices.prototype.enumerateDevices = async function () {
+        const devices = await enumerateDevices.call(this)
+        return [...devices, { kind: 'videoinput', deviceId: 'second', label: 'Front camera', groupId: '' }]
+      }
+      MediaDevices.prototype.getUserMedia = function (constraints) {
+        window.__lastVideo = constraints.video
+        const { deviceId, ...video } = constraints.video
+        return getUserMedia.call(this, { ...constraints, video: deviceId?.exact === 'second' ? video : constraints.video })
+      }
+    })
+    await openCapture(page)
+    await expect(shutter(page)).toBeEnabled()
+    await switchButton(page).click()
+    await page.getByRole('menuitem', { name: 'Front camera' }).click()
+    await expect(shutter(page)).toBeEnabled()
+    expect(await page.evaluate(() => window.__lastVideo.deviceId)).toEqual({ exact: 'second' })
+  })
+})
+
+test('a photo from the device can be chosen on the camera screen', async ({ page }) => {
+  await openCapture(page)
+  await expect(shutter(page)).toBeEnabled()
+  await pickFile(page, await makePhoto(page))
+  await expect(page.getByRole('button', { name: 'Retake' })).toBeVisible()
 })
 
 test('two tabs can open the camera without breaking each other', async ({ page, context }) => {

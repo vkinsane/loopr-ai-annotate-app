@@ -6,6 +6,7 @@ const BRAND = {
   ink: '#09123d', slate: '#4a5870', mist: '#f4f6fb', border: '#dde4ed', tint: '#ebedf9',
   carbon: '#05091c', carbonRaised: '#12173c', carbonBorder: '#252c4c', frost: '#c7d2ff',
   lime: '#cefe6f', limeDark: '#a8d94a', white: '#ffffff', snow: '#f8fafc', scrim: 'rgba(5, 9, 28, 0.55)',
+  gridLine: 'rgba(255, 255, 255, 0.4)',
 }
 const SCROLLBAR_PX = 8
 const HEADING_FONT = "'Outfit', system-ui, sans-serif"
@@ -58,6 +59,8 @@ const shared = {
           '#root > *': { animation: 'screen-in 180ms ease-out' },
         },
         '@keyframes screen-in': { from: { opacity: 0 } },
+        // iPhone Safari zooms the page into a field whose text is under 16 px, and the layout breaks while typing.
+        '@media (pointer: coarse)': { '.MuiInputBase-root .MuiInputBase-input': { fontSize: 16 } },
         // Shown only when an area's content overflows, and then always, even in browsers that hide scrollbars until you scroll.
         '*::-webkit-scrollbar': { width: SCROLLBAR_PX, height: SCROLLBAR_PX },
         '*::-webkit-scrollbar-track': { background: theme.palette.brand.tint },
@@ -129,12 +132,28 @@ export const SCROLL_SHADOWS = (theme) => {
 export const VISUALLY_HIDDEN = { position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap' }
 
 /** The part of a screen below the header bar. It does its own scrolling; position: relative is for ScrollThumb. */
+// Phones held either way and tablets held upright: the photo fills the screen and the details sit over it.
+// Wider screens that are also tall enough (computers, tablets held sideways) show the details in a sidebar.
+export const COMPACT_QUERY = '(max-width: 899.95px), (max-height: 599.95px)'
+export const COMPACT = `@media ${COMPACT_QUERY}`
+
+// Phones held sideways (also compact): too short for a panel under the photo, so it runs down the right side.
+export const SIDEWAYS = '@media (max-height: 599.95px) and (orientation: landscape)'
+
+// The details panel over the photo on compact screens: its inset from the card's edge, its header and button rows,
+// and its width when it runs down the side.
+export const OVERLAY = { inset: 8, row: 48, gap: 8, sideWidth: 340 }
+// The photo is centred in the space the closed panel leaves: above it, or beside it when sideways.
+export const OVERLAY_CLOSED_PX = OVERLAY.inset * 2 + OVERLAY.row * 2 + OVERLAY.gap
+export const CLEAR_OF_PANEL = { pb: `${OVERLAY_CLOSED_PX}px` } // inside a style's [COMPACT] block
+export const CLEAR_OF_SIDE_PANEL = { pb: 0, pr: `${OVERLAY.inset * 2 + OVERLAY.sideWidth}px` } // as its [SIDEWAYS] block
+
 export const SCREEN_BODY = { position: 'relative', flex: 1, minHeight: 0, width: '100%', overflowY: 'auto', mx: 'auto' }
 
-/** Preview and Summary. Desktop: photo on the left, details in a 380 px column on the right. */
+/** Preview and Summary. Wide screens: photo on the left, details in a 380 px column on the right. Compact: the photo only. */
 export const PHOTO_PAGE = {
-  ...SCREEN_BODY, maxWidth: { xs: 600, md: 1200 }, display: 'grid',
-  gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'minmax(0, 1fr) 380px' },
+  ...SCREEN_BODY, maxWidth: 1200, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 380px',
+  [COMPACT]: { gridTemplateColumns: 'minmax(0, 1fr)' },
 }
 
 /** The widest a photo of this shape can be: the full column, unless `heights` (a CSS height per breakpoint) stops it first. */

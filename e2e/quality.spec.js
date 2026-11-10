@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { makePhoto, openBeforeYouStart, openPreview, pickFile, withExifRotation } from './helpers.js'
+import { annotate, drag, makePhoto, openBeforeYouStart, openPreview, pickFile, withExifRotation } from './helpers.js'
 
 const row = (page, label) => page.getByRole('list', { name: 'Quality checks' }).getByRole('listitem').filter({ hasText: label })
 const BIG = { width: 4000, height: 3000 }
@@ -18,6 +18,21 @@ test('a dark photo is Poor, with advice, and Retake becomes the main button', as
   await expect(page.getByRole('alert')).toContainText(/dark/i)
   await expect(page.getByRole('button', { name: 'Retake' })).toHaveClass(/contained/)
   await expect(page.getByRole('button', { name: 'Annotate' })).toBeEnabled()
+})
+
+test('a good photo goes straight to Annotate', async ({ page }) => {
+  await openPreview(page, BIG)
+  await page.getByRole('button', { name: 'Annotate' }).click()
+  await expect(page.getByRole('button', { name: 'Zoom in' })).toBeVisible()
+})
+
+test('a weak photo asks before Annotate, and offers Retake', async ({ page }) => {
+  await openPreview(page, { ...BIG, kind: 'dark' })
+  await page.getByRole('button', { name: 'Annotate' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Annotate this photo?' })
+  await expect(dialog).toContainText('Photo is too dark')
+  await dialog.getByRole('button', { name: 'Retake' }).click()
+  await expect(page.getByRole('button', { name: 'Take photo' })).toBeVisible()
 })
 
 test('a very bright photo is Poor', async ({ page }) => {
@@ -41,6 +56,29 @@ test('the info button explains how to improve', async ({ page }) => {
   await openPreview(page, { width: 1000, height: 800 })
   await row(page, 'Resolution').getByRole('button', { name: 'More information' }).hover()
   await expect(page.getByRole('tooltip')).toContainText(/\w+/)
+})
+
+test.describe('on a phone', () => {
+  test.use({ viewport: { width: 390, height: 664 }, hasTouch: true })
+
+  test('a tap on the info button opens its tip and a second tap closes it', async ({ page }) => {
+    await openPreview(page, { width: 1000, height: 800 })
+    const info = row(page, 'Resolution').getByRole('button', { name: 'More information' })
+    await info.tap()
+    await expect(page.getByRole('tooltip')).toBeVisible()
+    await info.tap()
+    await expect(page.getByRole('tooltip')).toBeHidden()
+  })
+
+  test('fields use 16 px text, so iPhone Safari does not zoom in while typing', async ({ page }) => {
+    await openPreview(page)
+    await annotate(page)
+    await drag(page, [0.25, 0.35], [0.6, 0.6])
+    await page.getByRole('button', { name: '1 annotation', exact: true }).click()
+    const inputs = await page.locator('input:not([type=file])').all()
+    expect(inputs.length).toBeGreaterThan(0)
+    for (const input of inputs) expect(await input.evaluate((element) => getComputedStyle(element).fontSize)).toBe('16px')
+  })
 })
 
 test('a damaged photo reports that it cannot be read and blocks Annotate', async ({ page }) => {
@@ -76,7 +114,6 @@ test('PNG and WebP photos are accepted', async ({ page }) => {
   await expect(row(page, 'Resolution')).toContainText('400 × 300')
   await page.getByRole('button', { name: 'Retake' }).click()
   await expect(page.getByRole('button', { name: 'Take photo' })).toBeVisible()
-  await page.goBack()
   await openBeforeYouStart(page)
   await pickFile(page, Buffer.from(webp, 'base64'), 'a.webp', 'image/webp')
   await expect(row(page, 'Resolution')).toContainText('400 × 300')

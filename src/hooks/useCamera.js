@@ -2,13 +2,12 @@ import { useEffect, useState } from 'react'
 import { IN_USE_ERROR, UNSUPPORTED_ERROR, canUseCamera, canvasToJpeg, drawToCanvas, toCameraError } from '../utils'
 
 // `ideal` never rejects, unlike `exact` or `min`. 4:3 matches most phone sensors, so nothing is cropped to 16:9.
-const CONSTRAINTS = {
-  audio: false,
-  video: {
-    facingMode: { ideal: 'environment' },
-    width: { ideal: 4096 },
-    height: { ideal: 3072 },
-  },
+const VIDEO_SIZE = { width: { ideal: 4096 }, height: { ideal: 3072 } }
+
+// The camera the user chose from the list, or else the rear one.
+function constraintsFor(deviceId) {
+  const camera = deviceId ? { deviceId: { exact: deviceId } } : { facingMode: { ideal: 'environment' } }
+  return { audio: false, video: { ...camera, ...VIDEO_SIZE } }
 }
 
 function isPageVisible() {
@@ -18,12 +17,14 @@ function isPageVisible() {
 /**
  * Streams the rear camera into `videoRef` while mounted and the page is visible.
  * `state` is one of { status: 'starting' }, { status: 'live', width, height, track }, { status: 'error', error }.
+ * `selectCamera(deviceId)` switches to another camera from useCameraList.
  */
 export function useCamera(videoRef) {
   const [state, setState] = useState(() =>
     canUseCamera() ? { status: 'starting' } : { status: 'error', error: UNSUPPORTED_ERROR },
   )
   const [attempt, setAttempt] = useState(0)
+  const [deviceId, setDeviceId] = useState(null)
   const [visible, setVisible] = useState(isPageVisible)
 
   // Release the camera while the page is hidden (tab switch, app in background, screen locked).
@@ -53,7 +54,7 @@ export function useCamera(videoRef) {
     video.addEventListener('loadedmetadata', updateSize)
     video.addEventListener('resize', updateSize)
 
-    navigator.mediaDevices.getUserMedia(CONSTRAINTS).then(
+    navigator.mediaDevices.getUserMedia(constraintsFor(deviceId)).then(
       (stream) => {
         // StrictMode, or leaving the screen quickly, can run cleanup before the request finishes.
         if (request.signal.aborted) {
@@ -77,11 +78,17 @@ export function useCamera(videoRef) {
       if (video.srcObject instanceof MediaStream) video.srcObject.getTracks().forEach((track) => track.stop())
       video.srcObject = null
     }
-  }, [videoRef, attempt, visible])
+  }, [videoRef, attempt, visible, deviceId])
 
   function retry() {
     setState({ status: 'starting' })
     setAttempt((count) => count + 1)
+  }
+
+  // 'starting' at once, so nothing uses the old camera's track while the new one opens.
+  function selectCamera(id) {
+    setState({ status: 'starting' })
+    setDeviceId(id)
   }
 
   /** Resolves with { blob, url, method }. The frame freezes while saving and resumes if capture fails. */
@@ -108,7 +115,7 @@ export function useCamera(videoRef) {
     }
   }
 
-  return { state, retry, capture }
+  return { state, retry, capture, selectCamera }
 }
 
 // Width and height come later from the quality check, which decodes the photo anyway.

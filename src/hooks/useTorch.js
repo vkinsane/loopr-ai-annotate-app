@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { applyCameraSetting } from '../utils'
 
 // `on` is read from the track each render, not stored, so it always shows the real hardware state.
 export function useTorch(track) {
@@ -13,8 +14,7 @@ export function useTorch(track) {
     setPending(true)
     setFailed(false)
     try {
-      // applyConstraints replaces all constraints, so pass the current ones (resolution, camera) back.
-      await track.applyConstraints({ ...track.getConstraints(), advanced: [{ torch: !on }] })
+      await applyCameraSetting(track, { torch: !on })
     } catch (error) {
       console.error('Torch change failed', error)
       setFailed(true)

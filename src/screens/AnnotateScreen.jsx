@@ -1,22 +1,29 @@
 import { useEffect, useState } from 'react'
-import { Box, Button, Typography } from '@mui/material'
+import { Box, Button, Typography, useMediaQuery, useTheme } from '@mui/material'
 import AnnotationCanvas from '../components/AnnotationCanvas/AnnotationCanvas.jsx'
 import AnnotationList from '../components/AnnotationList/AnnotationList.jsx'
 import ConfirmDialog from '../components/ConfirmDialog/ConfirmDialog.jsx'
+import DetailsOverlay from '../components/DetailsOverlay/DetailsOverlay.jsx'
 import QualityChecks from '../components/QualityChecks/QualityChecks.jsx'
 import ScreenLayout from '../components/ScreenLayout/ScreenLayout.jsx'
 import ScrollThumb from '../components/ScrollThumb/ScrollThumb.jsx'
 import StatusBadge from '../components/StatusBadge/StatusBadge.jsx'
-import { gradePhoto, plural, qualityChecks } from '../utils'
+import { downloadAnnotatedPhoto, gradePhoto, plural, qualityChecks } from '../utils'
+import { COMPACT_QUERY } from '../theme.js'
 import { styles } from './AnnotateScreen.styles.js'
 
 /**
  * `photo` is { blob, url }, `quality` the measured { width, height, brightness, sharpness }.
- * `annotations` and `dispatch` come from App's annotations reducer.
+ * `annotations` and `dispatch` come from App's annotations reducer. `photoName` names the downloaded file.
  */
-export default function AnnotateScreen({ photo, quality, annotations, dispatch, onBack, onNewPhoto, onDone }) {
+export default function AnnotateScreen({ photo, quality, annotations, dispatch, photoName, onBack, onNewPhoto, onDone }) {
+  const theme = useTheme()
   const { items, selectedId } = annotations
   const [confirming, setConfirming] = useState(false)
+  const [download, setDownload] = useState('idle') // 'idle' | 'working' | 'failed'
+  // Phones: the list is on a panel over the photo, minimised at first so it doesn't cover the photo while drawing.
+  const compact = useMediaQuery(COMPACT_QUERY, { noSsr: true })
+  const [listOpen, setListOpen] = useState(false)
   const [confirmingNoBoxes, setConfirmingNoBoxes] = useState(false)
   const checks = qualityChecks(photo.blob.size, quality)
   const issues = checks.filter((check) => check.grade !== 'good')
@@ -34,6 +41,18 @@ export default function AnnotateScreen({ photo, quality, annotations, dispatch, 
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [selectedId, dispatch])
 
+  async function downloadAndStartNew() {
+    setDownload('working')
+    try {
+      const { lime, ink } = theme.palette.brand
+      await downloadAnnotatedPhoto(photo.blob, items, { box: lime, outline: ink }, photoName)
+      onNewPhoto()
+    } catch (error) {
+      console.error('Photo download failed', error)
+      setDownload('failed')
+    }
+  }
+
   const actions = (
     <>
       {issues.length > 0 && (
@@ -50,6 +69,22 @@ export default function AnnotateScreen({ photo, quality, annotations, dispatch, 
     </>
   )
 
+  const list = (
+    <AnnotationList
+      items={items}
+      selectedId={selectedId}
+      heading={!compact}
+      onSelect={select}
+      onRename={(id, label) => dispatch({ type: 'rename', id, label })}
+      onRemove={(id) => dispatch({ type: 'remove', id })}
+    />
+  )
+  const doneButton = (
+    <Button variant="contained" size="large" fullWidth onClick={() => (items.length > 0 ? onDone() : setConfirmingNoBoxes(true))}>
+      {items.length > 0 ? `Done · ${plural(items.length, 'annotation')}` : 'Done'}
+    </Button>
+  )
+
   return (
     <ScreenLayout title="Annotate" onBack={onBack} backLabel="Back to Preview" actions={actions} headerSx={styles.headerWidth}>
       <Box component="main" sx={styles.root}>
@@ -62,36 +97,43 @@ export default function AnnotateScreen({ photo, quality, annotations, dispatch, 
           onAdd={(rect) => dispatch({ type: 'add', id: crypto.randomUUID(), rect })}
           onChange={(id, rect) => dispatch({ type: 'change', id, rect })}
           onSelect={select}
+          overlay={compact && (
+            <DetailsOverlay title={plural(items.length, 'annotation')} open={listOpen} onToggle={() => setListOpen(!listOpen)} actions={doneButton}>
+              {list}
+            </DetailsOverlay>
+          )}
         />
 
-        <Box sx={styles.sidebar}>
-          <AnnotationList
-            items={items}
-            selectedId={selectedId}
-            onSelect={select}
-            onRename={(id, label) => dispatch({ type: 'rename', id, label })}
-            onRemove={(id) => dispatch({ type: 'remove', id })}
-          />
+        {!compact && (
+          <Box sx={styles.sidebar}>
+            {list}
 
-          <Box component="section" aria-labelledby="quality-heading" sx={styles.quality}>
-            <Typography id="quality-heading" component="h2" sx={styles.qualityTitle}>Photo quality</Typography>
-            <QualityChecks checks={checks} compact />
-          </Box>
+            <Box component="section" aria-labelledby="quality-heading" sx={styles.quality}>
+              <Typography id="quality-heading" component="h2" sx={styles.qualityTitle}>Photo quality</Typography>
+              <QualityChecks checks={checks} compact />
+            </Box>
 
-          <Box sx={styles.doneBar}>
-            <Button variant="contained" size="large" fullWidth onClick={() => (items.length > 0 ? onDone() : setConfirmingNoBoxes(true))}>
-              {items.length > 0 ? `Done · ${plural(items.length, 'annotation')}` : 'Done'}
-            </Button>
+            <Box sx={styles.doneBar}>{doneButton}</Box>
           </Box>
-        </Box>
+        )}
 
         <ConfirmDialog
           open={confirming}
           title="Discard this photo?"
-          message={`This photo and its ${plural(items.length, 'box', 'boxes')} will be lost.`}
+          message={download === 'failed'
+            ? "Couldn't make the photo, so try again."
+            : `This photo and its ${plural(items.length, 'box', 'boxes')} will be lost unless you download it.`}
           confirmLabel="Discard"
+          secondary={{
+            label: download === 'working' ? 'Preparing photo…' : 'Download and start new',
+            disabled: download === 'working',
+            onClick: downloadAndStartNew,
+          }}
           onConfirm={onNewPhoto}
-          onCancel={() => setConfirming(false)}
+          onCancel={() => {
+            setConfirming(false)
+            setDownload('idle')
+          }}
         />
 
         <ConfirmDialog
