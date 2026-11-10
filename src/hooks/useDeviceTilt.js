@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
+import { TOUCH_QUERY } from '../theme.js'
 import { readTilt } from '../utils'
 
 // iPhone shares motion only after the user agrees, which has to start from a tap. Chrome has the same function
 // but sends readings without it, so listening starts anyway and the tap is only offered until a reading comes.
 // Computers have no motion sensor, so the tap is offered on touch screens only.
-const askFirst = () => typeof window.DeviceMotionEvent?.requestPermission === 'function' && window.matchMedia('(pointer: coarse)').matches
+const askFirst = () => typeof window.DeviceMotionEvent?.requestPermission === 'function' && window.matchMedia(TOUCH_QUERY).matches
 
 /**
  * The phone's tilt from its gravity sensor while `enabled`: { roll, pitch } in degrees (see readTilt), or null before

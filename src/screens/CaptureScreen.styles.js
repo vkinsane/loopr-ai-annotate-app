@@ -1,10 +1,11 @@
-import { CARD_RADIUS, cornerLines, SIDEWAYS } from '../theme.js'
+import { CARD_RADIUS, cornerLines, NARROW_QUERY, ON_PHOTO_BUTTON, SHORT_QUERY, TOUCH_QUERY } from '../theme.js'
 
 const LANDSCAPE = '@media (orientation: landscape)'
 // Phones and tablets held upright: the camera view fills the screen, and the top bar and controls sit over it.
-const PHONE = '@media (max-width: 899.95px) and (orientation: portrait)'
-// Phones held sideways (SIDEWAYS): the whole view, as tall as the screen, with the top bar and the controls column over it.
+const PHONE = `@media (orientation: portrait) and ${NARROW_QUERY}, (orientation: portrait) and ${TOUCH_QUERY}`
+// Phones and tablets held sideways: the whole view, as tall as the screen, with the top bar and the controls column over it.
 // Not cropped to fill the width: a 4:3 view on a wide screen would lose more than a third.
+const SIDEWAYS = `@media (orientation: landscape) and ${SHORT_QUERY}, (orientation: landscape) and ${TOUCH_QUERY}`
 const CONTROLS_PX = 180
 const GUIDE = { size: 32, inset: 24, line: '3px solid' }
 // On phones the guides frame the part of the view that the top bar and controls don't cover.
@@ -86,7 +87,7 @@ export const styles = {
   round: { width: 52, height: 52, color: 'text.primary', bgcolor: 'action.selected', '&:hover': { bgcolor: 'action.focus' } },
   levelButton: {
     position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', minHeight: 44, px: 1.5, borderRadius: 999,
-    color: 'common.white', bgcolor: 'brand.scrim', '&:hover': { bgcolor: 'brand.carbon' },
+    ...ON_PHOTO_BUTTON,
   },
   shutterFill: { width: '100%', height: '100%', borderRadius: '50%', bgcolor: 'common.white' },
   torch: (on) => ({

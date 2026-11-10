@@ -108,7 +108,7 @@ test.describe('phone details panel', () => {
     await page.getByRole('button', { expanded: false }).click()
     await expect(checks).toBeVisible()
     await annotate(page)
-    await drag(page, [0.2, 0.2], [0.6, 0.6])
+    await drag(page, [0.3, 0.3], [0.7, 0.7]) // below the zoom tools, which sit over the photo
     await finishAnnotating(page)
     const name = page.getByRole('textbox', { name: 'Photo name' })
     await expect(name).toBeVisible()
@@ -161,16 +161,37 @@ test.describe('scroll bars', () => {
   })
 })
 
-test.describe('phone held sideways', () => {
-  test.use({ viewport: { width: SIZES.landscapePhone[0], height: SIZES.landscapePhone[1] }, hasTouch: true })
+// Sideways phones and tablets show the phone layout: the result and buttons over the bottom of the photo card.
+for (const [name, [width, height]] of Object.entries({ 'phone held sideways': SIZES.landscapePhone, 'tablet held sideways': [1180, 820] })) {
+  test.describe(name, () => {
+    test.use({ viewport: { width, height }, hasTouch: true })
 
-  test('the details run down the side, clear of the photo', async ({ page }) => {
-    await openPreview(page, { width: 900, height: 1200 })
-    const photo = await photoImage(page).boundingBox()
-    const annotateButton = await page.getByRole('button', { name: 'Annotate' }).boundingBox()
-    // The image box spans the card, so the photo's right edge is where the centred picture ends.
-    const pictureRight = photo.x + photo.width / 2 + (photo.height * 0.75) / 2
-    expect(annotateButton.x).toBeGreaterThan(pictureRight)
-    expect(annotateButton.y + annotateButton.height).toBeLessThanOrEqual(SIZES.landscapePhone[1])
+    test('the details sit over the photo, as on a phone', async ({ page }) => {
+      await openPreview(page, { width: 900, height: 1200 })
+      const card = await photoImage(page).boundingBox()
+      const annotateButton = await page.getByRole('button', { name: 'Annotate' }).boundingBox()
+      expect(annotateButton.x).toBeGreaterThan(card.x)
+      expect(annotateButton.x + annotateButton.width).toBeLessThan(card.x + card.width)
+      expect(annotateButton.y).toBeGreaterThan(card.y + card.height / 2)
+      expect(annotateButton.y + annotateButton.height).toBeLessThanOrEqual(height)
+    })
+  })
+}
+
+test.describe('phone summary with many boxes', () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true })
+
+  test('the list scrolls in its own box, and the photo name stays in view', async ({ page }) => {
+    await openAnnotate(page, { width: 900, height: 1200 })
+    for (let i = 0; i < 9; i++) {
+      const [x, y] = [0.15 + (i % 3) * 0.25, 0.25 + Math.floor(i / 3) * 0.12]
+      await drag(page, [x, y], [x + 0.15, y + 0.08])
+    }
+    await finishAnnotating(page)
+    const list = page.getByRole('region', { name: 'Annotations' }).locator('ul')
+    expect(await list.evaluate((ul) => ul.scrollHeight > ul.clientHeight)).toBe(true)
+    await list.evaluate((ul) => { ul.scrollTop = ul.scrollHeight })
+    await expect(page.getByRole('textbox', { name: 'Photo name' })).toBeInViewport()
+    await expect(list.getByText('Annotation 9')).toBeInViewport()
   })
 })

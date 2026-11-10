@@ -59,21 +59,6 @@ function App() {
   // A picked photo skips the camera.
   const handleNewPhoto = (newPhoto) => replacePhoto(newPhoto, 'preview')
 
-  return (
-    <>
-      {renderScreen()}
-      <ConfirmDialog
-        open={leaving}
-        title="Start over?"
-        message="Going back or forward in the browser starts a new inspection from the first page. The photo and boxes won't be kept."
-        confirmLabel="Start over"
-        cancelLabel="Stay here"
-        onConfirm={restart}
-        onCancel={stay}
-      />
-    </>
-  )
-
   function renderScreen() {
     if (screen === 'landing') return <LandingScreen onNext={() => go('before-you-start')} />
     if (screen === 'before-you-start') {
@@ -111,6 +96,21 @@ function App() {
       </Suspense>
     )
   }
+
+  return (
+    <>
+      {renderScreen()}
+      <ConfirmDialog
+        open={leaving}
+        title="Start over?"
+        message="Going back or forward in the browser starts a new inspection from the first page. The photo and boxes won't be kept."
+        confirmLabel="Start over"
+        cancelLabel="Stay here"
+        onConfirm={restart}
+        onCancel={stay}
+      />
+    </>
+  )
 }
 
 export default App

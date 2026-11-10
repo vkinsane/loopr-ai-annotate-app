@@ -1,3 +1,5 @@
+import { ON_PHOTO } from '../../theme.js'
+
 const LINE_PX = 120
 const MARK_PX = 20
 const GAP_PX = 8
@@ -17,6 +19,6 @@ export const styles = {
   }),
   text: (level) => ({
     position: 'absolute', top: 12, left: 0, transform: 'translateX(-50%)', px: 1, py: 0.25, borderRadius: 999, whiteSpace: 'nowrap',
-    bgcolor: 'brand.scrim', color: color(level), typography: 'caption', fontWeight: 600, fontVariantNumeric: 'tabular-nums',
+    ...ON_PHOTO, color: color(level), typography: 'caption', fontWeight: 600, fontVariantNumeric: 'tabular-nums',
   }),
 }
