@@ -15,7 +15,7 @@ export default function ZoomViewer({ photoUrl, onClose }) {
     <ThemeProvider theme={cameraTheme}>
       <Dialog fullScreen open onClose={onClose} aria-label="Zoomed photo" slotProps={{ paper: { sx: styles.paper } }}>
         <Box sx={styles.top}>
-          <IconButton aria-label="Close zoom" onClick={onClose} sx={styles.close}>
+          <IconButton aria-label="Close full screen" onClick={onClose} sx={styles.close}>
             <Close />
           </IconButton>
           <Typography aria-live="polite" sx={styles.level}>{Math.round(zoom * 100)}%</Typography>

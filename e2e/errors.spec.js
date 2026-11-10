@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { downloadPhoto, drag, finishAnnotating, openAnnotateWithBox, openPreview } from './helpers.js'
+import { annotate, downloadPhoto, drag, finishAnnotating, openAnnotateWithBox, openPreview } from './helpers.js'
 
 const ANNOTATE_CHUNK = '**/assets/AnnotateScreen-*.js'
 
@@ -9,7 +9,7 @@ test('a slow screen download shows the loader', async ({ page }) => {
     await route.continue()
   })
   await openPreview(page)
-  await page.getByRole('button', { name: 'Annotate' }).click()
+  await annotate(page)
   await expect(page.getByRole('status').filter({ hasText: 'Loading…' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Zoom in' })).toBeVisible()
 })
@@ -18,7 +18,7 @@ test('a failed screen download does not leave a blank page', async ({ page }) =>
   test.fail(true, 'Open finding: there is no error boundary around the lazy screens.')
   await page.route(ANNOTATE_CHUNK, (route) => route.abort())
   await openPreview(page)
-  await page.getByRole('button', { name: 'Annotate' }).click()
+  await annotate(page)
   await page.waitForTimeout(1000)
   await expect(page.locator('#root')).not.toBeEmpty()
 })

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { AddBoxOutlined, DeleteOutlined, EditOutlined } from '@mui/icons-material'
+import { AddBoxOutlined, Check, DeleteOutlined, EditOutlined } from '@mui/icons-material'
 import { Box, IconButton, InputBase, Tooltip, Typography } from '@mui/material'
 import { VISUALLY_HIDDEN } from '../../theme.js'
 import { boxLabel, finishText, TEXT_RULES, validateText } from '../../utils'
@@ -7,22 +7,36 @@ import ScrollThumb from '../ScrollThumb/ScrollThumb.jsx'
 import { styles } from './AnnotationList.styles.js'
 
 const RULE = TEXT_RULES.annotationName
+const MOUSE = '(pointer: fine)'
 
 /**
  * One row per box: editable label, size in photo pixels, delete. Focusing a row selects its box.
  * Labels are checked with `validateText` while typing or pasting and `finishText` on blur. Their message floats as a
  * tooltip under the field, so no row moves; a hidden live region reads it to screen readers.
- * `readOnly` shows only the names and sizes, for the Summary screen.
+ * `readOnly` shows only the names and sizes, for the Summary screen. `heading={false}` drops the title row, for a panel that has its own.
  */
-export default function AnnotationList({ items, selectedId, readOnly = false, onSelect, onRename, onRemove }) {
+export default function AnnotationList({ items, selectedId, readOnly = false, heading = true, onSelect, onRename, onRemove }) {
   const listRef = useRef(null)
   const labelBeforeEdit = useRef('')
   const [note, setNote] = useState(null) // { id, text, warn }: the message from validation
+  const [editingId, setEditingId] = useState(null) // the row whose name is being typed
 
   // A new or selected box may be below the fold of the scrolling list.
   useEffect(() => {
     listRef.current?.querySelector(`[data-id="${selectedId}"]`)?.scrollIntoView({ block: 'nearest' })
   }, [selectedId])
+
+  // A new box is named next, so its field takes focus with the default name selected.
+  // Only with a mouse: on touch screens the keyboard would cover the photo after every box.
+  const count = useRef(items.length)
+  useEffect(() => {
+    const added = items.length > count.current
+    count.current = items.length
+    if (!added || readOnly || !window.matchMedia(MOUSE).matches) return
+    const input = listRef.current?.querySelector(`[data-id="${items.at(-1).id}"] input`)
+    input?.focus()
+    input?.select()
+  }, [items, readOnly])
 
   const showNote = (item, message) => setNote(message && { id: item.id, ...message })
 
@@ -41,7 +55,7 @@ export default function AnnotationList({ items, selectedId, readOnly = false, on
 
   return (
     <Box component="section" aria-label="Annotations" sx={styles.root(readOnly)}>
-      {!readOnly && (
+      {!readOnly && heading && (
         <Box sx={styles.header}>
           <Typography component="h2" sx={styles.title}>Annotations</Typography>
           <Typography sx={styles.count}>{items.length}</Typography>
@@ -90,10 +104,14 @@ export default function AnnotationList({ items, selectedId, readOnly = false, on
                     onChange={(event) => handleChange(item, event.target.value)}
                     onFocus={() => {
                       labelBeforeEdit.current = item.label
+                      setEditingId(item.id)
                       onSelect(item.id)
                     }}
-                    onBlur={() => handleBlur(item)}
-                    onKeyDown={(event) => event.key === 'Enter' && event.currentTarget.blur()}
+                    onBlur={() => {
+                      setEditingId(null)
+                      handleBlur(item)
+                    }}
+                    onKeyDown={(event) => (event.key === 'Enter' || event.key === 'Escape') && event.currentTarget.blur()}
                     inputProps={{
                       'aria-label': `Name of annotation ${index + 1}`,
                       title: item.label,
@@ -106,16 +124,19 @@ export default function AnnotationList({ items, selectedId, readOnly = false, on
                   />
                 </Tooltip>
                 <Typography sx={styles.size}>{Math.round(item.width)} × {Math.round(item.height)}</Typography>
+                {/* While typing, the pencil becomes a check that finishes. mousedown keeps the focus, so the tap reaches it. */}
                 <IconButton
-                  aria-label={`Edit ${name}`}
+                  aria-label={editingId === item.id ? `Finish editing ${name}` : `Edit ${name}`}
+                  onMouseDown={(event) => event.preventDefault()}
                   onClick={(event) => {
                     const input = event.currentTarget.closest('li').querySelector('input')
+                    if (editingId === item.id) return input.blur()
                     input.focus()
                     input.select()
                   }}
                   sx={styles.edit}
                 >
-                  <EditOutlined />
+                  {editingId === item.id ? <Check /> : <EditOutlined />}
                 </IconButton>
                 <IconButton
                   aria-label={`Delete ${name}`}

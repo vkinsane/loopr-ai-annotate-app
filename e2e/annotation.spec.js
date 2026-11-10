@@ -87,8 +87,8 @@ test.describe('with a mouse', () => {
     await drag(page, A, B)
     for (const [width, height] of [[1024, 768], [820, 1180], [390, 844], [844, 390], [1440, 900]]) {
       await page.setViewportSize({ width, height })
-      await expect.poll(async () => (await photoImage(page).boundingBox()).width).toBeGreaterThan(0)
-      expectRect((await boxesInPhotoPixels(page))[0], EXPECTED, 16)
+      // The layout settles a moment after a resize, so the check is retried until then.
+      await expect(async () => expectRect((await boxesInPhotoPixels(page))[0], EXPECTED, 16)).toPass({ timeout: 2000 })
     }
   })
 
@@ -115,9 +115,18 @@ test.describe('with a mouse', () => {
     expectRect(box, { x: 0.4 * PHOTO.width, y: 0.4 * PHOTO.height, width: 0.2 * PHOTO.width, height: 0.2 * PHOTO.height })
   })
 
+  test('a new box focuses its name field with the name selected', async ({ page }) => {
+    await drag(page, A, B)
+    const name = page.getByLabel('Name of annotation 1')
+    await expect(name).toBeFocused()
+    await page.keyboard.type('Scratch')
+    await expect(name).toHaveValue('Scratch')
+  })
+
   test('Delete and Backspace remove the selected box', async ({ page }) => {
     await drag(page, [0.1, 0.1], [0.3, 0.3])
     await drag(page, [0.5, 0.5], [0.7, 0.7])
+    await page.keyboard.press('Escape') // leaves the name field the new box focused
     await page.keyboard.press('Delete')
     await expect(canvasBoxes(page)).toHaveCount(1)
     await page.getByLabel(/Name of annotation 1/).click()
@@ -126,8 +135,11 @@ test.describe('with a mouse', () => {
     await expect(canvasBoxes(page)).toHaveCount(0)
   })
 
-  test('Escape deselects and keeps the box', async ({ page }) => {
+  test('Escape leaves the name field, then deselects and keeps the box', async ({ page }) => {
     await drag(page, A, B)
+    await page.keyboard.press('Escape')
+    await expect(page.getByLabel('Name of annotation 1')).not.toBeFocused()
+    await expect(corner(page, 'top-left')).toHaveCount(1)
     await page.keyboard.press('Escape')
     await expect(corner(page, 'top-left')).toHaveCount(0)
     await expect(canvasBoxes(page)).toHaveCount(1)
@@ -150,6 +162,10 @@ test.describe('with a mouse', () => {
     expect(Math.abs(first.x + first.width / 2 - point.x)).toBeLessThanOrEqual(4)
     await page.getByRole('button', { name: 'Delete Annotation 1' }).click()
     await expect(canvasBoxes(page)).toHaveCount(1)
+  })
+
+  test('no draw hint with a mouse', async ({ page }) => {
+    await expect(page.getByText('Drag to draw a box', { exact: true })).toBeHidden()
   })
 
   test('the box label shows the name', async ({ page }) => {
@@ -176,6 +192,16 @@ test.describe('with touch', () => {
     await touch(client, 'touchMove', [to])
     await touch(client, 'touchEnd', [])
     expectRect((await boxesInPhotoPixels(page))[0], EXPECTED, 16)
+    // No on-screen keyboard over the photo after each box.
+    await expect(page.getByLabel('Name of annotation 1')).not.toBeFocused()
+  })
+
+  test('an empty photo shows the draw hint until the first box', async ({ page }) => {
+    await openAnnotate(page)
+    const hint = page.getByText('Drag to draw a box', { exact: true })
+    await expect(hint).toBeVisible()
+    await drag(page, A, B)
+    await expect(hint).toHaveCount(0)
   })
 
   test('two fingers (emulated pinch) make no box', async ({ page }) => {

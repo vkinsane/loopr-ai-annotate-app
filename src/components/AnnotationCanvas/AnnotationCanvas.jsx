@@ -1,22 +1,22 @@
 import { useRef, useState } from 'react'
 import { Add, PanToolOutlined, Remove } from '@mui/icons-material'
-import { Box, IconButton, Typography } from '@mui/material'
+import { Box, IconButton } from '@mui/material'
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch'
 import { CORNERS } from '../../theme.js'
 import { boxLabel, clamp, isTooSmall, labelGoesBelow, moveRect, rectFromPoints, resizeRect, ZOOM } from '../../utils'
+import DrawHint from '../DrawHint/DrawHint.jsx'
 import { styles } from './AnnotationCanvas.styles.js'
 
 const MIN_BOX_SCREEN_PX = 12
-const IDLE_HINT = 'Drag on the photo to add an annotation. Drag a box to move it, or a corner to resize it.'
-const DRAW_HINT = 'Lift your finger to add the box. Very small boxes are not added.'
-const MOVE_HINT = 'Drag to move the photo, or pinch to zoom. Tap the hand again to draw and edit boxes.'
+const MOVE_HINT = 'Drag to move the photo. Tap the hand again to draw.'
 
 /**
  * Boxes are stored in photo pixels and drawn as percentages of the frame, so they stay on the same
  * pixels at any screen size. The gesture is read from where it starts: corner, box or empty photo.
  * Pinch, scroll or the + and − buttons zoom; the hand button makes one finger or the mouse move the photo instead of drawing.
+ * `overlay` is drawn over the card, outside the zoomed photo: on phones, the annotation panel and Done.
  */
-export default function AnnotationCanvas({ photoUrl, size, items, selectedId, onAdd, onChange, onSelect }) {
+export default function AnnotationCanvas({ photoUrl, size, items, selectedId, overlay, onAdd, onChange, onSelect }) {
   const layerRef = useRef(null)
   const gesture = useRef(null)
   const zoomRef = useRef(null)
@@ -131,6 +131,9 @@ export default function AnnotationCanvas({ photoUrl, size, items, selectedId, on
             </Box>
           </TransformComponent>
         </TransformWrapper>
+        {items.length === 0 && !draft && !moving && <DrawHint />}
+        {/* Move mode stops drawing, so it says how to get back. */}
+        {moving && <Box component="span" role="status" sx={styles.moveHint}>{MOVE_HINT}</Box>}
         <Box component="span" sx={styles.sizeBadge}>{size.width} × {size.height} px</Box>
         <Box sx={styles.toolbar}>
           <IconButton aria-label="Move the photo" aria-pressed={moving} disabled={zoomLevel === 'fit'} onClick={() => setHandOn(!handOn)} sx={styles.tool(moving)}>
@@ -144,7 +147,7 @@ export default function AnnotationCanvas({ photoUrl, size, items, selectedId, on
           </IconButton>
         </Box>
       </Box>
-      <Typography sx={styles.hint}>{moving ? MOVE_HINT : draft ? DRAW_HINT : IDLE_HINT}</Typography>
+      {overlay}
     </Box>
   )
 }

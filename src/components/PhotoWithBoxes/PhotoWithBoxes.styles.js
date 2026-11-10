@@ -1,13 +1,16 @@
 import { alpha } from '@mui/material'
-import { BOX_LABEL_TEXT, CARD_RADIUS, fitPhotoWidth, INK_OUTLINE } from '../../theme.js'
+import { BOX_LABEL_TEXT, CARD_RADIUS, COMPACT, INK_OUTLINE } from '../../theme.js'
 import { percentRect } from '../../utils'
 
-const PHOTO_HEIGHT = { xs: 'max(60px, min(42dvh, 100dvh - 520px))', sm: '36dvh', md: 'calc(100dvh - 90px)' }
+// Wide screens: capped by the screen height. Compact: the full height of the size container around it.
+const PHOTO_HEIGHT = 'calc(100dvh - 90px)'
 
 export const styles = {
   frame: (ratio) => ({
-    position: 'relative', aspectRatio: String(ratio), mx: 'auto', alignSelf: 'start', width: fitPhotoWidth(PHOTO_HEIGHT, ratio),
-    border: 1, borderColor: 'divider', borderRadius: CARD_RADIUS, overflow: 'hidden', bgcolor: 'brand.carbonRaised',
+    position: 'relative', aspectRatio: String(ratio), mx: 'auto', alignSelf: 'start', width: `min(100%, ${PHOTO_HEIGHT} * ${ratio})`,
+    overflow: 'hidden', bgcolor: 'brand.carbonRaised', border: 1, borderColor: 'divider', borderRadius: CARD_RADIUS,
+    // Compact: the card is the area around the photo (see SummaryScreen), as on Preview and Annotate.
+    [COMPACT]: { alignSelf: 'center', width: `min(100%, 100cqh * ${ratio})`, border: 0, borderRadius: 0 },
   }),
   photo: { display: 'block', width: '100%', height: '100%' },
   box: (rect, size) => ({

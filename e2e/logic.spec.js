@@ -1,6 +1,6 @@
 // Pure rules from utils/, run without a browser. Exact boundaries are cheaper and clearer here than through images.
 import { expect, test } from '@playwright/test'
-import { finishText, TEXT_RULES, toCameraError, validatePhotoFile, validateText } from '../src/utils/index.js'
+import { finishText, readTilt, TEXT_RULES, tiltAdvice, toCameraError, validatePhotoFile, validateText } from '../src/utils/index.js'
 import { annotationsReducer, initialAnnotations } from '../src/utils/annotations.js'
 import { clamp, isTooSmall, moveRect, rectFromPoints, resizeRect } from '../src/utils/geometry.js'
 import { getCaptureHint, gradeBrightness, gradeFileSize, gradePhoto, gradeResolution, gradeSharpness, laplacianVariance, meanBrightness, qualityChecks } from '../src/utils/quality.js'
@@ -186,4 +186,31 @@ test.describe('camera errors', () => {
     test(`${name} maps to ${kind}`, () => expect(toCameraError(new DOMException('x', name)).kind).toBe(kind))
   }
   test('something that is not an Error maps to unknown', () => expect(toCameraError('boom').kind).toBe('unknown'))
+})
+
+test.describe('level', () => {
+  const G = 9.8
+  const near = (actual, expected) => expect(Math.abs(actual - expected)).toBeLessThan(0.5)
+
+  test('upright and straight reads 0, 0', () => {
+    const { roll, pitch } = readTilt({ x: 0, y: G, z: 0 }, 0)
+    near(roll, 0)
+    near(pitch, 0)
+  })
+  test('flipped signs give the same tilt', () => {
+    const tilt = readTilt({ x: 1, y: 9, z: 2 }, 0)
+    const flipped = readTilt({ x: -1, y: -9, z: -2 }, 0)
+    near(flipped.roll, tilt.roll)
+    near(flipped.pitch, tilt.pitch)
+  })
+  test('a phone held sideways is level when the screen has turned too', () => {
+    near(readTilt({ x: G, y: 0, z: 0 }, 90).roll, 0)
+  })
+  test('advice names the way to turn, then how to hold', () => {
+    expect(tiltAdvice({ roll: -10, pitch: 0 }).text).toBe('Turn left 10°')
+    expect(tiltAdvice({ roll: 6, pitch: 0 }).text).toBe('Turn right 6°')
+    expect(tiltAdvice({ roll: 0, pitch: 8 }).text).toBe('Hold upright: 8° off')
+    expect(tiltAdvice({ roll: 0, pitch: 80 }).text).toBe('Hold flat: 10° off')
+    expect(tiltAdvice({ roll: 1, pitch: 89 })).toEqual({ level: true, text: 'Level' })
+  })
 })

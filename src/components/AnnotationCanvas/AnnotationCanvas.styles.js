@@ -1,21 +1,30 @@
 import { alpha } from '@mui/material'
-import { BOX_LABEL_TEXT, CARD_RADIUS, fitPhotoWidth, INK_OUTLINE } from '../../theme.js'
+import { BOX_LABEL_TEXT, CARD_RADIUS, CLEAR_OF_PANEL, CLEAR_OF_SIDE_PANEL, COMPACT, INK_OUTLINE, SIDEWAYS } from '../../theme.js'
 import { percentRect } from '../../utils'
 
 // Selected and draft boxes use the brand indigo. Other boxes are lime with a navy outline so they show on any paint colour.
 const lineColor = (variant) => (theme) => (variant === 'other' ? theme.palette.brand.lime : theme.palette.primary.main)
 const HANDLE = { hit: 44, dot: 14 }
-const PHOTO_HEIGHT = { xs: 'max(190px, min(50dvh, 100dvh - 376px))', sm: 'max(240px, 50dvh)', md: 'max(240px, 100dvh - 143px)' }
+// Wide screens: capped by the screen height. Compact: the full height of the card, which fills the screen.
+const PHOTO_HEIGHT = 'max(240px, 100dvh - 102px)'
 // Everything drawn on the zoomed photo uses these, so it keeps its size on screen.
 const unzoomed = (px) => `calc(${px}px / var(--zoom, 1))`
 const UNZOOM = 'scale(calc(1 / var(--zoom, 1)))'
 
 export const styles = {
-  // One bordered card: the photo, with the hint as its footer. The backdrop fills the sides of a portrait photo.
-  root: { gridArea: { md: 'photo' }, alignSelf: 'start', border: 1, borderColor: 'divider', borderRadius: CARD_RADIUS, overflow: 'hidden', bgcolor: 'brand.carbonRaised' },
-  // Largest box with the photo's shape that fits: full width, capped by screen height.
+  // One bordered card around the photo. The backdrop fills the sides of a portrait photo.
+  // Compact: the card fills the screen and is a size container, so the photo is the largest of its shape that fits,
+  // centred in the part above the closed panel.
+  root: {
+    position: 'relative', gridArea: 'photo', alignSelf: 'start', minHeight: 0,
+    border: 1, borderColor: 'divider', borderRadius: CARD_RADIUS, overflow: 'hidden', bgcolor: 'brand.carbonRaised',
+    [COMPACT]: { gridArea: 'auto', alignSelf: 'stretch', display: 'grid', placeItems: 'center', containerType: 'size', ...CLEAR_OF_PANEL },
+    [SIDEWAYS]: CLEAR_OF_SIDE_PANEL,
+  },
+  // Largest box with the photo's shape that fits: full width, capped by the height.
   frame: (ratio, moving) => ({
-    position: 'relative', aspectRatio: String(ratio), mx: 'auto', overflow: 'hidden', width: fitPhotoWidth(PHOTO_HEIGHT, ratio),
+    position: 'relative', aspectRatio: String(ratio), mx: 'auto', overflow: 'hidden',
+    width: `min(100%, ${PHOTO_HEIGHT} * ${ratio})`, [COMPACT]: { width: `min(100%, 100cqh * ${ratio})` },
     userSelect: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none', touchAction: 'none', cursor: moving ? 'grab' : 'auto',
   }),
   photo: { display: 'block', width: '100%', height: '100%', pointerEvents: 'none' },
@@ -52,10 +61,15 @@ export const styles = {
     bgcolor: (theme) => alpha(theme.palette.brand.carbon, 0.8), color: 'brand.snow', typography: 'caption', fontWeight: 500,
     fontVariantNumeric: 'tabular-nums',
   },
-  toolbar: { position: 'absolute', left: 8, bottom: 8, display: 'flex', gap: 0.25, p: 0.25, borderRadius: 999, bgcolor: 'brand.scrim' },
+  // Compact: at the top, clear of the annotation panel at the bottom. Sideways the panel is at the side, so the bottom is free.
+  toolbar: { position: 'absolute', left: 8, bottom: 8, [COMPACT]: { bottom: 'auto', top: 8 }, [SIDEWAYS]: { top: 'auto', bottom: 8 }, display: 'flex', gap: 0.25, p: 0.25, borderRadius: 999, bgcolor: 'brand.scrim' },
   tool: (on) => ({
     width: 40, height: 40, color: on ? 'brand.ink' : 'brand.snow', bgcolor: on ? 'brand.lime' : 'transparent',
     '&:hover': { bgcolor: on ? 'brand.lime' : 'brand.carbon' }, '&.Mui-disabled': { color: 'brand.frost', opacity: 0.45 },
   }),
-  hint: { px: 1.75, py: 1.25, bgcolor: 'background.paper', borderTop: 1, borderColor: 'divider', typography: 'body2', color: 'text.secondary' },
+  // Top left (under the zoom tools on compact screens), clear of the size badge on the right.
+  moveHint: {
+    position: 'absolute', left: 10, top: 10, [COMPACT]: { top: 58 }, [SIDEWAYS]: { top: 10 }, maxWidth: 'calc(100% - 150px)', px: 1, py: 0.5, borderRadius: '6px', pointerEvents: 'none',
+    bgcolor: 'brand.scrim', color: 'brand.snow', typography: 'caption', fontWeight: 500,
+  },
 }

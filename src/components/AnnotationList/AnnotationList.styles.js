@@ -1,7 +1,8 @@
-import { SCROLL_SHADOWS, TABLE_BODY_RADIUS, TABLE_HEADER } from '../../theme.js'
+import { COMPACT, SCROLL_SHADOWS, TABLE_BODY_RADIUS, TABLE_HEADER } from '../../theme.js'
 
 const ROW_LINE = { '&:not(:last-of-type)': { borderBottom: 1, borderColor: 'divider' } }
-const ROW_BUTTON = { width: { xs: 44, md: 36 }, height: { xs: 44, md: 36 } }
+// Compact screens are touch screens, so their buttons get the full 44 px.
+const ROW_BUTTON = { width: 36, height: 36, [COMPACT]: { width: 44, height: 44 } }
 
 export const styles = {
   // Inside a fixed-height sidebar, the list scrolls on its own and the heading stays.
@@ -29,7 +30,7 @@ export const styles = {
     bgcolor: selected ? 'brand.tint' : 'transparent', '&:hover': { bgcolor: selected ? 'brand.tint' : 'action.hover' },
     boxShadow: selected ? (theme) => `inset 3px 0 0 ${theme.palette.primary.main}` : 'none', ...ROW_LINE,
   }),
-  readOnlyRow: { display: 'flex', alignItems: 'center', gap: 1.25, px: 1.75, py: 1.5, ...ROW_LINE },
+  readOnlyRow: { display: 'flex', alignItems: 'center', gap: 1.25, px: 1.75, py: 1.25, ...ROW_LINE },
   readOnlyName: { flexGrow: 1, minWidth: 0, typography: 'body1', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
   readOnlySize: { flexShrink: 0, typography: 'caption', color: 'text.secondary', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' },
   // Same colours as the box on the photo: indigo when selected, lime with a navy outline otherwise.
@@ -38,12 +39,12 @@ export const styles = {
     boxShadow: selected ? 'none' : (theme) => `0 0 0 1px ${theme.palette.brand.ink}`,
   }),
   input: (selected) => ({
-    flexGrow: 1, minWidth: 0, height: { xs: 44, md: 40 }, typography: { xs: 'body1', md: 'body2' }, fontWeight: selected ? 600 : 500,
+    flexGrow: 1, minWidth: 0, height: 40, typography: 'body2', fontWeight: selected ? 600 : 500, [COMPACT]: { height: 44, typography: 'body1' },
     '& input': { textOverflow: 'ellipsis' }, // "…" when not being edited; full name on hover (title)
   }),
   // Phones need the room for the name; the Summary screen shows the size.
   size: { display: { xs: 'none', sm: 'block' }, typography: 'caption', color: 'text.secondary', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' },
   note: (note) => ({ typography: 'caption', fontSize: 13, bgcolor: note?.warn ? 'warning.dark' : 'brand.ink', color: 'common.white' }),
-  edit: { ...ROW_BUTTON, flexShrink: 0, color: 'text.secondary', '& svg': { fontSize: { xs: 20, md: 18 } } },
-  remove: (selected) => ({ ...ROW_BUTTON, color: selected ? 'error.main' : 'text.secondary', '& svg': { fontSize: { md: 20 } } }),
+  edit: { ...ROW_BUTTON, flexShrink: 0, color: 'text.secondary', '& svg': { fontSize: 18 }, [COMPACT]: { ...ROW_BUTTON[COMPACT], '& svg': { fontSize: 20 } } },
+  remove: (selected) => ({ ...ROW_BUTTON, color: selected ? 'error.main' : 'text.secondary', '& svg': { fontSize: 20 } }),
 }
