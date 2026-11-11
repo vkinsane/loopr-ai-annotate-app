@@ -1,4 +1,4 @@
-import { COMPACT, COMPACT_PAGE_PADDING, SCREEN_BODY, TABLE_HEADER } from '../theme.js'
+import { COMPACT, COMPACT_PAGE_PADDING, SCREEN_BODY, SIDE_DIVIDER, TABLE_HEADER } from '../theme.js'
 
 const MAX_WIDTH = 1200
 
@@ -16,7 +16,7 @@ export const styles = {
   qualityPill: { display: { xs: 'none', sm: 'block' } },
   newPhoto: { flexShrink: 0, ml: 1 },
   // Height 0 + min-height 100% means the photo alone sets the row height; a long list scrolls instead of growing it.
-  sidebar: { display: 'flex', flexDirection: 'column', gap: 2, minHeight: '100%', height: 0, gridArea: 'side' },
+  sidebar: { ...SIDE_DIVIDER, display: 'flex', flexDirection: 'column', gap: 2, minHeight: '100%', height: 0, gridArea: 'side' },
   quality: { flexShrink: 0 },
   // Joined to the list below, like a table header.
   qualityTitle: { ...TABLE_HEADER, borderBottomStyle: 'none', borderBottomWidth: 0 },

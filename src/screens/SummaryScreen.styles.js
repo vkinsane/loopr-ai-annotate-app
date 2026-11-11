@@ -1,4 +1,4 @@
-import { CARD_RADIUS, CLEAR_OF_PANEL, COMPACT, PHOTO_PAGE } from '../theme.js'
+import { CARD_RADIUS, CLEAR_OF_PANEL, COMPACT, PHOTO_PAGE, SIDE_DIVIDER } from '../theme.js'
 
 // One window tall, like Annotate: the photo shrinks to fit and the list scrolls inside.
 // Wide screens: photo on the left, details and actions on the right. Compact: the details sit over the photo.
@@ -15,7 +15,7 @@ export const styles = {
     },
   },
   headerWidth: { maxWidth: PHOTO_PAGE.maxWidth },
-  side: { display: 'flex', flexDirection: 'column', gap: 2, minHeight: 0 },
+  side: { ...SIDE_DIVIDER, display: 'flex', flexDirection: 'column', gap: 2, minHeight: 0 },
   tiles: { display: 'flex', gap: 1, flexShrink: 0 },
   tile: { flex: 1, borderRadius: CARD_RADIUS, px: 1.75, py: 1.5, display: 'flex', flexDirection: 'column', gap: 0.5 },
   tileLabel: { typography: 'caption', color: 'text.secondary' },

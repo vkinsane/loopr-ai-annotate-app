@@ -170,6 +170,9 @@ export const PHOTO_MAX_HEIGHT = 'calc(100dvh - 90px)'
 export const ON_PHOTO = { bgcolor: 'brand.scrim', color: 'brand.snow' }
 export const ON_PHOTO_BUTTON = { ...ON_PHOTO, '&:hover': { bgcolor: 'brand.carbon' } }
 
+// Wide screens: a line between the photo and the details column beside it.
+export const SIDE_DIVIDER = { borderLeft: 1, borderColor: 'divider', pl: 2 }
+
 export const BOX_LABEL_TEXT = { fontSize: 11, fontWeight: 600, lineHeight: '16px' }
 
 /** A navy line just outside and inside a lime box, so it shows on any photo. */

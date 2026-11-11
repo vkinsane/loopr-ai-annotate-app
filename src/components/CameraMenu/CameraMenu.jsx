@@ -3,10 +3,10 @@ import { Cameraswitch, Check } from '@mui/icons-material'
 import { IconButton, ListItemIcon, Menu, MenuItem } from '@mui/material'
 import { styles } from './CameraMenu.styles.js'
 
-/** Lists the cameras from useCameraList and marks the one in use. Hidden when there is only one. */
+/** Lists the cameras from useCameraList and marks the one in use. With one camera, it shows which camera that is. */
 export default function CameraMenu({ cameras, currentId, disabled, onSelect }) {
   const [anchor, setAnchor] = useState(null)
-  if (cameras.length < 2) return null
+  if (cameras.length === 0) return null
 
   function choose(id) {
     setAnchor(null)
@@ -16,7 +16,7 @@ export default function CameraMenu({ cameras, currentId, disabled, onSelect }) {
   return (
     <>
       <IconButton
-        aria-label="Switch camera"
+        aria-label="Choose camera"
         aria-haspopup="menu"
         aria-expanded={Boolean(anchor)}
         disabled={disabled}

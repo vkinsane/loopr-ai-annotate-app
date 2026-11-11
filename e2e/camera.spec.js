@@ -228,10 +228,11 @@ test.describe('exposure', () => {
   const brighter = (page) => page.getByRole('button', { name: 'Brighter' })
   const value = (page) => page.getByRole('group', { name: 'Exposure' }).locator('output')
 
-  test('is hidden when the camera has none', async ({ page }) => {
+  test('says it is not available when the camera has none', async ({ page }) => {
     await openCapture(page)
     await expect(shutter(page)).toBeEnabled()
     await expect(page.getByRole('group', { name: 'Exposure' })).toHaveCount(0)
+    await expect(page.getByText('Exposure not available')).toBeVisible()
   })
 
   test('steps by a third and stops at the limit', async ({ page }) => {
@@ -272,10 +273,13 @@ test.describe('level', () => {
     await expect(page.getByText('Level', { exact: true })).toBeVisible()
   })
 
-  test('is not offered on a computer', async ({ page }) => {
+  test('on a computer, says it needs a motion sensor', async ({ page }) => {
     await openCapture(page)
     await expect(shutter(page)).toBeEnabled()
     await expect(page.getByRole('button', { name: 'Show level' })).toHaveCount(0)
+    await expect(page.getByText('Level needs a motion sensor')).toBeVisible()
+    await tiltPhone(page, { x: 0, y: 9.8, z: 0 }) // a laptop that does have a sensor
+    await expect(page.getByText('Level needs a motion sensor')).toHaveCount(0)
   })
 
   test.describe('on a phone', () => {
@@ -295,12 +299,14 @@ test.describe('level', () => {
 })
 
 test.describe('choosing a camera', () => {
-  const switchButton = (page) => page.getByRole('button', { name: 'Switch camera' })
+  const switchButton = (page) => page.getByRole('button', { name: 'Choose camera' })
 
-  test('the list is hidden with only one camera', async ({ page }) => {
+  test('with only one camera, the list shows it as the one in use', async ({ page }) => {
     await openCapture(page)
     await expect(shutter(page)).toBeEnabled()
-    await expect(switchButton(page)).toHaveCount(0)
+    await switchButton(page).click()
+    await expect(page.getByRole('menuitem')).toHaveCount(1)
+    await expect(page.getByRole('menuitem')).toHaveClass(/Mui-selected/)
   })
 
   test('another camera can be picked from the list', async ({ page }) => {

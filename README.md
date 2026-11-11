@@ -35,7 +35,7 @@ For the tests, install the browser once with `npx playwright install chromium`.
 - **Capture**
   - Rear camera at the highest resolution the device gives.
   - Live resolution, brightness and sharpness chips, with a hint ("Too dark, so turn on the torch").
-  - Grid, level, exposure, torch and camera switch, each shown only when the device supports it.
+  - Grid, level, exposure, torch and camera list. On a computer, the ones it can't use say "not available".
   - Clear screens for a blocked, missing or busy camera, with "Try again" and "Choose a photo instead".
 - **Preview & quality**
   - Resolution, file size, brightness and sharpness, each graded Good / Warning / Poor, with advice.

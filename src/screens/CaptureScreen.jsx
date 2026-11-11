@@ -1,14 +1,15 @@
 import { useRef, useState } from 'react'
-import { FlashlightOff, FlashlightOn, StraightenOutlined } from '@mui/icons-material'
-import { Box, Button, ButtonBase, CircularProgress, IconButton, ThemeProvider, Typography } from '@mui/material'
+import { Exposure, FlashlightOff, FlashlightOn, StraightenOutlined } from '@mui/icons-material'
+import { Box, Button, ButtonBase, CircularProgress, IconButton, ThemeProvider, Typography, useMediaQuery } from '@mui/material'
 import BackButton from '../components/BackButton/BackButton.jsx'
 import CameraMenu from '../components/CameraMenu/CameraMenu.jsx'
 import ChoosePhotoButton from '../components/ChoosePhotoButton/ChoosePhotoButton.jsx'
 import ExposureControl from '../components/ExposureControl/ExposureControl.jsx'
 import LevelIndicator from '../components/LevelIndicator/LevelIndicator.jsx'
 import LiveQualityChips from '../components/LiveQualityChips/LiveQualityChips.jsx'
+import NotAvailable from '../components/NotAvailable/NotAvailable.jsx'
 import { useCamera, useCameraList, useDeviceTilt, useExposure, useLiveQuality, useTorch } from '../hooks'
-import { cameraTheme, CORNERS } from '../theme.js'
+import { cameraTheme, CORNERS, TOUCH_QUERY } from '../theme.js'
 import { getCaptureHint } from '../utils'
 import CameraErrorScreen from './CameraErrorScreen.jsx'
 import { styles } from './CaptureScreen.styles.js'
@@ -27,6 +28,11 @@ export default function CaptureScreen({ onBack, onCapture, onPickPhoto }) {
   const motion = useDeviceTilt(live)
   const cameras = useCameraList(live)
   const quality = useLiveQuality(videoRef, live && !capturing)
+  // Computers rarely offer exposure and have no motion sensor. They say so, so every camera feature is visible.
+  const computer = !useMediaQuery(TOUCH_QUERY, { noSsr: true })
+  const noExposure = live && computer && !exposure.supported
+  const noLevel = live && computer && !motion.tilt
+  const rows = { exposure: exposure.supported || noExposure, level: noLevel }
 
   if (state.status === 'error') {
     return (
@@ -84,7 +90,7 @@ export default function CaptureScreen({ onBack, onCapture, onPickPhoto }) {
                 </Button>
               )}
               {CORNERS.map(([vertical, horizontal]) => (
-                <Box key={`${vertical}-${horizontal}`} aria-hidden sx={styles.guide(vertical, horizontal, exposure.supported)} />
+                <Box key={`${vertical}-${horizontal}`} aria-hidden sx={styles.guide(vertical, horizontal, Number(rows.exposure) + Number(rows.level))} />
               ))}
               {capturing && (
                 <Box role="status" sx={styles.saving}>
@@ -96,13 +102,15 @@ export default function CaptureScreen({ onBack, onCapture, onPickPhoto }) {
           </Box>
         </Box>
 
-        <Box sx={styles.controls(exposure.supported)}>
+        <Box sx={styles.controls(rows)}>
           <Typography sx={styles.hint(hint.warn)}>{hint.text}</Typography>
           {exposure.supported && (
             <Box sx={styles.exposure}>
               <ExposureControl exposure={exposure} disabled={capturing} />
             </Box>
           )}
+          {noExposure && <NotAvailable Icon={Exposure} label="Exposure not available" sx={styles.exposure} />}
+          {noLevel && <NotAvailable Icon={StraightenOutlined} label="Level needs a motion sensor" sx={styles.level} />}
           {/* A photo from the device can be used even when the camera works. */}
           <Box sx={styles.gallery}>
             <ChoosePhotoButton asIcon disabled={capturing} onPick={onPickPhoto} sx={styles.round} />
@@ -125,12 +133,7 @@ export default function CaptureScreen({ onBack, onCapture, onPickPhoto }) {
             >
               {torch.on ? <FlashlightOn /> : <FlashlightOff />}
             </IconButton>
-          ) : live && (
-            <Box sx={styles.noTorch}>
-              <FlashlightOff aria-hidden sx={styles.noTorchIcon} />
-              Torch not available
-            </Box>
-          )}
+          ) : live && <NotAvailable Icon={FlashlightOff} label="Torch not available" sx={styles.torchSlot} />}
         </Box>
 
         {state.status === 'starting' && (

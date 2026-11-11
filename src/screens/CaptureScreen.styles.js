@@ -11,7 +11,7 @@ const GUIDE = { size: 32, inset: 24, line: '3px solid' }
 // On phones the guides frame the part of the view that the top bar and controls don't cover.
 const PHONE_GUIDE_INSET = { top: 84, bottom: 216 }
 const SIDEWAYS_GUIDE_TOP = 72
-const EXPOSURE_ROW_PX = 64 // the exposure buttons plus the gap above them
+const EXTRA_ROW_PX = 64 // an exposure or level row plus the gap above it
 const fade = (direction) => ({ backgroundImage: (theme) => `linear-gradient(${direction}, ${theme.palette.brand.scrim}, transparent)` })
 
 export const styles = {
@@ -49,24 +49,24 @@ export const styles = {
     '&::before': { top: 0, bottom: 0, left: '33.333%', right: '33.333%', borderLeftWidth: 1, borderRightWidth: 1 },
     '&::after': { left: 0, right: 0, top: '33.333%', bottom: '33.333%', borderTopWidth: 1, borderBottomWidth: 1 },
   },
-  guide: (vertical, horizontal, hasExposure) => ({
+  guide: (vertical, horizontal, extraRows) => ({
     position: 'absolute', [vertical]: GUIDE.inset, [horizontal]: GUIDE.inset, width: GUIDE.size, height: GUIDE.size,
     ...cornerLines(vertical, horizontal, GUIDE.line, 6), color: 'common.white',
-    [PHONE]: { [vertical]: PHONE_GUIDE_INSET[vertical] + (vertical === 'bottom' && hasExposure ? EXPOSURE_ROW_PX : 0) },
+    [PHONE]: { [vertical]: PHONE_GUIDE_INSET[vertical] + (vertical === 'bottom' ? extraRows * EXTRA_ROW_PX : 0) },
     [SIDEWAYS]: vertical === 'top' ? { top: SIDEWAYS_GUIDE_TOP } : {},
   }),
   saving: {
     position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
     gap: 1.5, bgcolor: 'brand.scrim', color: 'common.white', typography: 'subtitle1',
   },
-  // The exposure row is only there when the camera offers exposure (mostly Android), so no gap is left without it.
-  controls: (hasExposure) => ({
+  // The exposure and level rows are only there when they show something, so no gap is left without them.
+  controls: ({ exposure, level }) => ({
     display: 'grid', gridTemplateColumns: '1fr auto 1fr',
-    gridTemplateAreas: hasExposure ? '"hint hint hint" "exposure exposure exposure" "gallery shutter torch"' : '"hint hint hint" "gallery shutter torch"',
+    gridTemplateAreas: [...['hint', exposure && 'exposure', level && 'level'].filter(Boolean).map((area) => `"${area} ${area} ${area}"`), '"gallery shutter torch"'].join(' '),
     alignItems: 'center', justifyItems: 'center', gap: 2.5, px: 2, pt: 2.5, pb: 4.5,
     [LANDSCAPE]: {
       width: CONTROLS_PX, gridTemplateColumns: 'auto', alignContent: 'center', p: 2,
-      gridTemplateAreas: hasExposure ? '"torch" "shutter" "gallery" "exposure" "hint"' : '"torch" "shutter" "gallery" "hint"',
+      gridTemplateAreas: ['torch', 'shutter', 'gallery', exposure && 'exposure', level && 'level', 'hint'].filter(Boolean).map((area) => `"${area}"`).join(' '),
     },
     [PHONE]: { position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 1, pt: 6, ...fade('to top') },
     [SIDEWAYS]: { position: 'absolute', top: 0, bottom: 0, right: 0, zIndex: 1, ...fade('to left') },
@@ -82,6 +82,7 @@ export const styles = {
     borderRadius: '50%', border: 4, borderColor: 'common.white', '&.Mui-disabled': { opacity: 0.4 },
   },
   exposure: { gridArea: 'exposure' },
+  level: { gridArea: 'level' },
   gallery: { gridArea: 'gallery' },
   // The gallery button matches the torch button on the other side of the shutter.
   round: { width: 52, height: 52, color: 'text.primary', bgcolor: 'action.selected', '&:hover': { bgcolor: 'action.focus' } },
@@ -95,12 +96,7 @@ export const styles = {
     color: on ? 'primary.contrastText' : 'text.primary', bgcolor: on ? 'primary.main' : 'action.selected',
     '&:hover': { bgcolor: on ? 'primary.dark' : 'action.focus' },
   }),
-  // Same slot as the torch button, so users know the camera has no torch rather than looking for one.
-  noTorch: {
-    gridArea: 'torch', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5,
-    maxWidth: 96, typography: 'caption', textAlign: 'center', color: 'text.secondary',
-  },
-  noTorchIcon: { fontSize: 22, color: 'text.disabled' },
+  torchSlot: { gridArea: 'torch' },
   overlay: {
     position: 'fixed', inset: 0, bgcolor: 'background.default', p: 4,
     display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2.5, textAlign: 'center',

@@ -3,7 +3,8 @@ import { CARD_RADIUS, SCREEN_BODY } from '../theme.js'
 const MAX_WIDTH = { xs: 480, sm: 608, md: 1168 }
 
 // Phone and tablet: one column, Open camera pinned to the bottom (tablet column 560 px).
-// Desktop: the three steps side by side, tips and Open camera in one row below them. Nothing is vertically centred: centring moves the page when a step grows.
+// Desktop: the three steps side by side, tips and Open camera in one row below them, centred in the window.
+// Auto margins, not justify-content, centre it: a window too short for it then scrolls instead of cutting off the top.
 export const styles = {
   root: {
     ...SCREEN_BODY, maxWidth: MAX_WIDTH, px: { xs: 2, sm: 3 }, pt: { xs: 1, sm: 3 }, pb: { md: 5 },
@@ -11,7 +12,7 @@ export const styles = {
   },
   headerWidth: { maxWidth: MAX_WIDTH, px: { xs: 2, sm: 3 } },
   steps: {
-    listStyle: 'none', m: 0, mt: { xs: 1, sm: 0 }, p: 0, gap: { xs: 1.5, md: 2.5 },
+    listStyle: 'none', m: 0, mt: { xs: 1, sm: 0, md: 'auto' }, p: 0, gap: { xs: 1.5, md: 2.5 },
     display: { xs: 'flex', md: 'grid' }, flexDirection: 'column', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
   },
   step: { borderRadius: CARD_RADIUS, p: { xs: 2, sm: 2.5, md: 3 }, display: 'flex', flexDirection: 'column', gap: { xs: 1.75, md: 2 } },
@@ -34,7 +35,7 @@ export const styles = {
   // Desktop: tips and Open camera in one row right under the steps, so wide screens have no gap in the middle.
   // Phone and tablet: the wrapper drops out of the layout
   // (display: contents) and Open camera is pinned to the bottom, so hiding steps for the blocked-camera help moves nothing.
-  bottom: { display: { xs: 'contents', md: 'flex' }, alignItems: 'flex-end', gap: 3, pt: 3 },
+  bottom: { display: { xs: 'contents', md: 'flex' }, alignItems: 'flex-end', gap: 3, pt: 3, mb: { md: 'auto' } },
   tips: (hideOnSmall) => ({
     display: { xs: hideOnSmall ? 'none' : 'flex', md: 'flex' }, flexGrow: { md: 1 }, mt: { xs: 1.5, md: 0 },
     px: { xs: 2, md: 3 }, py: { xs: 1.75, md: 0 }, height: { md: 52 }, borderRadius: CARD_RADIUS, bgcolor: 'brand.tint',

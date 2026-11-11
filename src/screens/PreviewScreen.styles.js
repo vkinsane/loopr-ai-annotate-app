@@ -1,4 +1,4 @@
-import { CARD_RADIUS, CLEAR_OF_PANEL, COMPACT, INNER_RADIUS, ON_PHOTO_BUTTON, PHOTO_MAX_HEIGHT, PHOTO_PAGE } from '../theme.js'
+import { CARD_RADIUS, CLEAR_OF_PANEL, COMPACT, INNER_RADIUS, ON_PHOTO_BUTTON, PHOTO_MAX_HEIGHT, PHOTO_PAGE, SIDE_DIVIDER } from '../theme.js'
 
 export const styles = {
   // One window tall. Wide screens: photo on the left, result and buttons on the right.
@@ -27,7 +27,7 @@ export const styles = {
     ...ON_PHOTO_BUTTON, typography: 'button', fontSize: 14,
   },
   advice: { typography: 'body2' },
-  side: { display: 'flex', flexDirection: 'column', gap: 1.5 },
+  side: { ...SIDE_DIVIDER, display: 'flex', flexDirection: 'column', gap: 1.5 },
   actions: { mt: 0.5, display: 'flex', gap: 1.5 },
   action: { flex: 1 },
 }
