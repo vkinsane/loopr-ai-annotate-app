@@ -71,6 +71,24 @@ For the tests, install the browser once with `npx playwright install chromium`.
 | Brightness | 70–190 | 40–70 or 190–220 | < 40 or > 220 |
 | Sharpness | ≥ 60 | 20–60 | < 20 |
 
+#### How I chose them
+
+- **Resolution**
+  - **Good from 8 MP** (about 3264 × 2448): enough to zoom 2–3× into a small defect and still see it clearly. Most phone rear cameras give 12 MP or more, so they pass.
+  - **Poor below 2 MP** (about Full HD, 1920 × 1080): the level of a basic laptop webcam. Small cracks or scratches are lost when you zoom in.
+- **File size**
+  - A detailed 8–12 MP JPEG is usually 1–5 MB. Under **500 KB** usually means a small, heavily compressed or very plain photo.
+  - Under **150 KB** is a thumbnail or almost empty image.
+  - It's only a rough signal (JPEG compression changes it), so it only warns and never blocks.
+- **Brightness** (average on a 0–255 scale)
+  - A well-lit photo averages around the middle, about 100–150, so **70–190** counts as Good.
+  - **Below 40** most of the photo is in deep shadow, and **above 220** most of it is close to white. In both cases detail is lost, so they're Poor.
+  - The two Warning bands (40–70 and 190–220) catch "a bit dark" or "a bit bright" before it gets bad.
+- **Sharpness** (edge strength on a 320 px grey copy)
+  - Measured on the same small copy for the live view and the photo, so one set of numbers works on every camera.
+  - A flat or blurred image scores close to 0; the sharper the edges, the higher the score. I put **20** as "clearly blurry" and **60** as "sharp enough to annotate", based on test images.
+- **Honest note:** brightness and sharpness are starting values. They aren't tuned on many real devices yet. The next step is to take sharp and blurry photos on a few phones, measure their scores, and set each limit between the two groups.
+
 ### Annotation
 - Boxes are stored in **photo pixels** and drawn as **percentages** of the photo, so they stay aligned at any screen size, rotation or zoom.
 - Boxes are HTML elements, so labels are real text and corner handles stay 44 px to touch.
@@ -93,12 +111,6 @@ For the tests, install the browser once with `npx playwright install chromium`.
 - **Editing a photo clears its boxes** (after a warning). Moving boxes through a crop or turn was not worth the extra code.
 - **Browser Back starts over** after the camera opens (after a warning). This avoids half-finished states.
 - **Nothing is saved or uploaded.** Photos stay private, but a reload loses the work.
-
-## Known limitations and next steps
-
-- Level, exposure and camera switching were tested with simulated sensors, not on many real devices.
-- Thresholds are starting values; I would tune them with real photos from several phones.
-- Next: undo/redo, moving boxes with the keyboard, saving work in IndexedDB, and TypeScript.
 
 ## Testing
 
