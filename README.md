@@ -7,10 +7,6 @@ A mobile-first web app for visual inspection: take a photo, check its quality, a
 
 ## Demos
 
-### Desktop
-
-<!-- Add the desktop screen recording here -->
-
 ### Mobile
 
 - [Watch the mobile demo](https://drive.google.com/file/d/1bcFdxtKgmOIa0k1NVfS2l8C6WmcPGFDt/view?usp=sharing)
