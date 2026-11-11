@@ -43,13 +43,13 @@ For the tests, install the browser once with `npx playwright install chromium`.
   - 4:3 matches most phone sensors, so nothing is cropped to 16:9.
 - I use `ImageCapture.takePhoto()` where it exists (Chrome, Android) for full sensor resolution.
 - On other browsers (including iPhone) I draw the full-size video frame to a canvas and save a JPEG.
-- Torch and exposure state is read from the camera on every render, so the buttons always show the real state.
 - The camera is released when the screen closes or the page is hidden.
 
 ### Quality assessment
 - Checked live every 250 ms on the camera view, and once on the saved photo.
 - Both use a 320 px wide grey copy, so it is fast and scores the same on any device.
-- **Brightness:** average luma (0–255). **Sharpness:** variance of a 3×3 Laplacian filter (blur gives low values).
+- **Brightness:** how light the photo is on average, from 0 (black) to 255 (white).
+- **Sharpness:** how strong the edges are. A sharp photo has clear edges and scores high; a blurry one scores low.
 - The worst grade decides the result. A poor photo is never blocked: Retake becomes the main button and Annotate asks first.
 
 #### Thresholds
@@ -74,7 +74,6 @@ For the tests, install the browser once with `npx playwright install chromium`.
 - **State in `App`** (photo, quality, boxes), so going back and forth between steps keeps the work.
 - **One hook per device feature:** `useCamera`, `useTorch`, `useExposure`, `useDeviceTilt`, `useCameraList`.
 - **No router:** `useScreenHistory` links the steps to the browser's Back and Forward.
-- **One layout rule (`COMPACT`):** phones and tablets show the photo full size with a panel over it; computers show a sidebar.
 - **Code splitting:** Annotate, Summary, zoom and the editor load only when needed.
 - **Styling:** each component has a `Name.styles.js` file; all colours come from `theme.js`.
 
