@@ -15,6 +15,24 @@ A mobile-first web app for visual inspection: take a photo, check its quality, a
 
 - [Watch the mobile demo](https://drive.google.com/file/d/1bcFdxtKgmOIa0k1NVfS2l8C6WmcPGFDt/view?usp=sharing)
 
+## Screenshots
+
+**Camera blocked (mobile)**: clear steps to fix it, or choose a photo instead
+
+<img src="docs/screenshots/camera-blocked.png" alt="Camera access is blocked screen with three steps to allow the camera, and Try again and Choose a photo instead buttons" width="300">
+
+**Edit photo**: turn, flip and crop before annotating
+
+![Edit photo screen: the photo with crop corners, and Left, Right, Flip and Reset buttons below it](docs/screenshots/edit-photo.png)
+
+**Quality warning**: a weak photo asks before annotating
+
+![Dialog titled Annotate this photo, explaining the photo is low resolution, with Retake and Annotate anyway buttons](docs/screenshots/quality-warning.png)
+
+**Annotate (desktop)**
+
+![Annotate screen on desktop: three named boxes on a factory photo, with the annotation list and photo quality beside it](docs/screenshots/annotate-desktop.png)
+
 ## Run it locally
 
 Needs Node.js 22.12+.
