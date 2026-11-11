@@ -78,7 +78,6 @@ For the tests, install the browser once with `npx playwright install chromium`.
   - **Poor below 2 MP** (about Full HD, 1920 × 1080): the level of a basic laptop webcam. Small cracks or scratches are lost when you zoom in.
 - **File size**
   - A detailed 8–12 MP JPEG is usually 1–5 MB. Under **500 KB** usually means a small, heavily compressed or very plain photo.
-  - Under **150 KB** is a thumbnail or almost empty image.
   - It's only a rough signal (JPEG compression changes it), so it only warns and never blocks.
 - **Brightness** (average on a 0–255 scale)
   - A well-lit photo averages around the middle, about 100–150, so **70–190** counts as Good.
@@ -87,7 +86,6 @@ For the tests, install the browser once with `npx playwright install chromium`.
 - **Sharpness** (edge strength on a 320 px grey copy)
   - Measured on the same small copy for the live view and the photo, so one set of numbers works on every camera.
   - A flat or blurred image scores close to 0; the sharper the edges, the higher the score. I put **20** as "clearly blurry" and **60** as "sharp enough to annotate", based on test images.
-- **Honest note:** brightness and sharpness are starting values. They aren't tuned on many real devices yet. The next step is to take sharp and blurry photos on a few phones, measure their scores, and set each limit between the two groups.
 
 ### Annotation
 - Boxes are stored in **photo pixels** and drawn as **percentages** of the photo, so they stay aligned at any screen size, rotation or zoom.
