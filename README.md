@@ -52,6 +52,8 @@ For the tests, install the browser once with `npx playwright install chromium`.
 - **Brightness:** average luma (0–255). **Sharpness:** variance of a 3×3 Laplacian filter (blur gives low values).
 - The worst grade decides the result. A poor photo is never blocked: Retake becomes the main button and Annotate asks first.
 
+#### Thresholds
+
 | Check | Good | Warning | Poor |
 |---|---|---|---|
 | Resolution | ≥ 8 MP | 2–8 MP | < 2 MP |
@@ -97,8 +99,8 @@ For the tests, install the browser once with `npx playwright install chromium`.
 - **Annotation:** draw, move, resize, small boxes, zoom, rotation, touch.
 - **Camera:** permission allowed/denied, no camera, camera busy, torch, exposure, level, switching camera.
 - **Failures:** slow or failed screen loads, going offline, failed download.
-- **Screens:** 320 px phones to 1440 px desktops, sideways phones and tablets, 200% zoom, 44 px tap targets.
-- **Accessibility:** axe checks on every screen, keyboard use, dialogs, reduced motion.
+- **Screens:** 320 px phones to 1440 px desktops and tablets, 200% zoom, 44 px tap targets.
+- **Accessibility:** automatic checks on every screen. Buttons, dialogs and the box list also work with a keyboard.
 
 ## Folder structure
 
