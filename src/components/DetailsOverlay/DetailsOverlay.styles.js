@@ -1,8 +1,6 @@
 import { alpha } from '@mui/material'
-import { CARD_RADIUS, OVERLAY } from '../../theme.js'
+import { INNER_RADIUS as RADIUS, OVERLAY } from '../../theme.js'
 
-// The panel and buttons sit inside the photo card, so their corners follow its curve: card radius minus the inset.
-const RADIUS = `calc(${CARD_RADIUS} - ${OVERLAY.inset}px)`
 const ROW_PX = OVERLAY.row
 const MAX_WIDTH = 560 // tablets and phones held sideways: a readable width, centred, instead of the whole screen
 

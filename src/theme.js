@@ -144,18 +144,23 @@ export const COMPACT = `@media ${COMPACT_QUERY}`
 
 // The details panel over the photo on compact screens: its inset from the card's edge, and its header and button rows.
 export const OVERLAY = { inset: 8, row: 48, gap: 8 }
+// The photo, panel and buttons sit inside the photo card, so their corners follow its curve: card radius minus the inset.
+export const INNER_RADIUS = `calc(${CARD_RADIUS} - ${OVERLAY.inset}px)`
 // The closed panel: header row and button row. The photo is centred in the space above it.
 export const OVERLAY_CLOSED_PX = OVERLAY.inset * 2 + OVERLAY.row * 2 + OVERLAY.gap
 // The same inset as the panel on every side, so the photo's edges line up with the panel's.
 export const CLEAR_OF_PANEL = { p: `${OVERLAY.inset}px`, pb: `${OVERLAY_CLOSED_PX}px` } // inside a style's [COMPACT] block
+
+// Phones: a narrow margin around the photo card, so the photo gets more of the screen.
+export const COMPACT_PAGE_PADDING = { p: 1 }
 
 /** The part of a screen below the header bar. It does its own scrolling; position: relative is for ScrollThumb. */
 export const SCREEN_BODY = { position: 'relative', flex: 1, minHeight: 0, width: '100%', overflowY: 'auto', mx: 'auto' }
 
 /** Preview and Summary. Wide screens: photo on the left, details in a 380 px column on the right. Compact: the photo only. */
 export const PHOTO_PAGE = {
-  ...SCREEN_BODY, maxWidth: 1200, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 380px',
-  [COMPACT]: { gridTemplateColumns: 'minmax(0, 1fr)' },
+  ...SCREEN_BODY, maxWidth: 1200, p: 2, gap: 2, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 380px',
+  [COMPACT]: { gridTemplateColumns: 'minmax(0, 1fr)', ...COMPACT_PAGE_PADDING },
 }
 
 // The tallest a photo may be beside a sidebar: the window less the header bar (57 px) and the page's padding (32 px).

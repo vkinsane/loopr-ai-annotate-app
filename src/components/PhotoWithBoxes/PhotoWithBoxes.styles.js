@@ -1,5 +1,5 @@
 import { alpha } from '@mui/material'
-import { BOX_LABEL_TEXT, CARD_RADIUS, COMPACT, INK_OUTLINE, PHOTO_MAX_HEIGHT } from '../../theme.js'
+import { BOX_LABEL_TEXT, CARD_RADIUS, COMPACT, INK_OUTLINE, INNER_RADIUS, PHOTO_MAX_HEIGHT } from '../../theme.js'
 import { percentRect } from '../../utils'
 
 export const styles = {
@@ -7,7 +7,7 @@ export const styles = {
     position: 'relative', aspectRatio: String(ratio), mx: 'auto', alignSelf: 'start', width: `min(100%, ${PHOTO_MAX_HEIGHT} * ${ratio})`,
     overflow: 'hidden', bgcolor: 'brand.carbonRaised', border: 1, borderColor: 'divider', borderRadius: CARD_RADIUS,
     // Compact: the card is the area around the photo (see SummaryScreen), as on Preview and Annotate.
-    [COMPACT]: { alignSelf: 'center', width: `min(100%, 100cqh * ${ratio})`, border: 0, borderRadius: 0 },
+    [COMPACT]: { alignSelf: 'center', width: `min(100%, 100cqh * ${ratio})`, border: 0, borderRadius: INNER_RADIUS },
   }),
   photo: { display: 'block', width: '100%', height: '100%' },
   box: (rect, size) => ({

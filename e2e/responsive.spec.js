@@ -168,7 +168,7 @@ for (const [name, [width, height]] of Object.entries({ 'phone held sideways': SI
 
     test('the details sit over the photo, as on a phone', async ({ page }) => {
       await openPreview(page, { width: 900, height: 1200 })
-      const card = await photoImage(page).boundingBox()
+      const card = await photoImage(page).locator('..').boundingBox() // the card around the photo
       const annotateButton = await page.getByRole('button', { name: 'Annotate' }).boundingBox()
       expect(annotateButton.x).toBeGreaterThan(card.x)
       expect(annotateButton.x + annotateButton.width).toBeLessThan(card.x + card.width)

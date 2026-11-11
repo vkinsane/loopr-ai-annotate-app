@@ -1,4 +1,4 @@
-import { COMPACT, SCREEN_BODY, TABLE_HEADER } from '../theme.js'
+import { COMPACT, COMPACT_PAGE_PADDING, SCREEN_BODY, TABLE_HEADER } from '../theme.js'
 
 const MAX_WIDTH = 1200
 
@@ -10,7 +10,7 @@ export const styles = {
     ...SCREEN_BODY, maxWidth: MAX_WIDTH, p: 2, display: 'grid', gap: 2,
     // max-content: the photo card clips its overflow, so an `auto` row could collapse and let the sidebar overlap it.
     gridTemplateColumns: 'minmax(0, 1fr) 370px', gridTemplateRows: 'max-content', alignContent: 'start', gridTemplateAreas: '"photo side"',
-    [COMPACT]: { gridTemplateColumns: 'minmax(0, 1fr)', gridTemplateRows: 'minmax(0, 1fr)', alignContent: 'stretch', gridTemplateAreas: 'none' },
+    [COMPACT]: { gridTemplateColumns: 'minmax(0, 1fr)', gridTemplateRows: 'minmax(0, 1fr)', alignContent: 'stretch', gridTemplateAreas: 'none', ...COMPACT_PAGE_PADDING },
   },
   headerWidth: { maxWidth: MAX_WIDTH },
   qualityPill: { display: { xs: 'none', sm: 'block' } },

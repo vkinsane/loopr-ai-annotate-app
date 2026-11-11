@@ -193,7 +193,7 @@ test('while a name is typed, the pencil becomes a check that finishes it', async
 
 test('full screen view opens and closes on Preview', async ({ page }) => {
   await openPreview(page)
-  await page.getByRole('button', { name: 'Open photo full screen' }).click()
+  await page.getByRole('button', { name: 'Expand photo' }).click()
   const close = page.getByRole('button', { name: /close/i })
   await expect(close).toBeVisible()
   await close.click()

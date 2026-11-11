@@ -3,7 +3,7 @@ import { CARD_RADIUS, CLEAR_OF_PANEL, COMPACT, PHOTO_PAGE } from '../theme.js'
 // One window tall, like Annotate: the photo shrinks to fit and the list scrolls inside.
 // Wide screens: photo on the left, details and actions on the right. Compact: the details sit over the photo.
 export const styles = {
-  root: { ...PHOTO_PAGE, p: 2, gap: 2, gridTemplateRows: 'minmax(0, 1fr)' },
+  root: { ...PHOTO_PAGE, gridTemplateRows: 'minmax(0, 1fr)' },
   // Wide screens: no box of its own; the photo is the card.
   // Compact: the card fills the screen and is a size container, so the photo is the largest of its shape that fits,
   // centred in the part above the closed panel.

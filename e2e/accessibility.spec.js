@@ -87,7 +87,7 @@ test('a box can be renamed and deleted from the keyboard', async ({ page }) => {
 
 test('the info tooltip opens with the keyboard', async ({ page }) => {
   await openPreview(page, { width: 1000, height: 800 })
-  await page.getByRole('button', { name: 'Open photo full screen' }).focus()
+  await page.getByRole('button', { name: 'Expand photo' }).focus()
   await page.keyboard.press('Tab')
   expect(await focusedName(page)).toBe('More information')
   await expect(page.getByRole('tooltip')).toBeVisible()

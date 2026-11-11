@@ -29,6 +29,7 @@ export default function PreviewScreen({ photo, quality, boxCount, onRetake, onAn
   const short = useMediaQuery(SHORT_QUERY, { noSsr: true })
   const [detailsOpen, setDetailsOpen] = useState(!short)
   const measured = quality && !quality.failed ? quality : null
+  const ratio = measured && measured.width / measured.height
   const summary = quality?.failed ? MEASURE_FAILED : measured && gradePhoto({ bytes: photo.blob.size, ...measured })
   const poor = summary?.grade === 'poor'
 
@@ -66,15 +67,15 @@ export default function PreviewScreen({ photo, quality, boxCount, onRetake, onAn
     <ScreenLayout title={TITLE} headerSx={styles.headerWidth}>
       <Box component="main" sx={styles.root}>
         <ScrollThumb />
-        <Box sx={styles.photoFrame(measured && measured.width / measured.height)}>
-          <Box component="img" src={photo.url} alt="Captured photo" sx={styles.photo} />
+        <Box sx={styles.photoFrame(ratio)}>
+          <Box component="img" src={photo.url} alt="Captured photo" sx={styles.photo(ratio)} />
           {measured && (
             <Box sx={styles.photoTools}>
               <Button startIcon={<CropRotate />} onClick={() => (boxCount > 0 ? setConfirming('edit') : setEditing(true))} sx={styles.photoTool}>
                 Edit
               </Button>
-              <Button aria-label="Open photo full screen" startIcon={<OpenInFull />} onClick={() => setZooming(true)} sx={styles.photoTool}>
-                Full screen
+              <Button aria-label="Expand photo" startIcon={<OpenInFull />} onClick={() => setZooming(true)} sx={styles.photoTool}>
+                Expand
               </Button>
             </Box>
           )}

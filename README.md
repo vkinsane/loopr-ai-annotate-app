@@ -13,7 +13,7 @@ A mobile-first web app for visual inspection: take a photo, check its quality, a
 
 ### Mobile
 
-<!-- Add the mobile screen recording here -->
+- [Watch the mobile demo](https://drive.google.com/file/d/1bcFdxtKgmOIa0k1NVfS2l8C6WmcPGFDt/view?usp=sharing)
 
 ## Run it locally
 

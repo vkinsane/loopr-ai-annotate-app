@@ -1,5 +1,5 @@
 import { alpha } from '@mui/material'
-import { BOX_LABEL_TEXT, CARD_RADIUS, CLEAR_OF_PANEL, COMPACT, INK_OUTLINE, ON_PHOTO, PHOTO_MAX_HEIGHT } from '../../theme.js'
+import { BOX_LABEL_TEXT, CARD_RADIUS, CLEAR_OF_PANEL, COMPACT, INK_OUTLINE, INNER_RADIUS, ON_PHOTO, PHOTO_MAX_HEIGHT } from '../../theme.js'
 import { percentRect } from '../../utils'
 
 // Selected and draft boxes use the brand indigo. Other boxes are lime with a navy outline so they show on any paint colour.
@@ -24,7 +24,7 @@ export const styles = {
   // Largest box with the photo's shape that fits: full width, capped by the height.
   frame: (ratio, moving) => ({
     position: 'relative', aspectRatio: String(ratio), mx: 'auto', overflow: 'hidden',
-    width: `min(100%, ${PHOTO_HEIGHT} * ${ratio})`, [COMPACT]: { width: `min(100%, 100cqh * ${ratio})` },
+    width: `min(100%, ${PHOTO_HEIGHT} * ${ratio})`, [COMPACT]: { width: `min(100%, 100cqh * ${ratio})`, borderRadius: INNER_RADIUS },
     userSelect: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none', touchAction: 'none', cursor: moving ? 'grab' : 'auto',
   }),
   photo: { display: 'block', width: '100%', height: '100%', pointerEvents: 'none' },
