@@ -13,10 +13,6 @@ A mobile-first web app for visual inspection: take a photo, check its quality, a
 
 ## Screenshots
 
-**Camera blocked (mobile)**: clear steps to fix it, or choose a photo instead
-
-<img src="docs/screenshots/camera-blocked.png" alt="Camera access is blocked screen with three steps to allow the camera, and Try again and Choose a photo instead buttons" width="300">
-
 **Edit photo**: turn, flip and crop before annotating
 
 ![Edit photo screen: the photo with crop corners, and Left, Right, Flip and Reset buttons below it](docs/screenshots/edit-photo.png)
@@ -28,6 +24,10 @@ A mobile-first web app for visual inspection: take a photo, check its quality, a
 **Annotate (desktop)**
 
 ![Annotate screen on desktop: three named boxes on a factory photo, with the annotation list and photo quality beside it](docs/screenshots/annotate-desktop.png)
+
+**Camera blocked (mobile)**: clear steps to fix it, or choose a photo instead
+
+<img src="docs/screenshots/camera-blocked.png" alt="Camera access is blocked screen with three steps to allow the camera, and Try again and Choose a photo instead buttons" width="300">
 
 ## Run it locally
 
