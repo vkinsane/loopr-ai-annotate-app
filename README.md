@@ -5,6 +5,16 @@ A mobile-first web app for visual inspection: take a photo, check its quality, a
 - **Live app:** [Open Loopr Annotate](https://painfully-legal-viper.ngrok-free.app/)
 - **Flow:** Landing → Camera permission → Capture → Preview & quality → Annotate → Summary
 
+## Demos
+
+### Desktop
+
+<!-- Add the desktop screen recording here -->
+
+### Mobile
+
+<!-- Add the mobile screen recording here -->
+
 ## Run it locally
 
 Needs Node.js 22.12+.
